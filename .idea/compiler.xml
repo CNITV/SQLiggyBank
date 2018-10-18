@@ -6,8 +6,13 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="SQLiggyBank" />
+        <module name="database" />
+        <module name="main" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="main" target="1.8" />
+      <module name="mainmodule" target="1.8" />
+    </bytecodeTargetLevel>
   </component>
 </project>
