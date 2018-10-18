@@ -10,8 +10,8 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>main</module>
-        <module>database</module>
+        <module>client</module>
+        <module>server</module>
     </modules>
 
     <properties>

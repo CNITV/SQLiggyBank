@@ -4,7 +4,7 @@ public class Main {
 
         System.out.println("running");
 
-        Database.hello();
+		Server.hello();
 
     }
 
