@@ -1,0 +1,1118 @@
+{
+  "info": {
+    "_postman_id": "07aec06e-abcc-4c8c-957e-9752a07cb32f",
+    "name": "SQLiggyBank",
+    "description": "SQLiggyBank este o aplicatie cross-platform pentru a amenaja \"piggy-bank-uri\" virtuale de orice fel, fie de catre o clasa sau o familie. Proiectul foloseste un server, client si o baza de date PostgreSQL.\n\n**Atentie!**\n\nVariabilele incluse in aceasta documentatie nu sunt functionale in produsul final, dar sunt un bun exemplu pentru folosirea acestui API.\n\nJWT sunt Java Web Tokens, le puteti viziona neencriptat pe site-ul [jwt.io](https://jwt.io)\n\nSecretul pentru HMACSHA256 JWT incluse in aceasta documentatie este \"SQLiggyBank-JWT-Secret\". Puteti folosi acest secret pe site-ul mentionat pentru a viziona JWT neencriptate.\n\nRestul documentatiei se va scrie in engleza pentru a se conforma cu uniformitatea limbajului din proiectul de pe GitHub.\n\n[Vizitati-ne!](https://github.com/CNITV/SQLiggyBank)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "API",
+      "item": [
+        {
+          "name": "Users",
+          "item": [
+            {
+              "name": "User Profile",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": ""
+                },
+                "url": {
+                  "raw": "sqliggybank.lbi.ro/api/users/{{username}}",
+                  "host": [
+                    "sqliggybank",
+                    "lbi",
+                    "ro"
+                  ],
+                  "path": [
+                    "api",
+                    "users",
+                    "{{username}}"
+                  ]
+                },
+                "description": "This request returns the user information for any user that is publicly available."
+              },
+              "response": []
+            },
+            {
+              "name": "User Profile (Authed)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{AuthedJWT}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": ""
+                },
+                "url": {
+                  "raw": "sqliggybank.lbi.ro/api/users/{{username}}",
+                  "host": [
+                    "sqliggybank",
+                    "lbi",
+                    "ro"
+                  ],
+                  "path": [
+                    "api",
+                    "users",
+                    "{{username}}"
+                  ]
+                },
+                "description": "Returns the publicly available user profile information for anyone. If the authenticated user attempts to access their own information, this endpoint returns all private user information as well."
+              },
+              "response": []
+            },
+            {
+              "name": "User Register",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "description": "The user must be a JSON object.",
+                    "key": "Content-Type",
+                    "name": "Content-Type",
+                    "type": "text",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n\t\"username\": \"{{username}}\",\n\t\"password\": \"{{password}}\",\n\t\"first_name\": \"{{first_name}}\",\n\t\"last_name\": \"{{last_name}}\",\n\t\"email\": \"{{email}}\"\n}"
+                },
+                "url": {
+                  "raw": "sqliggybank.lbi.ro/api/users/new",
+                  "host": [
+                    "sqliggybank",
+                    "lbi",
+                    "ro"
+                  ],
+                  "path": [
+                    "api",
+                    "users",
+                    "new"
+                  ]
+                },
+                "description": "Registers a user according to specific JSON schema. If schema is invalid, request is rejected. If accepted, success is returned."
+              },
+              "response": []
+            },
+            {
+              "name": "User Authentication",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "name": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n\t\"username\": \"{{username}}\",\n\t\"password\": \"{{password}}\"\n}"
+                },
+                "url": {
+                  "raw": "sqliggybank.lbi.ro/api/users/login",
+                  "host": [
+                    "sqliggybank",
+                    "lbi",
+                    "ro"
+                  ],
+                  "path": [
+                    "api",
+                    "users",
+                    "login"
+                  ]
+                },
+                "description": "Takes a username and password JSON object. Returns a JWT if successful."
+              },
+              "response": []
+            },
+            {
+              "name": "Edit User Information",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{AuthedJWT}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "name": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n\t\"username\": \"{{username}}\",\n\t\"password\": \"ANewPassword\",\n\t\"first_name\": \"{{first_name}}\",\n\t\"last_name\": \"{{last_name}}\",\n\t\"email\": \"{{email}}\"\n}"
+                },
+                "url": {
+                  "raw": "sqliggybank.lbi.ro/api/users/{{username}}",
+                  "host": [
+                    "sqliggybank",
+                    "lbi",
+                    "ro"
+                  ],
+                  "path": [
+                    "api",
+                    "users",
+                    "{{username}}"
+                  ]
+                },
+                "description": "Patches any changes to user information. Requires authentication. Returns a refreshed JWT for the new user in case username or password were changed."
+              },
+              "response": []
+            },
+            {
+              "name": "Delete User",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{AuthedJWT}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": ""
+                },
+                "url": {
+                  "raw": "sqliggybank.lbi.ro/api/users/{{username}}",
+                  "host": [
+                    "sqliggybank",
+                    "lbi",
+                    "ro"
+                  ],
+                  "path": [
+                    "api",
+                    "users",
+                    "{{username}}"
+                  ]
+                },
+                "description": "This request deletes an user. You must be authenticated with the user you are trying to delete to do this. The account can never be recovered after the deletion."
+              },
+              "response": []
+            }
+          ],
+          "description": "A user is a member of the SQLiggyBank website.\nAll users are public, but not all their personal information is.",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "e5d4ec99-74f3-46a7-8ecc-377903dc4d47",
+                "type": "text/javascript",
+                "exec": [
+                  ""
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "id": "db570699-b61f-45ec-bf8f-9bbb7d646d89",
+                "type": "text/javascript",
+                "exec": [
+                  ""
+                ]
+              }
+            }
+          ],
+          "_postman_isSubFolder": true
+        },
+        {
+          "name": "Groups",
+          "item": [
+            {
+              "name": "Group Information",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": ""
+                },
+                "url": {
+                  "raw": "sqliggybank.lbi.ro/api/groups/{{testGroupName}}",
+                  "host": [
+                    "sqliggybank",
+                    "lbi",
+                    "ro"
+                  ],
+                  "path": [
+                    "api",
+                    "groups",
+                    "{{testGroupName}}"
+                  ]
+                },
+                "description": "Returns publicly-available group information. If group is private, the request returns a Not Authorized status code."
+              },
+              "response": []
+            },
+            {
+              "name": "Group Information (Authed)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{AuthedJWT}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": ""
+                },
+                "url": {
+                  "raw": "sqliggybank.lbi.ro/api/groups/{{testGroupName}}",
+                  "host": [
+                    "sqliggybank",
+                    "lbi",
+                    "ro"
+                  ],
+                  "path": [
+                    "api",
+                    "groups",
+                    "{{testGroupName}}"
+                  ]
+                },
+                "description": "Returns group information for authenticated user. If group is private, the request returns a Not Authorized status code, but only if the authenticated user does not belong to the group."
+              },
+              "response": []
+            },
+            {
+              "name": "Group Invite List",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{AuthedJWT}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": ""
+                },
+                "url": {
+                  "raw": "sqliggybank.lbi.ro/api/groups/{{testGroupName}}/invites/",
+                  "host": [
+                    "sqliggybank",
+                    "lbi",
+                    "ro"
+                  ],
+                  "path": [
+                    "api",
+                    "groups",
+                    "{{testGroupName}}",
+                    "invites",
+                    ""
+                  ]
+                },
+                "description": "Gets all the invite link UUID's for specified group. Only the group administrator can do this. Even invite links will be returned, but clearly marked."
+              },
+              "response": []
+            },
+            {
+              "name": "Create Group",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{AuthedJWT}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "name": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n\t\"name\": \"{{testGroupName}}\",\n\t\"description\": \"This is just a test group, this doesn't actually exist, you thought it did? Ha!\"\n}"
+                },
+                "url": {
+                  "raw": "sqliggybank.lbi.ro/api/groups/new",
+                  "host": [
+                    "sqliggybank",
+                    "lbi",
+                    "ro"
+                  ],
+                  "path": [
+                    "api",
+                    "groups",
+                    "new"
+                  ]
+                },
+                "description": "Creates a new group on the user. The request returns an error if group already exists. The client must be authenticated to be able to create a group, in order to assign the client's account as a group administrator."
+              },
+              "response": []
+            },
+            {
+              "name": "Generate Group Invite",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{AuthedJWT}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": ""
+                },
+                "url": {
+                  "raw": "sqliggybank.lbi.ro/api/groups/{{testGroupName}}/invites/new",
+                  "host": [
+                    "sqliggybank",
+                    "lbi",
+                    "ro"
+                  ],
+                  "path": [
+                    "api",
+                    "groups",
+                    "{{testGroupName}}",
+                    "invites",
+                    "new"
+                  ]
+                },
+                "description": "Generates a new group invite link that you can share with anyone. This can only be created by the group administrator. The invite link expires automatically in 24 hours."
+              },
+              "response": []
+            },
+            {
+              "name": "Group Invite",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{AuthedJWT}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": ""
+                },
+                "url": {
+                  "raw": "sqliggybank.lbi.ro/api/groups/invite/{{inviteID}}",
+                  "host": [
+                    "sqliggybank",
+                    "lbi",
+                    "ro"
+                  ],
+                  "path": [
+                    "api",
+                    "groups",
+                    "invite",
+                    "{{inviteID}}"
+                  ]
+                },
+                "description": "Adds authenticated user to group. If client is not authenticated, the endpoint will return a Not Authenticated status code. ALL invite links expire in 24 hours."
+              },
+              "response": []
+            },
+            {
+              "name": "Edit Group Information",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{AuthedJWT}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "name": "Content-Type",
+                    "type": "text",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n\t\"name\": \"{{testGroupName}}\",\n\t\"description\": \"This is just a test group, this doesn't actually exist, you thought it did? Ha! But hey, at least this description is not the original one\"\n}"
+                },
+                "url": {
+                  "raw": "sqliggybank.lbi.ro/api/groups/{{testGroupName}}",
+                  "host": [
+                    "sqliggybank",
+                    "lbi",
+                    "ro"
+                  ],
+                  "path": [
+                    "api",
+                    "groups",
+                    "{{testGroupName}}"
+                  ]
+                },
+                "description": "Patches any changes to group information. Requires authentication as the group administrator."
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Group",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{AuthedJWT}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": ""
+                },
+                "url": {
+                  "raw": "sqliggybank.lbi.ro/api/groups/{{testGroupName}}",
+                  "host": [
+                    "sqliggybank",
+                    "lbi",
+                    "ro"
+                  ],
+                  "path": [
+                    "api",
+                    "groups",
+                    "{{testGroupName}}"
+                  ]
+                },
+                "description": "This request deletes a group. You must be authenticated as the group administrator to do this. The group can never be recovered after the deletion."
+              },
+              "response": []
+            }
+          ],
+          "description": "A group is a, well, group of users that has access to a Piggy Bank.\nGroups can be private or public and have different behaviour depending on the usecase.",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "6b88065c-ecc0-4833-839f-27831b53692f",
+                "type": "text/javascript",
+                "exec": [
+                  ""
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "id": "be38e3ef-e7b6-46fa-be4d-131a097d070e",
+                "type": "text/javascript",
+                "exec": [
+                  ""
+                ]
+              }
+            }
+          ],
+          "_postman_isSubFolder": true
+        },
+        {
+          "name": "User Lists",
+          "item": [
+            {
+              "name": "List for Group",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{adminAuthedJWT}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": ""
+                },
+                "url": {
+                  "raw": "sqliggybank.lbi.ro/api/lists/{{testGroupName}}",
+                  "host": [
+                    "sqliggybank",
+                    "lbi",
+                    "ro"
+                  ],
+                  "path": [
+                    "api",
+                    "lists",
+                    "{{testGroupName}}"
+                  ]
+                },
+                "description": "Gets the user list for a specific group."
+              },
+              "response": []
+            }
+          ],
+          "description": "User Lists are specialized structs that contains arrays of all members of a group.\nThese endpoints are normally hidden and only available for debug purposes for developers.\nOnly collaborators to SQLiggyBank have access to these endpoints.",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "ae60b6fb-0df2-4824-917f-3e85bfdb7b6b",
+                "type": "text/javascript",
+                "exec": [
+                  ""
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "id": "dbc62910-a445-4ab9-9dba-054c0aa8d97c",
+                "type": "text/javascript",
+                "exec": [
+                  ""
+                ]
+              }
+            }
+          ],
+          "_postman_isSubFolder": true
+        },
+        {
+          "name": "Piggy Banks",
+          "item": [
+            {
+              "name": "Piggy Bank Information",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{AuthedJWT}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": ""
+                },
+                "url": {
+                  "raw": "sqliggybank.lbi.ro/api/banks/{{testGroupName}}/{{testBankName}}",
+                  "host": [
+                    "sqliggybank",
+                    "lbi",
+                    "ro"
+                  ],
+                  "path": [
+                    "api",
+                    "banks",
+                    "{{testGroupName}}",
+                    "{{testBankName}}"
+                  ]
+                },
+                "description": "Returns all the information about a piggy-bank. A piggy-bank can only be seen by its group members, so authorization is required."
+              },
+              "response": []
+            },
+            {
+              "name": "Create Piggy Bank",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{AuthedJWT}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "name": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n\t\"name\": \"{{testBankName}}\",\n\t\"description\": \"This is a piggy bank created by some test account. Enjoy stuffing it with money!\"\n}"
+                },
+                "url": {
+                  "raw": "sqliggybank.lbi.ro/api/banks/{{testGroupName}}/new",
+                  "host": [
+                    "sqliggybank",
+                    "lbi",
+                    "ro"
+                  ],
+                  "path": [
+                    "api",
+                    "banks",
+                    "{{testGroupName}}",
+                    "new"
+                  ]
+                },
+                "description": "Creates a new piggy bank. Only the group administrator may do this."
+              },
+              "response": []
+            },
+            {
+              "name": "Edit Piggy Bank Information",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{AuthedJWT}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "name": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n\t\"name\": \"{{testBankName}}\",\n\t\"description\": \"This is a piggy bank created by some test account. Enjoy stuffing it with money! Also, this is a different description than the first one.\"\n}"
+                },
+                "url": {
+                  "raw": "sqliggybank.lbi.ro/api/banks/{{testGroupName}}/{{testBankName}}",
+                  "host": [
+                    "sqliggybank",
+                    "lbi",
+                    "ro"
+                  ],
+                  "path": [
+                    "api",
+                    "banks",
+                    "{{testGroupName}}",
+                    "{{testBankName}}"
+                  ]
+                },
+                "description": "Edit the information regarding a piggy-bank. This can only be done by the group administrator."
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Piggy Bank",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{AuthedJWT}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": ""
+                },
+                "url": {
+                  "raw": "sqliggybank.lbi.ro/api/banks/{{testGroupName}}/{{testBankName}}",
+                  "host": [
+                    "sqliggybank",
+                    "lbi",
+                    "ro"
+                  ],
+                  "path": [
+                    "api",
+                    "banks",
+                    "{{testGroupName}}",
+                    "{{testBankName}}"
+                  ]
+                },
+                "description": "Deletes a piggy bank. You must be the group administrator to do this."
+              },
+              "response": []
+            }
+          ],
+          "description": "Piggy Banks description.",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "b3a859d5-e132-445e-9a42-1fefe8960a67",
+                "type": "text/javascript",
+                "exec": [
+                  ""
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "id": "bc8efc44-6520-45cf-b8e5-b6cb505525c9",
+                "type": "text/javascript",
+                "exec": [
+                  ""
+                ]
+              }
+            }
+          ],
+          "_postman_isSubFolder": true
+        },
+        {
+          "name": "Transactions",
+          "item": [
+            {
+              "name": "Transaction Information",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{AuthedJWT}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": ""
+                },
+                "url": {
+                  "raw": "sqliggybank.lbi.ro/api/transactions/{{testGroupName}}/{{testBankName}}/{{testTransactionID}}",
+                  "host": [
+                    "sqliggybank",
+                    "lbi",
+                    "ro"
+                  ],
+                  "path": [
+                    "api",
+                    "transactions",
+                    "{{testGroupName}}",
+                    "{{testBankName}}",
+                    "{{testTransactionID}}"
+                  ]
+                },
+                "description": "Read the transaction information for the specified ID. The UUID must be memorised to read the transaction. Any group member can get this information."
+              },
+              "response": []
+            },
+            {
+              "name": "Add Transaction",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{AuthedJWT}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "name": "Content-Type",
+                    "type": "text",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n\t\"amount\": \"150\",\n\t\"payee\": \"SomePayee\",\n\t\"description\": \"This is a test of the transaction system. SomePayee adds 150 currency to the piggy bank.\",\n\t\"tags\": \"fun, test, transaction, tutorial, API\"\n}"
+                },
+                "url": {
+                  "raw": "sqliggybank.lbi.ro/api/transactions/{{testGroupName}}/{{testBankName}}/new",
+                  "host": [
+                    "sqliggybank",
+                    "lbi",
+                    "ro"
+                  ],
+                  "path": [
+                    "api",
+                    "transactions",
+                    "{{testGroupName}}",
+                    "{{testBankName}}",
+                    "new"
+                  ]
+                },
+                "description": "Add a transaction to the piggy bank. This can only be done by the group administrator.\n\nAll transactions are immutable. Once sent, they cannot be changed at all."
+              },
+              "response": []
+            }
+          ],
+          "description": "Transactions description.",
+          "_postman_isSubFolder": true
+        },
+        {
+          "name": "Goals",
+          "item": [
+            {
+              "name": "Goal Information",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{AuthedJWT}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": ""
+                },
+                "url": {
+                  "raw": "sqliggybank.lbi.ro/api/goals/{{testGroupName}}/{{testBankName}}/{{testGoalName}}",
+                  "host": [
+                    "sqliggybank",
+                    "lbi",
+                    "ro"
+                  ],
+                  "path": [
+                    "api",
+                    "goals",
+                    "{{testGroupName}}",
+                    "{{testBankName}}",
+                    "{{testGoalName}}"
+                  ]
+                },
+                "description": "Read the goal information. Any group member can get this information."
+              },
+              "response": []
+            },
+            {
+              "name": "Add Goal",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{AuthedJWT}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "name": "Content-Type",
+                    "type": "text",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n\t\"name\": \"{{testGoalName}}\",\n\t\"description\": \"So guys, we did it. We reached a quarter of the work for this project. Over 25% of the SQLiggyBank project is now complete. Let's add some money to this piggy bank just for the occasion!\",\n\t\"target_amount\": 250,\n\t\"deadline\": \"Tue, 30 Oct 2018 07:00:00 +0000\"\n}"
+                },
+                "url": {
+                  "raw": "sqliggybank.lbi.ro/api/goals/{{testGroupName}}/{{testBankName}}/new",
+                  "host": [
+                    "sqliggybank",
+                    "lbi",
+                    "ro"
+                  ],
+                  "path": [
+                    "api",
+                    "goals",
+                    "{{testGroupName}}",
+                    "{{testBankName}}",
+                    "new"
+                  ]
+                },
+                "description": "Add a goal to the piggy bank. This can only be done by the group administrator."
+              },
+              "response": []
+            },
+            {
+              "name": "Edit Goal Information",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{AuthedJWT}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "name": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n\t\"name\": \"{{testGoalName}}\",\n\t\"description\": \"So guys, we did it. We reached a quarter of the work for this project. Over 25% of the SQLiggyBank project is now complete. Let's add EVEN MORE money to this piggy bank just for the occasion!\"\n}"
+                },
+                "url": {
+                  "raw": "sqliggybank.lbi.ro/api/banks/{{testGroupName}}/{{testBankName}}",
+                  "host": [
+                    "sqliggybank",
+                    "lbi",
+                    "ro"
+                  ],
+                  "path": [
+                    "api",
+                    "banks",
+                    "{{testGroupName}}",
+                    "{{testBankName}}"
+                  ]
+                },
+                "description": "Edit the information regarding a goal. This can only be done by the group administrator."
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Goal",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{AuthedJWT}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": ""
+                },
+                "url": {
+                  "raw": "sqliggybank.lbi.ro/api/banks/{{testGroupName}}/{{testBankName}}",
+                  "host": [
+                    "sqliggybank",
+                    "lbi",
+                    "ro"
+                  ],
+                  "path": [
+                    "api",
+                    "banks",
+                    "{{testGroupName}}",
+                    "{{testBankName}}"
+                  ]
+                },
+                "description": "Deletes a goal. You must be the group administrator to do this."
+              },
+              "response": []
+            }
+          ],
+          "description": "Goals description.",
+          "_postman_isSubFolder": true
+        }
+      ],
+      "description": "This folder contains all the API endpoints of SQLiggyBank. All HTML endpoints will be linked without the \"/api\" prefix."
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "id": "c465a051-a870-42c6-a42d-e1c570efa521",
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "id": "22ccfadb-4a6f-437a-b234-f7fa7e794dda",
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ]
+}
