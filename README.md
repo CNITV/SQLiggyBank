@@ -7,3 +7,6 @@ SQLiggyBank este o aplicatie cross-platform pentru a amenaja un fond al clasei c
 
 Proiectul foloseste un server, client si o baza de date PostgreSQL.
 
+## Documentatie API
+
+Pentru a viziona documentatia API-ului SQLiggyBank, il puteti accesa pe Postman [aici](https://documenter.getpostman.com/view/3806934/RWgwRFa8).
