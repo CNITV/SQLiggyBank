@@ -7,7 +7,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import view.main_menu.MainMenu;
+import view.login.LoginMenu;
 
 import java.io.IOException;
 
@@ -39,7 +39,7 @@ public class Main extends Application implements WindowManager {
      * first calls the init method {@link Application#init()} to initialize the program and then calls this method
      * (start) to actually run the program.
      * <p>
-     * This method then calls {@link #mainMenu()}.
+     * This method then calls {@link #loginMenu()}.
      * <p>
      * When the program finishes execution, the Application class calls the  method {@link Application#stop()} in
      * order to close a connection.
@@ -54,27 +54,30 @@ public class Main extends Application implements WindowManager {
         stage.setScene(new Scene(new Group(), win_width, win_height));
         stage.setResizable(false);
 
-        mainMenu();
+        loginMenu();
     }
 
     /**
-     * This method represents the main menu for the application. It implements the {@link WindowManager#mainMenu()
-     * mainMenu} method.
+     * This method represents the login menu for the application. It implements the {@link WindowManager#loginMenu()
+     * loginMenu} method.
+     *
+     * @see WindowManager#loginMenu()
      */
     @Override
-    public void mainMenu() {
+    public void loginMenu() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/MainMenu.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/LoginMenu/LoginMenu.fxml"));
             loader.setControllerFactory(
-                    c -> new MainMenu(this)
+                    c -> new LoginMenu(this)
             );
             Parent root = loader.load();
 
-            stage.setTitle(app_name + " - Main menu");
+            stage.setTitle(app_name + " - Login");
             stage.getScene().setRoot(root);
             stage.show();
         } catch (IOException exception) {
             /*
+            TODO
                 log the exception
                 exception.printStackTrace();
                 Platform.exit();

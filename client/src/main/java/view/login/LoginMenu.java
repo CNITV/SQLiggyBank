@@ -1,18 +1,18 @@
-package view.main_menu;
+package view.login;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import view.WindowManager;
 
-public class MainMenu {
+public class LoginMenu {
 
     private WindowManager windowManager;
 
     @FXML
     private Button button;
 
-    public MainMenu(WindowManager windowManager) {
+    public LoginMenu(WindowManager windowManager) {
         this.windowManager = windowManager;
     }
 
