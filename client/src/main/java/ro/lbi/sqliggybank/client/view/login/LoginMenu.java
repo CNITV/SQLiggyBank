@@ -1,6 +1,6 @@
-package view.login;
+package ro.lbi.sqliggybank.client.view.login;
 
-import view.WindowManager;
+import ro.lbi.sqliggybank.client.view.WindowManager;
 
 public class LoginMenu {
 
