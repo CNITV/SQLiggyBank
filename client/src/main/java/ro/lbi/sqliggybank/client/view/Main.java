@@ -1,4 +1,4 @@
-package view;
+package ro.lbi.sqliggybank.client.view;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -7,7 +7,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import view.login.LoginMenu;
+import ro.lbi.sqliggybank.client.view.login.LoginMenu;
 
 import java.io.IOException;
 
@@ -66,7 +66,7 @@ public class Main extends Application implements WindowManager {
     @Override
     public void loginMenu() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/LoginMenu/LoginMenu.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/ro/lbi/sqliggybank/client/views/LoginMenu/LoginMenu.fxml"));
             loader.setControllerFactory(
                     c -> new LoginMenu(this)
             );

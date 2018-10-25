@@ -1,4 +1,4 @@
-package view;
+package ro.lbi.sqliggybank.client.view;
 
 /**
  * This is just an interface for the windows that need to be implemented in the application.
