@@ -24,8 +24,8 @@ import java.io.IOException;
  */
 public class Main extends Application implements WindowManager {
 
-    private static int win_width = 800;
-    private static int win_height = 600;
+    private static int win_width = 1280;
+    private static int win_height = 720;
 
     /*
      *  TODO change the name of the application, this is just a placeholder
@@ -52,7 +52,7 @@ public class Main extends Application implements WindowManager {
     public void start(Stage primaryStage) {
         stage = primaryStage;
         stage.setScene(new Scene(new Group(), win_width, win_height));
-        stage.setResizable(false);
+        stage.setResizable(true);
 
         loginMenu();
     }

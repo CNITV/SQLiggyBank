@@ -2,39 +2,23 @@
 
 <?import javafx.geometry.*?>
 <?import javafx.scene.text.*?>
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
+<?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="view.login.LoginMenu">
-   <center>
-      <VBox prefHeight="192.0" prefWidth="400.0" BorderPane.alignment="CENTER">
-         <children>
-            <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="233.0" prefWidth="452.0" text="SQLiggyBank" textAlignment="CENTER" textOverrun="CENTER_ELLIPSIS">
-               <font>
-                  <Font name="Arial" size="36.0" />
-               </font>
-            </Label>
-            <Button fx:id="button" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#buttonPressed" prefHeight="113.0" prefWidth="200.0" text="Button">
-               <VBox.margin>
-                  <Insets left="100.0" />
-               </VBox.margin>
-            </Button>
-         </children>
-      </VBox>
-   </center>
-   <top>
-      <VBox prefHeight="102.0" prefWidth="600.0" BorderPane.alignment="CENTER" />
-   </top>
-   <left>
-      <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER" />
-   </left>
-   <right>
-      <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER" />
-   </right>
-   <bottom>
-      <VBox prefHeight="81.0" prefWidth="600.0" BorderPane.alignment="CENTER" />
-   </bottom>
-</BorderPane>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="view.login.LoginMenu">
+   <children>
+      <Label text="Hello world!">
+         <font>
+            <Font size="150.0" />
+         </font>
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+         <padding>
+            <Insets left="250.0" top="250.0" />
+         </padding>
+      </Label>
+   </children>
+</AnchorPane>
