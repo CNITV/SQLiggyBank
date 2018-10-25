@@ -53,6 +53,8 @@ public class Main extends Application implements WindowManager {
         stage = primaryStage;
         stage.setScene(new Scene(new Group(), win_width, win_height));
         stage.setResizable(true);
+        stage.setMinWidth(win_width);
+        stage.setMinHeight(win_height);
 
         loginMenu();
     }
