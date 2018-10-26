@@ -36,7 +36,6 @@ public class Main extends Application implements WindowManager {
 
     /**
      * The application name.
-     * TODO change this to something more suitable once we come up with a good name.
      */
     private static String app_name = "SQLiggyBank";
 
@@ -87,7 +86,7 @@ public class Main extends Application implements WindowManager {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/ro/lbi/sqliggybank/client/views/LoginMenu/LoginMenu.fxml"));
             loader.setControllerFactory(
-                    c -> new LoginMenu(this)
+                    c -> new LoginMenu(this, getHostServices())
             );
             Parent root = loader.load();
 
@@ -105,8 +104,13 @@ public class Main extends Application implements WindowManager {
     }
 
     /**
-     * Main function that the JVM calls. It is not actually used for anything. It's main purpose is just calling
-     * the {@link #start(Stage) start} method.
+     * Main function of the application.
+     * <p>
+     * It is not actually used for anything. This method is only here because some IDEs don't fully support
+     * JavaFX. Running the program from the command-line should correctly call the method
+     * {@link javafx.application.Application#launch(String...) launch}.
+     * <p>
+     * This method's only purpose is to call the {@link #start(Stage) start} method.
      *
      * @param args the command line arguments for the program.
      */
