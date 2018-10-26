@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import javafx.geometry.*?>
 <?import javafx.scene.text.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
@@ -17,7 +15,6 @@
             </Label>
             <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: green;">
                <children>
-                  <HBox alignment="CENTER" minWidth="100.0" prefHeight="100.0" prefWidth="350.0" />
                   <VBox prefHeight="100.0" prefWidth="188.0">
                      <children>
                         <Label prefHeight="50.0" prefWidth="182.0" text="Username:">
@@ -38,7 +35,21 @@
                         <TextField fx:id="passwordTextField" prefHeight="50.0" />
                      </children>
                   </VBox>
-                  <HBox prefHeight="100.0" prefWidth="350.0" />
+               </children>
+            </HBox>
+            <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: yellow;">
+               <children>
+                  <Button fx:id="loginButton" mnemonicParsing="false" onAction="#loginButtonPressed" prefHeight="50.0" prefWidth="150.0" text="Login">
+                     <font>
+                        <Font name="Arial" size="23.0" />
+                     </font>
+                  </Button>
+                  <HBox prefHeight="100.0" prefWidth="50.0" />
+                  <Button fx:id="registerButton" contentDisplay="CENTER" mnemonicParsing="false" onAction="#registerButtonPressed" prefHeight="50.0" prefWidth="150.0" text="Register">
+                     <font>
+                        <Font name="Arial" size="23.0" />
+                     </font>
+                  </Button>
                </children>
             </HBox>
          </children>

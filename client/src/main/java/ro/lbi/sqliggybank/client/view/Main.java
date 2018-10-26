@@ -13,7 +13,7 @@ import java.io.IOException;
 
 /**
  * This class is the starting point for the program. The application uses JavaFX in order to build the GUI. It
- * implements the {@link WindowManager WindowManager} interface.
+ * implements the {@link ro.lbi.sqliggybank.client.view.WindowManager WindowManager} interface.
  *
  * @see javafx.application.Application
  *
@@ -24,14 +24,25 @@ import java.io.IOException;
  */
 public class Main extends Application implements WindowManager {
 
+    /**
+     * The application window width.
+     */
     private static int win_width = 1280;
+
+    /**
+     * The application window height.
+     */
     private static int win_height = 720;
 
-    /*
-     *  TODO change the name of the application, this is just a placeholder
+    /**
+     * The application name.
+     * TODO change this to something more suitable once we come up with a good name.
      */
     private static String app_name = "SQLiggyBank";
 
+    /**
+     * The primary stage for the application.
+     */
     private Stage stage;
 
     /**
@@ -43,6 +54,9 @@ public class Main extends Application implements WindowManager {
      * <p>
      * When the program finishes execution, the Application class calls the  method {@link Application#stop()} in
      * order to close a connection.
+     * <p>
+     * The application window minimum width is set {@link #win_width} and the minimum height is set
+     * to {@link #win_height}.
      *
      * @see javafx.application.Application#start(Stage)
      *
@@ -62,6 +76,9 @@ public class Main extends Application implements WindowManager {
     /**
      * This method represents the login menu for the application. It implements the {@link WindowManager#loginMenu()
      * loginMenu} method.
+     * <p>
+     * It gives the user two options to choose from: either log in with an existing username/password combination or
+     * create a new account.
      *
      * @see WindowManager#loginMenu()
      */
