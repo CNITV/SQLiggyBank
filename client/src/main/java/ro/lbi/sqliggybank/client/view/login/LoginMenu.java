@@ -20,7 +20,8 @@ import ro.lbi.sqliggybank.client.view.WindowManager;
 public class LoginMenu {
 
     /**
-     * This is the {@link WindowManager window manager} property that helps the program switch between views.
+     * This is the {@link ro.lbi.sqliggybank.client.view.WindowManager window manager} property that helps
+     * the program switch between views.
      *
      * @see ro.lbi.sqliggybank.client.view.WindowManager
      */
@@ -57,7 +58,8 @@ public class LoginMenu {
     }
 
     /**
-     * This is the default constructor. It takes a {@link WindowManager window manager} as a parameter.
+     * This is the default constructor. It takes a {@link ro.lbi.sqliggybank.client.view.WindowManager
+     * window manager} as a parameter.
      *
      * @param windowManager the window manager passed by the calling function.
      * @param hostServices the host services passed by the calling function.

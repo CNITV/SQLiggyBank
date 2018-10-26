@@ -25,12 +25,12 @@ import java.io.IOException;
 public class Main extends Application implements WindowManager {
 
     /**
-     * The application window width.
+     * The preferred application window width.
      */
     private static int win_width = 1280;
 
     /**
-     * The application window height.
+     * The preferred application window height.
      */
     private static int win_height = 720;
 
@@ -46,15 +46,15 @@ public class Main extends Application implements WindowManager {
 
     /**
      * This is the starting point for the application. The {@link javafx.application.Application Application} class
-     * first calls the init method {@link Application#init()} to initialize the program and then calls this method
-     * (start) to actually run the program.
+     * first calls the init method {@link javafx.application.Application#init()} to initialize the program and then
+     * calls this method (start) to actually run the program.
      * <p>
      * This method then calls {@link #loginMenu()}.
      * <p>
-     * When the program finishes execution, the Application class calls the  method {@link Application#stop()} in
-     * order to close a connection.
+     * When the program finishes execution, the Application class calls the method
+     * {@link javafx.application.Application#stop()} in order to close a connection.
      * <p>
-     * The application window minimum width is set {@link #win_width} and the minimum height is set
+     * The application window minimum width is set to {@link #win_width} and the minimum height is set
      * to {@link #win_height}.
      *
      * @see javafx.application.Application#start(Stage)
@@ -73,13 +73,13 @@ public class Main extends Application implements WindowManager {
     }
 
     /**
-     * This method represents the login menu for the application. It implements the {@link WindowManager#loginMenu()
-     * loginMenu} method.
+     * This method represents the login menu for the application. It implements the
+     * {@link ro.lbi.sqliggybank.client.view.WindowManager#loginMenu() loginMenu} method.
      * <p>
      * It gives the user two options to choose from: either log in with an existing username/password combination or
      * create a new account.
      *
-     * @see WindowManager#loginMenu()
+     * @see ro.lbi.sqliggybank.client.view.WindowManager#loginMenu()
      */
     @Override
     public void loginMenu() {

@@ -16,7 +16,7 @@ public interface WindowManager {
      * introduced the right login/password combination. If that's not the case, an error pop-up should be displayed
      * to alert the user that the combination is erroneous.
      * <p>
-     * If the user introduced the right login/password combination, then the programs proceeds to the dashboard menu.
+     * If the user introduced the right login/password combination, then the program proceeds to the dashboard menu.
      */
     void loginMenu();
 
