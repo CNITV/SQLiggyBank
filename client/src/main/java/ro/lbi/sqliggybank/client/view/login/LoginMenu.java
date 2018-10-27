@@ -85,8 +85,9 @@ public class LoginMenu {
      */
     @FXML
     private void loginButtonPressed(ActionEvent event) {
-        System.out.println("Username is: " + usernameTextField.getText());
-        System.out.println("Password is: " + passwordTextField.getText());
+        /*
+        get the username and password and check through the api.
+         */
     }
 
     /**
@@ -98,7 +99,9 @@ public class LoginMenu {
      */
     @FXML
     private void registerButtonPressed(ActionEvent event) {
-        System.out.println("New user: " + usernameTextField.getText() + "/" + passwordTextField.getText());
+        /*
+        redirect user to register screen.
+         */
     }
 
     /**

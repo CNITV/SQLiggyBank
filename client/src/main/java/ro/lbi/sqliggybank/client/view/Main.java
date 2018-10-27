@@ -1,12 +1,16 @@
 package ro.lbi.sqliggybank.client.view;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import ro.lbi.sqliggybank.client.util.Alert;
 import ro.lbi.sqliggybank.client.view.login.LoginMenu;
 
 import java.io.IOException;
@@ -23,6 +27,13 @@ import java.io.IOException;
  *
  */
 public class Main extends Application implements WindowManager {
+
+    /**
+     * This is the default logger for the program view. The framework used is log4j.
+     *
+     * @see org.apache.log4j.Logger
+     */
+    private static final Logger LOGGER = Logger.getLogger(Main.class);
 
     /**
      * The preferred application window width.
@@ -95,11 +106,18 @@ public class Main extends Application implements WindowManager {
             stage.show();
         } catch (IOException exception) {
             /*
-            TODO
-                log the exception
-                exception.printStackTrace();
-                Platform.exit();
-            */
+            This happens whenever the FXML loader can't load for whatever reason the file specified.
+             */
+            LOGGER.log(Level.ERROR, "The FXML loader couldn't load the FXML file." , exception);
+            Alert.showAlert("FXML error", "The FXML loader couldn't load the FXML file.");
+            Platform.exit();
+        } catch (IllegalStateException exception) {
+            /*
+            This happens whenever the FXML file isn't found at the specified path or the file name is wrong.
+             */
+            LOGGER.log(Level.ERROR, "The FXML loader couldn't find the file at the specified path.", exception);
+            Alert.showAlert("FXML error", "The FXML loader couldn't find the file at the specified path.");
+            Platform.exit();
         }
     }
 
