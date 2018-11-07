@@ -6,6 +6,7 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import org.apache.log4j.Logger;
 
 /**
  * This class implements the login controller. It's a lightweight interface for the user, giving him an option to either
@@ -17,6 +18,13 @@ import javafx.stage.Stage;
  *
  */
 public class LoginController {
+
+    /**
+     * This is the default logger for the program view. The framework used is log4j.
+     *
+     * @see org.apache.log4j.Logger
+     */
+    private static final Logger LOGGER = Logger.getLogger(LoginController.class);
 
     /**
      * The username text field.

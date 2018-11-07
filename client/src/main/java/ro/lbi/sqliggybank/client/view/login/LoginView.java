@@ -1,7 +1,11 @@
 package ro.lbi.sqliggybank.client.view.login;
 
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import ro.lbi.sqliggybank.client.util.Alert;
 
 import java.io.IOException;
 
@@ -20,14 +24,40 @@ import java.io.IOException;
 public class LoginView {
 
     /**
+     * This is the default logger for the program view. The framework used is log4j.
+     *
+     * @see org.apache.log4j.Logger
+     */
+    private static final Logger LOGGER = Logger.getLogger(LoginView.class);
+
+    /**
      * Load the FXML login file into the controller and get its view.
      *
      * @return the view of the FXML login file.
-     * @throws IOException in case the FXML loader can't load the file for whatever reason.
      */
-    public Parent getView() throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/ro/lbi/sqliggybank/client/view/login/login.fxml"));
-        return loader.load();
+    public Parent getView() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/ro/lbi/sqliggybank/client/view/login/login.fxml"));
+            return loader.load();
+        } catch (IOException exception) {
+            /*
+            This happens whenever the FXML loader can't load the specified file for whatever reason.
+             */
+            LOGGER.log(Level.ERROR, "The FXML loader couldn't load the FXML file." , exception);
+            Alert.showAlert("FXML error", "The FXML loader couldn't load the FXML file.");
+            Platform.exit();
+        } catch (IllegalStateException exception) {
+            /*
+            This happens whenever the FXML file isn't found at the specified path or the file name is wrong.
+             */
+            LOGGER.log(Level.ERROR, "The FXML loader couldn't find the file at the specified path.", exception);
+            Alert.showAlert("FXML error", "The FXML loader couldn't find the file at the specified path.");
+            Platform.exit();
+        }
+        /*
+        The application should never reach this point. Otherwise there's a bug.
+         */
+        return null;
     }
 
 }

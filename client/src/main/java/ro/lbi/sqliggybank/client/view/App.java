@@ -1,15 +1,11 @@
 package ro.lbi.sqliggybank.client.view;
 
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import ro.lbi.sqliggybank.client.util.Alert;
 import ro.lbi.sqliggybank.client.view.login.LoginView;
 
-import java.io.IOException;
 
 /**
  * This class is the starting point for the program. The application uses JavaFX in order to build the GUI.
@@ -79,26 +75,10 @@ public class App extends Application {
         /*
         Load the login view.
          */
-        try {
-            LoginView loginView = new LoginView();
-            Scene scene = new Scene(loginView.getView(), win_width, win_height);
+        LoginView loginView = new LoginView();
+        Scene scene = new Scene(loginView.getView(), win_width, win_height);
 
-            primaryStage.setScene(scene);
-        } catch (IOException exception) {
-            /*
-            This happens whenever the FXML loader can't load the specified file for whatever reason.
-             */
-            LOGGER.log(Level.ERROR, "The FXML loader couldn't load the FXML file." , exception);
-            Alert.showAlert("FXML error", "The FXML loader couldn't load the FXML file.");
-            Platform.exit();
-        } catch (IllegalStateException exception) {
-            /*
-            This happens whenever the FXML file isn't found at the specified path or the file name is wrong.
-             */
-            LOGGER.log(Level.ERROR, "The FXML loader couldn't find the file at the specified path.", exception);
-            Alert.showAlert("FXML error", "The FXML loader couldn't find the file at the specified path.");
-            Platform.exit();
-        }
+        primaryStage.setScene(scene);
 
         primaryStage.show();
     }
