@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0"
+            prefWidth="1280.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="ro.lbi.sqliggybank.client.view.login.LoginController">
+    <center>
+        <VBox alignment="CENTER" maxHeight="450.0" prefHeight="450.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+            <Label prefHeight="200.0" prefWidth="600.0" text="SQLiggyBank">
+                <font>
+                    <Font name="Arial Italic" size="96.0"/>
+                </font>
+            </Label>
+            <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+                <VBox prefHeight="100.0" prefWidth="188.0">
+                    <Label prefHeight="50.0" prefWidth="182.0" text="Username:">
+                        <font>
+                            <Font name="Arial Bold Italic" size="32.0"/>
+                        </font>
+                    </Label>
+                    <Label prefHeight="50.0" prefWidth="182.0" text="Password:">
+                        <font>
+                            <Font name="Arial Bold Italic" size="32.0"/>
+                        </font>
+                    </Label>
+                </VBox>
+                <VBox prefHeight="100.0" prefWidth="276.0">
+                    <TextField fx:id="usernameTextField" prefHeight="50.0"/>
+                    <TextField fx:id="passwordTextField" prefHeight="50.0"/>
+                </VBox>
+            </HBox>
+            <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+                <Button mnemonicParsing="false" onAction="#loginButtonPressed" prefHeight="50.0" prefWidth="150.0"
+                        text="Login">
+                    <font>
+                        <Font name="Arial" size="23.0"/>
+                    </font>
+                </Button>
+                <HBox prefHeight="100.0" prefWidth="50.0"/>
+                <Button contentDisplay="CENTER" mnemonicParsing="false" onAction="#registerButtonPressed"
+                        prefHeight="50.0" prefWidth="150.0" text="Register">
+                    <font>
+                        <Font name="Arial" size="23.0"/>
+                    </font>
+                </Button>
+            </HBox>
+        </VBox>
+    </center>
+    <top>
+        <HBox prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER"/>
+    </top>
+    <bottom>
+        <HBox alignment="CENTER_RIGHT" prefHeight="150.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+            <VBox alignment="TOP_RIGHT" prefWidth="500.0">
+                <Hyperlink alignment="TOP_LEFT" onAction="#githubURLPressed" prefWidth="200.0" text="Project's Github">
+                    <font>
+                        <Font name="Arial Italic" size="19.0"/>
+                    </font>
+                </Hyperlink>
+                <Hyperlink alignment="TOP_LEFT" onAction="#apiURLPressed" prefWidth="200.0" text="Project's API">
+                    <font>
+                        <Font name="Arial Italic" size="19.0"/>
+                    </font>
+                </Hyperlink>
+                <HBox.margin>
+                    <Insets right="100.0"/>
+                </HBox.margin>
+            </VBox>
+        </HBox>
+    </bottom>
+    <left>
+        <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER"/>
+    </left>
+    <right>
+        <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER"/>
+    </right>
+</BorderPane>
