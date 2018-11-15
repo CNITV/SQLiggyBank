@@ -38,6 +38,7 @@ public class LoginView {
     public Parent getView() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/ro/lbi/sqliggybank/client/view/login/login.fxml"));
+
             return loader.load();
         } catch (IOException exception) {
             /*

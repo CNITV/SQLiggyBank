@@ -5,6 +5,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.apache.log4j.Logger;
 import ro.lbi.sqliggybank.client.view.login.LoginView;
+import ro.lbi.sqliggybank.client.view.window_manager.WindowManagerImpl;
 
 
 /**
@@ -27,19 +28,35 @@ public class App extends Application {
     private static final Logger LOGGER = Logger.getLogger(App.class);
 
     /**
+     * This is the implementation of the window manager.
+     */
+    private static WindowManagerImpl windowManager;
+
+    /**
      * The preferred application window width.
      */
-    private static int win_width = 1280;
+    public static int win_width = 1280;
 
     /**
      * The preferred application window height.
      */
-    private static int win_height = 720;
+    public static int win_height = 720;
 
     /**
      * The application name.
      */
-    private static String app_name = "SQLiggyBank";
+    public static String app_name = "SQLiggyBank";
+
+    /**
+     * The init method. It is called before the {@link #start(Stage) start} method to initialize any dependencies as
+     * necessary.
+     *
+     * @see javafx.application.Application#init()
+     */
+    @Override
+    public void init() {
+        windowManager = new WindowManagerImpl();
+    }
 
     /**
      * This is the starting point for the application. The {@link javafx.application.Application Application} class
@@ -70,17 +87,26 @@ public class App extends Application {
          */
         primaryStage.getProperties().put("hostServices", getHostServices());
 
-        primaryStage.setTitle(app_name + " - Login");
+        /*
+        Set the stage for the window manager.
+         */
+        windowManager.setStage(primaryStage);
 
         /*
-        Load the login view.
+        After the program is done building the dependencies, load the login menu.
          */
-        LoginView loginView = new LoginView();
-        Scene scene = new Scene(loginView.getView(), win_width, win_height);
+        windowManager.loginMenu();
+    }
 
-        primaryStage.setScene(scene);
+    /**
+     * This method is called after the {@link #start(Stage) start} method to close any connection or delete any
+     * dependency as necessary.
+     *
+     * @see javafx.application.Application#stop()
+     */
+    @Override
+    public void stop() {
 
-        primaryStage.show();
     }
 
     /**

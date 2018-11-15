@@ -4,6 +4,7 @@ import javafx.application.HostServices;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import org.apache.log4j.Logger;
@@ -36,7 +37,7 @@ public class LoginController {
      * The password text field.
      */
     @FXML
-    private TextField passwordTextField;
+    private PasswordField passwordField;
 
     /**
      * This method is the default initialize method for an FXML controller class.
@@ -46,7 +47,7 @@ public class LoginController {
     @FXML
     private void initialize() {
         usernameTextField.setPromptText("username");
-        passwordTextField.setPromptText("password");
+        passwordField.setPromptText("password");
     }
 
     /**

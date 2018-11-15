@@ -30,7 +30,7 @@
                 </VBox>
                 <VBox prefHeight="100.0" prefWidth="276.0">
                     <TextField fx:id="usernameTextField" prefHeight="50.0"/>
-                    <TextField fx:id="passwordTextField" prefHeight="50.0"/>
+                    <PasswordField fx:id="passwordField" prefHeight="50.0"/>
                 </VBox>
             </HBox>
             <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
