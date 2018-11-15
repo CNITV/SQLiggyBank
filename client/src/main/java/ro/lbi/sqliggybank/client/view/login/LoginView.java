@@ -6,6 +6,7 @@ import javafx.scene.Parent;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import ro.lbi.sqliggybank.client.util.Alert;
+import ro.lbi.sqliggybank.client.view.window_manager.WindowManager;
 
 import java.io.IOException;
 
@@ -33,13 +34,16 @@ public class LoginView {
     /**
      * Load the FXML login file into the controller and get its view.
      *
+     * @param windowManager the window manager injected into the controller.
      * @return the view of the FXML login file.
      */
-    public Parent getView() {
+    public Parent getView(WindowManager windowManager) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/ro/lbi/sqliggybank/client/view/login/login.fxml"));
+            Parent root = loader.load();
+            ((LoginController)loader.getController()).setWindowManager(windowManager);
 
-            return loader.load();
+            return root;
         } catch (IOException exception) {
             /*
             This happens whenever the FXML loader can't load the specified file for whatever reason.

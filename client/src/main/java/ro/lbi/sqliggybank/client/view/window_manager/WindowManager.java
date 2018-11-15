@@ -10,8 +10,13 @@ package ro.lbi.sqliggybank.client.view.window_manager;
 public interface WindowManager {
 
     /**
-     * This is the login menu function that needs to be overwritten by the class implementing this interface.
+     * This is the login menu method that needs to be overwritten by the class implementing this interface.
      */
     void loginMenu();
+
+    /**
+     * This is the register menu method that needs to be implemented by the class implementing this interface.
+     */
+    void registerMenu();
 
 }

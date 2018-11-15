@@ -5,6 +5,7 @@ import javafx.stage.Stage;
 
 import org.apache.log4j.Logger;
 
+import ro.lbi.sqliggybank.client.view.window_manager.WindowManager;
 import ro.lbi.sqliggybank.client.view.window_manager.WindowManagerImpl;
 
 
@@ -65,8 +66,8 @@ public class App extends Application {
      * first calls the init method {@link javafx.application.Application#init() init} to initialize the program and then
      * calls this method (start) to actually run the program.
      * <p>
-     * This method then calls {@link ro.lbi.sqliggybank.client.view.login.LoginView#getView() getView} to load the
-     * login view.
+     * This method then calls {@link ro.lbi.sqliggybank.client.view.login.LoginView#getView(WindowManager) getView} to
+     * load the login view.
      * <p>
      * When the program finishes execution, the Application class calls the method
      * {@link javafx.application.Application#stop() stop} in order to close any connection with the server.

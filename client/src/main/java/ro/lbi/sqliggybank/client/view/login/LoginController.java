@@ -8,6 +8,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import org.apache.log4j.Logger;
+import ro.lbi.sqliggybank.client.view.window_manager.WindowManager;
 
 /**
  * This class implements the login controller. It's a lightweight interface for the user, giving him an option to either
@@ -28,6 +29,13 @@ public class LoginController {
     private static final Logger LOGGER = Logger.getLogger(LoginController.class);
 
     /**
+     * This is the window manager. This way the controller can switch to other scenes.
+     *
+     * @see ro.lbi.sqliggybank.client.view.window_manager.WindowManager
+     */
+    private WindowManager windowManager;
+
+    /**
      * The username text field.
      */
     @FXML
@@ -38,6 +46,15 @@ public class LoginController {
      */
     @FXML
     private PasswordField passwordField;
+
+    /**
+     * This is the dependency injection of the window manager.
+     *
+     * @see #windowManager
+     */
+    void setWindowManager(WindowManager windowManager) {
+        this.windowManager = windowManager;
+    }
 
     /**
      * This method is the default initialize method for an FXML controller class.
@@ -80,6 +97,7 @@ public class LoginController {
         /*
         redirect user to register screen.
          */
+        windowManager.registerMenu();
     }
 
     /**

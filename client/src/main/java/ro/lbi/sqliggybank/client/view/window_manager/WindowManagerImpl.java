@@ -3,6 +3,7 @@ package ro.lbi.sqliggybank.client.view.window_manager;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import ro.lbi.sqliggybank.client.view.login.LoginView;
+import ro.lbi.sqliggybank.client.view.register.RegisterView;
 
 import static ro.lbi.sqliggybank.client.view.App.app_name;
 import static ro.lbi.sqliggybank.client.view.App.win_height;
@@ -28,7 +29,7 @@ public class WindowManagerImpl implements WindowManager {
     private Stage stage;
 
     /**
-     * This is the injection of the stage.
+     * This is the dependency injection of the stage.
      *
      * @see #stage
      *
@@ -44,13 +45,34 @@ public class WindowManagerImpl implements WindowManager {
      * It loads the login menu view into the application.
      *
      * @see ro.lbi.sqliggybank.client.view.window_manager.WindowManager#loginMenu()
+     * @see ro.lbi.sqliggybank.client.view.login.LoginView
      */
     @Override
     public void loginMenu() {
         LoginView loginView = new LoginView();
-        Scene scene = new Scene(loginView.getView(), win_width, win_height);
+        Scene scene = new Scene(loginView.getView(this), win_width, win_height);
 
         stage.setTitle(app_name + " - Login");
+
+        stage.setScene(scene);
+
+        stage.show();
+    }
+
+    /**
+     * The overwritten register menu method.
+     *
+     * It loads the register menu view into the application.
+     *
+     * @see ro.lbi.sqliggybank.client.view.window_manager.WindowManager#registerMenu()
+     * @see ro.lbi.sqliggybank.client.view.register.RegisterView
+     */
+    @Override
+    public void registerMenu() {
+        RegisterView registerView = new RegisterView();
+        Scene scene = new Scene(registerView.getView(this), win_width, win_height);
+
+        stage.setTitle(app_name + " - Register");
 
         stage.setScene(scene);
 
