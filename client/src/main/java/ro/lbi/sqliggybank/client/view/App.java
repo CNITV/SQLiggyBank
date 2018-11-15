@@ -1,10 +1,10 @@
 package ro.lbi.sqliggybank.client.view;
 
 import javafx.application.Application;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
+
 import org.apache.log4j.Logger;
-import ro.lbi.sqliggybank.client.view.login.LoginView;
+
 import ro.lbi.sqliggybank.client.view.window_manager.WindowManagerImpl;
 
 
@@ -29,6 +29,8 @@ public class App extends Application {
 
     /**
      * This is the implementation of the window manager.
+     *
+     * @see ro.lbi.sqliggybank.client.view.window_manager.WindowManagerImpl
      */
     private static WindowManagerImpl windowManager;
 
@@ -67,7 +69,7 @@ public class App extends Application {
      * login view.
      * <p>
      * When the program finishes execution, the Application class calls the method
-     * {@link javafx.application.Application#stop() stop} in order to close a connection.
+     * {@link javafx.application.Application#stop() stop} in order to close any connection with the server.
      * <p>
      * The application window minimum width is set to {@link #win_width} and the minimum height is set
      * to {@link #win_height}.
@@ -115,8 +117,6 @@ public class App extends Application {
      * It is not actually used for anything. This method is only here because some IDEs don't fully support
      * JavaFX. Running the program from the command-line should correctly call the method
      * {@link javafx.application.Application#launch(String...) launch}.
-     * <p>
-     * This method's only purpose is to call the {@link #start(Stage) start} method.
      *
      * @param args the command line arguments for the program.
      */
