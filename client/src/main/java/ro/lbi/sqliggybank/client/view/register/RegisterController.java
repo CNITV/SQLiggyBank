@@ -1,6 +1,9 @@
 package ro.lbi.sqliggybank.client.view.register;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
 import org.apache.log4j.Logger;
 import ro.lbi.sqliggybank.client.view.window_manager.WindowManager;
 
@@ -29,6 +32,36 @@ public class RegisterController {
     private WindowManager windowManager;
 
     /**
+     * The username text field.
+     */
+    @FXML
+    private TextField usernameTextField;
+
+    /**
+     * The password text field.
+     */
+    @FXML
+    private PasswordField passwordField;
+
+    /**
+     * The first name text field.
+     */
+    @FXML
+    private TextField firstNameTextField;
+
+    /**
+     * The last name text field.
+     */
+    @FXML
+    private TextField lastNameTextField;
+
+    /**
+     * The e-mail text field.
+     */
+    @FXML
+    private TextField emailTextField;
+
+    /**
      * This is the dependency injection of the window manager.
      *
      * @see #windowManager
@@ -45,6 +78,40 @@ public class RegisterController {
     @FXML
     private void initialize() {
 
+    }
+
+    /**
+     * This method fires whenever the user clicks on the login menu button.
+     * <p>
+     * It sends the user back to the login screen.
+     *
+     * @param event the action event received from the application.
+     */
+    @FXML
+    private void loginMenuButtonPressed(ActionEvent event) {
+        /*
+        redirect user to login screen
+         */
+        windowManager.loginMenu();
+    }
+
+    /**sss
+     * This method fires whenever the user presses the sign-up button to register to the application.
+     * <p>
+     * It checks if the input is valid and either sends the user back to the login menu or prompts for new input if
+     * the one introduced is invalid.
+     *
+     * @param event the action event received from the application.
+     */
+    @FXML
+    private void signUpButtonPressed(ActionEvent event) {
+        /*
+        if (input is valid) {
+            send user back to login screen
+        } else {
+            prompt the user for new input
+        }
+         */
     }
 
 }
