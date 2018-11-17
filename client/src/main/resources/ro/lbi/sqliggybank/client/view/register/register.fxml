@@ -4,18 +4,98 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0"
-            prefWidth="1280.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+            prefWidth="1280.0" stylesheets="@register.css" xmlns="http://javafx.com/javafx/8"
+            xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="ro.lbi.sqliggybank.client.view.register.RegisterController">
     <top>
-        <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-            <HBox prefHeight="100.0" prefWidth="150.0"/>
-            <Button mnemonicParsing="false" onAction="#loginMenuButtonPressed" text="Back to login menu">
+        <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+            <HBox minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="166.0" HBox.hgrow="ALWAYS"/>
+            <Button mnemonicParsing="false" onAction="#loginMenuButtonPressed" prefHeight="33.0" prefWidth="211.0"
+                    text="Back to login menu">
                 <font>
                     <Font name="Arial" size="18.0"/>
                 </font>
             </Button>
+            <HBox minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="1000.0" HBox.hgrow="ALWAYS"/>
         </HBox>
     </top>
+    <center>
+        <VBox alignment="CENTER" prefHeight="513.0" prefWidth="1075.0" BorderPane.alignment="CENTER">
+            <HBox alignment="CENTER" prefHeight="80.0" prefWidth="200.0">
+                <HBox prefHeight="100.0" prefWidth="200.0"/>
+                <Label prefHeight="50.0" prefWidth="140.0" text="Username:">
+                    <font>
+                        <Font name="Arial" size="22.0"/>
+                    </font>
+                </Label>
+                <TextField fx:id="usernameTextField" prefHeight="50.0" prefWidth="300.0"
+                           promptText="Choose a username"/>
+                <HBox prefHeight="100.0" prefWidth="200.0"/>
+            </HBox>
+            <HBox alignment="CENTER" layoutX="10.0" layoutY="220.0" prefHeight="80.0" prefWidth="200.0">
+                <HBox prefHeight="100.0" prefWidth="200.0"/>
+                <Label prefHeight="50.0" prefWidth="140.0" text="Password:">
+                    <font>
+                        <Font name="Arial" size="22.0"/>
+                    </font>
+                </Label>
+                <PasswordField fx:id="passwordField" prefHeight="50.0" prefWidth="300.0"
+                               promptText="Choose a password"/>
+                <HBox prefHeight="100.0" prefWidth="200.0"/>
+            </HBox>
+            <HBox alignment="CENTER" layoutX="10.0" layoutY="170.0" prefHeight="80.0" prefWidth="200.0">
+                <HBox prefHeight="100.0" prefWidth="200.0"/>
+                <Label prefHeight="50.0" prefWidth="140.0" text="First name*:">
+                    <font>
+                        <Font name="Arial" size="22.0"/>
+                    </font>
+                </Label>
+                <TextField fx:id="firstNameTextField" prefHeight="50.0" prefWidth="300.0" promptText="Your first name"/>
+                <HBox prefHeight="100.0" prefWidth="200.0"/>
+            </HBox>
+            <HBox alignment="CENTER" layoutX="10.0" layoutY="320.0" prefHeight="80.0" prefWidth="200.0">
+                <HBox prefHeight="100.0" prefWidth="200.0"/>
+                <Label prefHeight="50.0" prefWidth="140.0" text="Last name*:">
+                    <font>
+                        <Font name="Arial" size="22.0"/>
+                    </font>
+                </Label>
+                <TextField fx:id="lastNameTextField" prefHeight="50.0" prefWidth="300.0" promptText="Your last name"/>
+                <HBox prefHeight="100.0" prefWidth="200.0"/>
+            </HBox>
+            <HBox alignment="CENTER" layoutX="10.0" layoutY="370.0" prefHeight="80.0" prefWidth="200.0">
+                <HBox prefHeight="100.0" prefWidth="200.0"/>
+                <Label prefHeight="50.0" prefWidth="140.0" text="E-mail*:">
+                    <font>
+                        <Font name="Arial" size="22.0"/>
+                    </font>
+                </Label>
+                <TextField fx:id="emailTextField" prefHeight="50.0" prefWidth="300.0" promptText="Your e-mail"/>
+                <HBox prefHeight="100.0" prefWidth="200.0"/>
+            </HBox>
+            <Button defaultButton="true" mnemonicParsing="false" onAction="#signUpButtonPressed" prefHeight="60.0"
+                    prefWidth="150.0" text="Sign up!">
+                <font>
+                    <Font name="Arial Narrow Bold" size="30.0"/>
+                </font>
+            </Button>
+        </VBox>
+    </center>
+    <left>
+        <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER"/>
+    </left>
+    <right>
+        <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER"/>
+    </right>
+    <bottom>
+        <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+            <Label prefHeight="50.0" prefWidth="350.0" text="Everything marked with an asterisk (*) is optional.">
+                <font>
+                    <Font name="Arial Narrow Italic" size="18.0"/>
+                </font>
+            </Label>
+            <HBox prefHeight="100.0" prefWidth="200.0"/>
+        </HBox>
+    </bottom>
 </BorderPane>
