@@ -1,5 +1,6 @@
 package ro.lbi.sqliggybank.client.view.register;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import org.apache.log4j.Logger;
 import ro.lbi.sqliggybank.client.view.window_manager.WindowManager;
@@ -45,6 +46,21 @@ public class RegisterController {
     @FXML
     private void initialize() {
 
+    }
+
+    /**
+     * This method fires whenever the user clicks on the login menu button.
+     * <p>
+     * It sends the user back to the login screen.
+     *
+     * @param event the action event received from the application.
+     */
+    @FXML
+    private void loginMenuButtonPressed(ActionEvent event) {
+        /*
+        redirect user to login screen
+         */
+        windowManager.loginMenu();
     }
 
 }
