@@ -122,7 +122,7 @@ public class UserResource {
 		} else { // nice try hackers, no changing people's password willy-nilly this time
 			return Response
 					.status(Response.Status.UNAUTHORIZED)
-					.entity(new GenericResponse(Response.Status.UNAUTHORIZED.toString(), "You must be authenticated to edit this user!"))
+					.entity(new GenericResponse(Response.Status.UNAUTHORIZED.getStatusCode(), "You must be authenticated to edit this user!"))
 					.build();
 		}
 	}
@@ -145,7 +145,7 @@ public class UserResource {
 		} else { // why sabotage someone else's life on the website? :'(
 			return Response
 					.status(Response.Status.UNAUTHORIZED)
-					.entity(new GenericResponse(Response.Status.UNAUTHORIZED.toString(), "You must be authenticated to edit this user!"))
+					.entity(new GenericResponse(Response.Status.UNAUTHORIZED.getStatusCode(), "You must be authenticated to edit this user!"))
 					.build();
 		}
 	}
@@ -178,7 +178,7 @@ public class UserResource {
 					.withExpiresAt(expiryDate)
 					.sign(authAlgorithm); // create JWT for user
 			return Response // return token
-					.ok(new JWTResponse(Response.Status.OK.toString(), "Registration complete!", token))
+					.ok(new JWTResponse(Response.Status.OK.getStatusCode(), "Registration complete!", token))
 					.build();
 		} catch (IOException e) { // internal server error, apologize
 			e.printStackTrace();
@@ -224,7 +224,7 @@ public class UserResource {
 					.withExpiresAt(expiryDate)
 					.sign(authAlgorithm); // create JWT
 			return Response // return token
-					.ok(new JWTResponse(Response.Status.OK.toString(), "Login complete!", token))
+					.ok(new JWTResponse(Response.Status.OK.getStatusCode(), "Login complete!", token))
 					.build();
 		} catch (IOException e) { // internal server error, apologize
 			e.printStackTrace();
@@ -287,13 +287,13 @@ public class UserResource {
 			} else { // wrong password given, eject client
 				return Response
 						.status(Response.Status.FORBIDDEN)
-						.entity(new GenericResponse(Response.Status.FORBIDDEN.toString(), "Wrong username and password combination!"))
+						.entity(new GenericResponse(Response.Status.FORBIDDEN.getStatusCode(), "Wrong username and password combination!"))
 						.build();
 			}
 		} catch (JWTVerificationException e) { // invalid token, eject client
 			return Response
 					.status(Response.Status.UNAUTHORIZED)
-					.entity(new GenericResponse(Response.Status.UNAUTHORIZED.toString(), "Invalid authentication scheme!"))
+					.entity(new GenericResponse(Response.Status.UNAUTHORIZED.getStatusCode(), "Invalid authentication scheme!"))
 					.build();
 		}
 	}
@@ -336,24 +336,24 @@ public class UserResource {
 						.withExpiresAt(expiryDate)
 						.sign(authAlgorithm); // create JWT for user
 				return Response // return token
-						.ok(new JWTResponse(Response.Status.OK.toString(), "Update complete!", token))
+						.ok(new JWTResponse(Response.Status.OK.getStatusCode(), "Update complete!", token))
 						.build();
 			} else { // wrong user, eject client
 				return Response
 						.status(Response.Status.FORBIDDEN)
-						.entity(new GenericResponse(Response.Status.FORBIDDEN.toString(), "Wrong username and password combination!"))
+						.entity(new GenericResponse(Response.Status.FORBIDDEN.getStatusCode(), "Wrong username and password combination!"))
 						.build();
 			}
 		} catch (JWTVerificationException e) { // invalid token, eject client
 			return Response
 					.status(Response.Status.UNAUTHORIZED)
-					.entity(new GenericResponse(Response.Status.UNAUTHORIZED.toString(), "Invalid authentication scheme!"))
+					.entity(new GenericResponse(Response.Status.UNAUTHORIZED.getStatusCode(), "Invalid authentication scheme!"))
 					.build();
 		} catch (JsonParseException | JsonMappingException e) { // they screwed up the JSON for the user, eject them
 			e.printStackTrace();
 			return Response
 					.status(Response.Status.BAD_REQUEST)
-					.entity(new GenericResponse(Response.Status.BAD_REQUEST.toString(), "Invalid new user information! Try again!"))
+					.entity(new GenericResponse(Response.Status.BAD_REQUEST.getStatusCode(), "Invalid new user information! Try again!"))
 					.build();
 		} catch (IOException e) { // internal server error, apologize
 			e.printStackTrace();
@@ -381,19 +381,19 @@ public class UserResource {
 					jwt.getClaim("password").asString().equals(user.getPassword())) { // if user is correct...
 				userDAO.delete(user); // delete that bad boi
 				return Response // return OK
-						.ok(new GenericResponse(Response.Status.OK.toString(), "Deleted! Sorry to see you go :("))
+						.ok(new GenericResponse(Response.Status.OK.getStatusCode(), "Deleted! Sorry to see you go :("))
 						.build();
 
 			} else { // nice try hacker, eject client
 				return Response
 						.status(Response.Status.FORBIDDEN)
-						.entity(new GenericResponse(Response.Status.FORBIDDEN.toString(), "Wrong username and password combination!"))
+						.entity(new GenericResponse(Response.Status.FORBIDDEN.getStatusCode(), "Wrong username and password combination!"))
 						.build();
 			}
 		} catch (JWTVerificationException e) { // token's screwed, eject client
 			return Response
 					.status(Response.Status.UNAUTHORIZED)
-					.entity(new GenericResponse(Response.Status.UNAUTHORIZED.toString(), "Invalid authentication scheme!"))
+					.entity(new GenericResponse(Response.Status.UNAUTHORIZED.getStatusCode(), "Invalid authentication scheme!"))
 					.build();
 		}
 	}

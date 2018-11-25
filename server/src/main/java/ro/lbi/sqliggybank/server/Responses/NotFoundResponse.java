@@ -24,7 +24,7 @@ public class NotFoundResponse extends GenericResponse {
 	 * @param details The details of the response.
 	 */
 	public NotFoundResponse(String details) {
-		super(Response.Status.NOT_FOUND.toString(), "Resource not found!");
+		super(Response.Status.NOT_FOUND.getStatusCode(), "Resource not found!");
 		this.details = details;
 	}
 
@@ -35,7 +35,7 @@ public class NotFoundResponse extends GenericResponse {
 	 * @param message    The message of the response.
 	 * @param details    The details of the response.
 	 */
-	public NotFoundResponse(String statusCode, String message, String details) {
+	public NotFoundResponse(int statusCode, String message, String details) {
 		super(statusCode, message);
 		this.details = details;
 	}

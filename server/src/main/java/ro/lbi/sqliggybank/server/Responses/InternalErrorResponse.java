@@ -22,7 +22,7 @@ public class InternalErrorResponse extends GenericResponse {
 	 * @param error The error of the response.
 	 */
 	public InternalErrorResponse(String error) {
-		super(Response.Status.INTERNAL_SERVER_ERROR.toString(), "Internal server error! Contact system administrator for details");
+		super(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), "Internal server error! Contact system administrator for details");
 		this.error = error;
 	}
 
@@ -33,7 +33,7 @@ public class InternalErrorResponse extends GenericResponse {
 	 * @param message    The message of the response.
 	 * @param error      The error of the response.
 	 */
-	public InternalErrorResponse(String statusCode, String message, String error) {
+	public InternalErrorResponse(int statusCode, String message, String error) {
 		super(statusCode, message);
 		this.error = error;
 	}

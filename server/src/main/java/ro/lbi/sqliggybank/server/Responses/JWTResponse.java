@@ -22,7 +22,7 @@ public class JWTResponse extends GenericResponse {
 	 * @param token The JWT attached to the response.
 	 */
 	public JWTResponse(String token) {
-		super(Response.Status.OK.toString(), "Token created!");
+		super(Response.Status.OK.getStatusCode(), "Token created!");
 		this.token = token;
 	}
 
@@ -33,7 +33,7 @@ public class JWTResponse extends GenericResponse {
 	 * @param message    The message of the response.
 	 * @param token      The JWT attached to the response.
 	 */
-	public JWTResponse(String statusCode, String message, String token) {
+	public JWTResponse(int statusCode, String message, String token) {
 		super(statusCode, message);
 		this.token = token;
 	}

@@ -13,7 +13,7 @@ public class GenericResponse {
 	/**
 	 * The status code of the response.
 	 */
-	private String statusCode;
+	private int statusCode;
 	/**
 	 * The message of the response.
 	 */
@@ -32,7 +32,7 @@ public class GenericResponse {
 	 * @param statusCode The status code of the response.
 	 * @param message The message of the response.
 	 */
-	public GenericResponse(String statusCode, String message) {
+	public GenericResponse(int statusCode, String message) {
 		this.statusCode = statusCode;
 		this.message = message;
 	}
@@ -42,7 +42,7 @@ public class GenericResponse {
 	 *
 	 * @return The status code of the response.
 	 */
-	public String getStatusCode() {
+	public int getStatusCode() {
 		return statusCode;
 	}
 
@@ -51,7 +51,7 @@ public class GenericResponse {
 	 *
 	 * @param statusCode The new status code for the response.
 	 */
-	public void setStatusCode(String statusCode) {
+	public void setStatusCode(int statusCode) {
 		this.statusCode = statusCode;
 	}
 
