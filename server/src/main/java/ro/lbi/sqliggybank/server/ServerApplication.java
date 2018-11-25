@@ -53,7 +53,7 @@ public class ServerApplication extends Application<ServerConfiguration> {
 	}
 
 	/**
-	 * This method initializes the boostrap for the application. Currently, it merely adds the Hibernate bundles and
+	 * This method initializes the bootstrap for the application. Currently, it merely adds the Hibernate bundles and
 	 * environment variables to the application.
 	 *
 	 * @param bootstrap The bootstrap to initialize.

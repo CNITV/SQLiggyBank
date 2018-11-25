@@ -23,7 +23,7 @@ public class GenericResponse {
 	 * The default constructor of the response.
 	 * Needed for the super() methods.
 	 */
-	public GenericResponse() {
+	GenericResponse() {
 	}
 
 	/**
