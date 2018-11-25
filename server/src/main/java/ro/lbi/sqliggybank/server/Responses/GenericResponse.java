@@ -10,29 +10,65 @@ import java.util.Objects;
  * @since 2018-11-25
  */
 public class GenericResponse {
+	/**
+	 * The status code of the response.
+	 */
 	private String statusCode;
+	/**
+	 * The message of the response.
+	 */
 	private String message;
 
-	GenericResponse() {
+	/**
+	 * The default constructor of the response.
+	 * Needed for the super() methods.
+	 */
+	public GenericResponse() {
 	}
 
+	/**
+	 * The main constructor for GenericResponse.
+	 *
+	 * @param statusCode The status code of the response.
+	 * @param message The message of the response.
+	 */
 	public GenericResponse(String statusCode, String message) {
 		this.statusCode = statusCode;
 		this.message = message;
 	}
 
+	/**
+	 * Gets the status code of the response.
+	 *
+	 * @return The status code of the response.
+	 */
 	public String getStatusCode() {
 		return statusCode;
 	}
 
+	/**
+	 * Sets the status code of the response.
+	 *
+	 * @param statusCode The new status code for the response.
+	 */
 	public void setStatusCode(String statusCode) {
 		this.statusCode = statusCode;
 	}
 
+	/**
+	 * Gets the message of the response.
+	 *
+	 * @return The message of the response.
+	 */
 	public String getMessage() {
 		return message;
 	}
 
+	/**
+	 * Sets the message of the response.
+	 *
+	 * @param message The new message for the response.
+	 */
 	public void setMessage(String message) {
 		this.message = message;
 	}
