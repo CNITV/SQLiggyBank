@@ -10,6 +10,9 @@ import javafx.stage.Stage;
 import org.apache.log4j.Logger;
 import ro.lbi.sqliggybank.client.view.window_manager.WindowManager;
 
+import static ro.lbi.sqliggybank.client.view.App.win_height;
+import static ro.lbi.sqliggybank.client.view.App.win_width;
+
 /**
  * This class implements the login controller. It's a lightweight interface for the user, giving him an option to either
  * log in using an existing username/password combination or create a new one by registering to the server.
@@ -80,6 +83,13 @@ public class LoginController {
      */
     @FXML
     private void loginButtonPressed(ActionEvent event) {
+
+        /*
+        persist the current window settings
+         */
+        win_width = (int)((Node)event.getSource()).getScene().getWidth();
+        win_height = (int)((Node)event.getSource()).getScene().getHeight();
+
         /*
         get the username and password and check through the api.
          */
@@ -94,6 +104,13 @@ public class LoginController {
      */
     @FXML
     private void registerButtonPressed(ActionEvent event) {
+
+        /*
+        persist the current window settings
+         */
+        win_width = (int)((Node)event.getSource()).getScene().getWidth();
+        win_height = (int)((Node)event.getSource()).getScene().getHeight();
+
         /*
         redirect user to register screen.
          */

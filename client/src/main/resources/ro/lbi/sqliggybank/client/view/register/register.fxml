@@ -75,7 +75,7 @@
                 <HBox prefHeight="100.0" prefWidth="200.0"/>
             </HBox>
             <Button defaultButton="true" mnemonicParsing="false" onAction="#signUpButtonPressed" prefHeight="60.0"
-                    prefWidth="150.0" text="Sign up!">
+                    prefWidth="205.0" text="Sign up!">
                 <font>
                     <Font name="Arial Narrow Bold" size="30.0"/>
                 </font>
@@ -92,7 +92,7 @@
         <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
             <Label prefHeight="50.0" prefWidth="350.0" text="Everything marked with an asterisk (*) is optional.">
                 <font>
-                    <Font name="Arial Narrow Italic" size="18.0"/>
+                    <Font name="Arial Bold Italic" size="14.0"/>
                 </font>
             </Label>
             <HBox prefHeight="100.0" prefWidth="200.0"/>
