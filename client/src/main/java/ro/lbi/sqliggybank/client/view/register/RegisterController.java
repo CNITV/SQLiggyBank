@@ -2,10 +2,14 @@ package ro.lbi.sqliggybank.client.view.register;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import org.apache.log4j.Logger;
 import ro.lbi.sqliggybank.client.view.window_manager.WindowManager;
+
+import static ro.lbi.sqliggybank.client.view.App.win_height;
+import static ro.lbi.sqliggybank.client.view.App.win_width;
 
 /**
  * This class implements the register controller. It prompts the user to create a new account.
@@ -89,6 +93,13 @@ public class RegisterController {
      */
     @FXML
     private void loginMenuButtonPressed(ActionEvent event) {
+
+        /*
+        persist the current window settings
+         */
+        win_width = (int)((Node)event.getSource()).getScene().getWidth();
+        win_height = (int)((Node)event.getSource()).getScene().getHeight();
+
         /*
         redirect user to login screen
          */
@@ -105,6 +116,13 @@ public class RegisterController {
      */
     @FXML
     private void signUpButtonPressed(ActionEvent event) {
+
+        /*
+        persist the current window settings
+         */
+        win_width = (int)((Node)event.getSource()).getScene().getWidth();
+        win_height = (int)((Node)event.getSource()).getScene().getHeight();
+
         /*
         if (input is valid) {
             send user back to login screen
