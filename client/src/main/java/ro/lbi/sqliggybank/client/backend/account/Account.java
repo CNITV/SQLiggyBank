@@ -1,0 +1,43 @@
+package ro.lbi.sqliggybank.client.backend.account;
+
+import lombok.Getter;
+
+/**
+ * An account for the application. This is just a POJO holding the username and the password.
+ *
+ * (Credits to @StormFireFox1 for initially designing this)
+ *
+ * @author Alexandru GHERGHESCU (alexghergh)
+ * @since 2018-06-12 (v0.1)
+ * @version 0.1
+ */
+@Getter
+public class Account {
+
+	/**
+	 * The username of the account.
+	 */
+	private String username;
+
+	/**
+	 * The password of the account.
+	 */
+	private String password;
+
+	/**
+	 * Constructs and initializes an Account object.
+	 *
+	 * @param username The username for the account. Must not be empty.
+	 * @param password The password for the account. Must not be empty.
+	 */
+	public Account(String username, String password) {
+		if (username.equals("")) {
+			throw new IllegalArgumentException("Username must not be empty!");
+		} else if (password.equals("")) {
+			throw new IllegalArgumentException("Password must not be empty!");
+		}
+		this.username = username;
+		this.password = password;
+	}
+
+}

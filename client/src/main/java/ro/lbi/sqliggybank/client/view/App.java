@@ -23,8 +23,6 @@ public class App extends Application {
 
     /**
      * This is the default logger for the program view. The framework used is log4j.
-     *
-     * @see org.apache.log4j.Logger
      */
     private static final Logger LOGGER = Logger.getLogger(App.class);
 
@@ -43,7 +41,10 @@ public class App extends Application {
     /**
      * The preferred application window height.
      */
-    public static int win_height = 720;
+    /*
+    The added 33 is to compensate for the border.
+     */
+    public static int win_height = 720 + 33;
 
     /**
      * The application name.

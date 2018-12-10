@@ -1,5 +1,7 @@
 package ro.lbi.sqliggybank.client.view.login;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonParser;
 import javafx.application.HostServices;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -7,8 +9,16 @@ import javafx.scene.Node;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import ro.lbi.sqliggybank.client.backend.account.Account;
+import ro.lbi.sqliggybank.client.backend.database.DatabaseHandler;
+import ro.lbi.sqliggybank.client.backend.user.User;
+import ro.lbi.sqliggybank.client.util.Alert;
 import ro.lbi.sqliggybank.client.view.window_manager.WindowManager;
+
+import java.io.IOException;
+import java.net.ConnectException;
 
 import static ro.lbi.sqliggybank.client.view.App.win_height;
 import static ro.lbi.sqliggybank.client.view.App.win_width;
@@ -18,7 +28,7 @@ import static ro.lbi.sqliggybank.client.view.App.win_width;
  * log in using an existing username/password combination or create a new one by registering to the server.
  *
  * @author Alexandru GHERGHESCU (alexghergh)
- * @since 2018-23-11 (v0.1)
+ * @since 2018-23-10 (v0.1)
  * @version 0.1
  *
  */
@@ -26,10 +36,15 @@ public class LoginController {
 
     /**
      * This is the default logger for the program view. The framework used is log4j.
-     *
-     * @see org.apache.log4j.Logger
      */
     private static final Logger LOGGER = Logger.getLogger(LoginController.class);
+
+    /**
+     * This is the database handler. It handles API calls to the server.
+     *
+     * @see ro.lbi.sqliggybank.client.backend.database.DatabaseHandler
+     */
+    private DatabaseHandler databaseHandler;
 
     /**
      * This is the window manager. This way the controller can switch to other scenes.
@@ -50,13 +65,22 @@ public class LoginController {
     @FXML
     private PasswordField passwordField;
 
+//    /**
+//     * This is the dependency injection of the window manager.
+//     *
+//     * @see #windowManager
+//     */
+//    void setWindowManager(WindowManager windowManager) {
+//        this.windowManager = windowManager;
+//    }
+
     /**
-     * This is the dependency injection of the window manager.
-     *
-     * @see #windowManager
+     * The default constructor for the controller.
      */
-    void setWindowManager(WindowManager windowManager) {
+    LoginController(WindowManager windowManager) {
         this.windowManager = windowManager;
+
+        databaseHandler = new DatabaseHandler();
     }
 
     /**
@@ -66,8 +90,7 @@ public class LoginController {
      */
     @FXML
     private void initialize() {
-        usernameTextField.setPromptText("username");
-        passwordField.setPromptText("password");
+
     }
 
     /**
@@ -85,14 +108,80 @@ public class LoginController {
     private void loginButtonPressed(ActionEvent event) {
 
         /*
-        persist the current window settings
+        Persist the current window settings throughout the application.
          */
         win_width = (int)((Node)event.getSource()).getScene().getWidth();
         win_height = (int)((Node)event.getSource()).getScene().getHeight();
 
         /*
-        get the username and password and check through the api.
+        Get the username and password and check through the api.
+        Assuming everything is fine, redirect user to their dashboard.
+        Otherwise, throw an error message to indicate something went wrong.
          */
+        try {
+            /*
+            Create an account for the user with the username and password.
+             */
+            Account account;
+            account = new Account(usernameTextField.getText(), passwordField.getText());
+            try {
+                /*
+                Get the logged in user credentials using the account created earlier.
+                 */
+                String result;
+                result = databaseHandler.loginUser(account);
+
+                /*
+                Extract the JWT for the user from the credentials received from the server.
+                 */
+                String JWT = null;
+                if (result != null) {
+                    JWT = new JsonParser()
+                            .parse(result)
+                            .getAsJsonObject()
+                            .get("token")
+                            .getAsString();
+                }
+
+                try {
+                    /*
+                    Get the user account from the server using the JWT.
+                     */
+                    result = databaseHandler.findAuthenticatedUserInformation(account, JWT);
+
+                    Gson gson = new Gson();
+                    User user = gson.fromJson(result, User.class);
+                    user.setJWT(JWT);
+
+                    /*
+                    Redirect the user to their dashboard.
+                     */
+                    windowManager.dashboardMenu(user);
+
+                } catch (IOException e) {
+                    Alert.errorAlert("Error", e.getMessage());
+                    LOGGER.log(Level.ERROR, "Server error", e);
+                } catch (IllegalAccessException e) {
+                    Alert.errorAlert("Wrong authorization schema", e.getMessage());
+                    LOGGER.log(Level.ERROR, "Wrong authorization schema", e);
+                }
+
+
+            } catch (ConnectException e) {
+                Alert.errorAlert("Failed to connect to server", "Failed to connect to the database!" +
+                        " This might be due to the server not currently working! Please try again in a few moments!");
+                LOGGER.log(Level.ERROR, "Server connection error", e);
+            } catch (IOException e) {
+                Alert.errorAlert("Error", e.getMessage());
+                LOGGER.log(Level.ERROR, "Server error", e);
+            } catch (IllegalAccessException e) {
+                Alert.errorAlert("Failed to login", e.getMessage());
+                LOGGER.log(Level.ERROR, "Failed to login", e);
+            }
+        } catch (IllegalArgumentException e) {
+            Alert.errorAlert("Failed to login", e.getMessage());
+            LOGGER.log(Level.ERROR, "Failed to login", e);
+        }
     }
 
     /**
@@ -106,13 +195,13 @@ public class LoginController {
     private void registerButtonPressed(ActionEvent event) {
 
         /*
-        persist the current window settings
+        Persist the current window settings throughout the application.
          */
         win_width = (int)((Node)event.getSource()).getScene().getWidth();
         win_height = (int)((Node)event.getSource()).getScene().getHeight();
 
         /*
-        redirect user to register screen.
+        Redirect user to register screen.
          */
         windowManager.registerMenu();
     }

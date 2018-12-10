@@ -29,11 +29,12 @@
                     </Label>
                 </VBox>
                 <VBox prefHeight="100.0" prefWidth="276.0">
-                    <TextField fx:id="usernameTextField" prefHeight="50.0"/>
-                    <PasswordField fx:id="passwordField" prefHeight="50.0"/>
+                    <TextField fx:id="usernameTextField" prefHeight="50.0" promptText="username"/>
+                    <PasswordField fx:id="passwordField" prefHeight="50.0" promptText="password"/>
                 </VBox>
             </HBox>
             <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+
                 <Button defaultButton="true" mnemonicParsing="false" onAction="#loginButtonPressed" prefHeight="50.0"
                         prefWidth="150.0" text="Login">
                     <font>
