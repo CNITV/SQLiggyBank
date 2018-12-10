@@ -1,5 +1,7 @@
 package ro.lbi.sqliggybank.client.view.window_manager;
 
+import ro.lbi.sqliggybank.client.backend.user.User;
+
 /**
  * This is just an interface for the windows that need to be implemented in the application.
  *
@@ -15,8 +17,17 @@ public interface WindowManager {
     void loginMenu();
 
     /**
-     * This is the register menu method that needs to be implemented by the class implementing this interface.
+     * This is the register menu method that needs to be overwritten by the class implementing this interface.
      */
     void registerMenu();
+
+    /**
+     * This is the dashboard menu method that needs to be overwritten by the class implementing this interface
+     *
+     * @param user the user currently logged in.
+     *
+     * @see ro.lbi.sqliggybank.client.backend.user.User
+     */
+    void dashboardMenu(User user);
 
 }
