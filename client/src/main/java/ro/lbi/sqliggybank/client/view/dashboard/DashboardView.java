@@ -15,44 +15,9 @@ import java.io.IOException;
  * @version 0.1
  * @see ro.lbi.sqliggybank.client.view.App
  * @see ro.lbi.sqliggybank.client.view.dashboard.DashboardController
- * @since 2018-26-11 (v0.1)
+ * @since 2018-11-26 (v0.1)
  */
 public class DashboardView {
-
-//	/**
-//	 * Load the FXML dashboard file into the controller and get its view.
-//	 *
-//	 * @param windowManager the window manager injected into the controller.
-//	 * @return the view of the FXML dashboard file.
-//	 */
-//	public Parent getView(WindowManager windowManager, User user) {
-//		try {
-//			FXMLLoader loader = new FXMLLoader(getClass().getResource("/ro/lbi/sqliggybank/client/view/dashboard/dashboard.fxml"));
-//			Parent root = loader.load();
-//			((DashboardController)loader.getController()).setWindowManager(windowManager);
-//			((DashboardController)loader.getController()).setUser(user);
-//
-//			return root;
-//		} catch (IOException exception) {
-//            /*
-//            This happens whenever the FXML loader can't load the specified file for whatever reason.
-//             */
-//			LOGGER.log(Level.ERROR, "The FXML loader couldn't load the FXML file." , exception);
-//			Alert.errorAlert("FXML error", "The FXML loader couldn't load the FXML file.");
-//			Platform.exit();
-//		} catch (IllegalStateException exception) {
-//            /*
-//            This happens whenever the FXML file isn't found at the specified path or the file name is wrong.
-//             */
-//			LOGGER.log(Level.ERROR, "The FXML loader couldn't find the file at the specified path.", exception);
-//			Alert.errorAlert("FXML error", "The FXML loader couldn't find the file at the specified path.");
-//			Platform.exit();
-//		}
-//        /*
-//        The application should never reach this point. Otherwise there's a bug.
-//         */
-//		return null;
-//	}
 
 	/**
 	 * Load the FXML dashboard file into the controller and get its view.

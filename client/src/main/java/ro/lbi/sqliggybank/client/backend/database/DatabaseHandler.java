@@ -6,10 +6,32 @@ import ro.lbi.sqliggybank.client.backend.user.User;
 
 import java.io.IOException;
 
+/**
+ * This class handles all the requests from the client and calls the API from the server.
+ *
+ * <p>
+ * The connection between the client and the server is made through this class.
+ *
+ * @author Alexandru GHERGHESCU (alexghergh)
+ * @since 2018-12-15 (v0.1)
+ * @version 0.1
+ */
 public class DatabaseHandler {
 
 	private String serverUrl = "http://localhost:8080";
 
+	/**
+	 * This method is used to log in a user.
+	 *
+	 * <p>
+	 * It calls the server on this endpoint:
+	 * POST /api/users/login
+	 *
+	 * @param account the account data introduced by the user on the client side.
+	 * @return the user credentials gotten from the server.
+	 * @throws IOException throws this exception if something went wrong with the http call.
+	 * @throws IllegalAccessException throws this exception if the user inputted a wrong account.
+	 */
 	public String loginUser(Account account) throws IOException, IllegalAccessException {
 		OkHttpClient httpClient = new OkHttpClient();
 
@@ -50,7 +72,20 @@ public class DatabaseHandler {
 		return result;
 	}
 
-	public String findAuthenticatedUserInformation(Account account, String JWT) throws IOException, IllegalAccessException {
+	/**
+	 * This method is used to get all the user information from the server.
+	 *
+	 * <p>
+	 * It calls the server on this endpoint:
+	 * GET /api/users/{username}
+	 *
+	 * @param account the account data introduced by the user on the client side.
+	 * @param JWT the JWT needed for the authorization schema (if the JWT is wrong, only public fields are given).
+	 * @return a JSON containing the user information.
+	 * @throws IOException throws this exception if something went wrong with the http call.
+	 * @throws IllegalAccessException throws this exception if the user inputted a wrong account.
+	 */
+	public String getUser(Account account, String JWT) throws IOException, IllegalAccessException {
 		OkHttpClient httpClient = new OkHttpClient();
 
 		Request request = new Request.Builder()
@@ -76,14 +111,26 @@ public class DatabaseHandler {
 		return result;
 	}
 
+	/**
+	 * This method is used to delete a user from the server.
+	 *
+	 * <p>
+	 * It calls the server on this endpoint:
+	 * DEL /api/users/{username}
+	 *
+	 * @param user the user to be deleted.
+	 * @return returns an OK response if everything went right.
+	 * @throws IOException throws this exception if something went wrong with the http call.
+	 * @throws IllegalAccessException throws this exception if the user inputted a wrong account.
+	 */
 	@SuppressWarnings("Duplicates")
-	public String removeUser(User user, String JWT) throws IOException, IllegalAccessException {
+	public String deleteUser(User user) throws IOException, IllegalAccessException {
 		OkHttpClient httpClient = new OkHttpClient();
 
 		Request request = new Request.Builder()
 				.url(serverUrl + "/api/users/" + user.getUsername())
 				.delete()
-				.addHeader("Authorization", "Bearer " + JWT)
+				.addHeader("Authorization", "Bearer " + user.getJWT())
 				.build();
 
 		Response response = httpClient.newCall(request).execute();
@@ -103,6 +150,22 @@ public class DatabaseHandler {
 		return result;
 	}
 
+	/**
+	 * This method is used to register a user to the server.
+	 *
+	 * <p>
+	 * It calls the server on this endpoint:
+	 * POST api/users/new
+	 *
+	 * @param username the username of the user.
+	 * @param password the password of the user.
+	 * @param first_name the first name of the user.
+	 * @param last_name the last name of the user.
+	 * @param email the email of the user.
+	 * @return returns a JWT if everything went right.
+	 * @throws IOException throws this exception if something went wrong with the http call.
+	 * @throws IllegalStateException throws this exception if the user inputted an account that already exists.
+	 */
 	public String registerUser(String username, String password, String first_name, String last_name, String email)
 			throws IOException, IllegalStateException {
 		OkHttpClient httpClient = new OkHttpClient();
@@ -141,67 +204,65 @@ public class DatabaseHandler {
 		return result;
 	}
 
-//this is a typical GET request to get all the users in the database
-        /*try {
-            OkHttpClient httpClient = new OkHttpClient();
+	/**
+	 * This method is used to edit information about a user.
+	 *
+	 * <p>
+	 * It calls the method on this endpoint:
+	 * PATCH /api/users/{username}
+	 *
+	 * @param username the changed username of the user.
+	 * @param password the changed password of the user.
+	 * @param first_name the changed first name of the user.
+	 * @param last_name the changed last name of the user.
+	 * @param email the changed email of the user.
+	 * @param JWT the JWT needed for the authorization schema (a logged in user can only change his account).
+	 * @return returns OK on success.
+	 * @throws IOException throws this exception if something went wrong with the http call.
+	 * @throws IllegalStateException throws this exception if the username doesn't exist in the database.
+	 * @throws IllegalAccessException throws this exception if the authorization schema is wrong.
+	 */
+	public String editUser(String username, String password, String first_name, String last_name, String email, String JWT)
+			throws IOException, IllegalStateException, IllegalAccessException {
+		OkHttpClient httpClient = new OkHttpClient();
 
-            Request request = new Request.Builder()
-                    .url("http://localhost:8080/api/users/")
-                    .build();
+		MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+		RequestBody body = RequestBody.create(JSON, "{\n" +
+				"\t\"username\":\"" + username + "\",\n" +
+				"\t\"password\":\"" + password + "\",\n" +
+				"\t\"first_name\":" + (first_name.equals("") ? "null" : "\"" + first_name + "\"") + ",\n" +
+				"\t\"last_name\":" + (last_name.equals("") ? "null" : "\"" + last_name + "\"") + ",\n" +
+				"\t\"email\":" + (email.equals("") ? "null" : "\"" + email + "\"") + "\n" +
+				"}");
 
-            Response response = null;
+		Request request = new Request.Builder()
+				.url(serverUrl + "/api/users/" + username)
+				.patch(body)
+				.addHeader("Authorization", "Bearer " + JWT)
+				.build();
 
-            try {
-                response = httpClient.newCall(request).execute();
-                //System.out.printf(response.body().string());
-            } catch (IOException e) {
-                System.out.println("error1");
-            }
-            String jsonData = response.body().string();
-            System.out.println(jsonData);
-            JSONArray jsonArray = new JSONArray(response.body().string());
+		Response response = httpClient.newCall(request).execute();
 
-            for (int i = 0; i < jsonArray.length(); i++)
-            {
-                JSONObject jsonObj = jsonArray.getJSONObject(i);
+		if (response.code() == 500) {
+			throw new IllegalStateException("Username doesn't exist in the database!");
+		}
 
-                System.out.println(jsonObj.getString("username"));
+		if (response.code() == 401) {
+			throw new IllegalAccessException("Wrong authorization schema!");
+		}
 
-                System.out.println(jsonObj);
-            }
+		if (response.code() == 400) {
+			throw new IllegalAccessException("Bad request!");
+		}
 
-            JSONObject jsonObject = new JSONObject(jsonData);
-            System.out.println(jsonObject);
+		String result;
+		if (response.body() != null) {
+			result = response.body().string();
+		} else {
+			throw new NullPointerException("Response body came out null! Try again!");
+		}
+		response.close();
 
-            JSONArray jsonArray = Jobject.getJSONArray("users");
-
-            for (int i = 0; i < Jarray.length(); i++) {
-                JSONObject object = Jarray.getJSONObject(i);
-                System.out.println(object.get("username"));
-            }
-        }
-        catch (Exception e) {
-            System.out.println("error2");
-            e.printStackTrace();
-        }*/
-
-	// this is a typical POST request to create a user
-        /*MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-        RequestBody body = RequestBody.create(JSON, "{\"username\":\"mihai\",\"password\":\"pass\",\"firstName\":null,\"lastName\":null,\"email\":null}");
-
-        OkHttpClient client = new OkHttpClient();
-
-        Request request = new Request.Builder()
-                .url("http://localhost:8080/api/users")
-                .post(body)
-                //.addHeader("Authorization", "header value") //Notice this request has header if you don't need to send a header just erase this part
-                .build();
-        try {
-            Response response = client.newCall(request).execute();
-
-            // Do something with the response.
-            System.out.println(response);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
+		return result;
+	}
 }

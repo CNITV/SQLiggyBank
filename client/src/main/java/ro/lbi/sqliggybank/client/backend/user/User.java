@@ -12,7 +12,7 @@ import java.util.UUID;
  * WARNING: A User instance is not supposed to be created directly by the programmer.
  *
  * @author Alexandru GHERGHESCU (alexghergh)
- * @since 2018-08-12 (v0.1)
+ * @since 2018-12-08 (v0.1)
  * @version 0.1
  *
  */
