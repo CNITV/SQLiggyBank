@@ -2,13 +2,19 @@ package ro.lbi.sqliggybank.client.view.dashboard;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.VBox;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
+import javafx.stage.Modality;
+import javafx.stage.Screen;
+import javafx.stage.Stage;
 import org.apache.log4j.Logger;
 import ro.lbi.sqliggybank.client.backend.user.User;
 import ro.lbi.sqliggybank.client.util.Alert;
@@ -69,18 +75,6 @@ public class DashboardController {
 	private Circle profilePicture;
 
 	/**
-	 * The search bar.
-	 */
-	@FXML
-	private TextField searchTextField;
-
-	/**
-	 * The application main panel.
-	 */
-	@FXML
-	private VBox panelBox;
-
-	/**
 	 * The groups tree view structure.
 	 */
 	@FXML
@@ -89,7 +83,6 @@ public class DashboardController {
 	DashboardController(WindowManager windowManager, User user) {
 		this.windowManager = windowManager;
 		this.user = user;
-		initController();
 	}
 
 	/**
@@ -114,31 +107,35 @@ public class DashboardController {
 
 		/*
 		Initialize the groups, banks and goals.
-
-		ImageView rootIcon = new ImageView(
+		*/
+		/*ImageView rootIcon = new ImageView(
 				new Image("/ro/lbi/sqliggybank/client/view/dashboard/image/folder.png",
 						20, 20, true, true)
 		);
 
 		TreeItem<String> rootItem = new TreeItem<String> ("Group 1", rootIcon);
 		rootItem.setExpanded(true);
-		for (int i = 1; i < 6; i++) {
+		for (int i = 1; i < 100; i++) {
 			TreeItem<String> item = new TreeItem<String> ("Bank " + i);
 			rootItem.getChildren().add(item);
 		}
 		groupsTreeView.setRoot(rootItem);
-		rootItem.setExpanded(false);
-		 */
+		rootItem.setExpanded(false);*/
+
 	}
 
 	/**
 	 * This method is the default initialize method for an FXML controller class.
 	 * <p>
-	 * It is called <u>before</u> any constructor to set any properties that might be needed in the GUI.
+	 * It is called <u>right after</u> the constructor finished execution and the @FXML annotated fields
+	 * are populated.
+	 *
+	 * <p>
+	 * This method then initializes any attributes needed in the GUI.
 	 */
 	@FXML
 	private void initialize() {
-
+		initController();
 	}
 
 	/**
@@ -173,6 +170,11 @@ public class DashboardController {
 
 	}
 
+	/**
+	 * This method opens a settings dialog.
+	 *
+	 * @param event the event received from the application.
+	 */
 	@FXML
 	private void settingsButtonPressed(ActionEvent event) {
 		/*
@@ -180,8 +182,31 @@ public class DashboardController {
 		 */
 	}
 
+	/**
+	 * This method is used to open a dialog with the search of another user.
+	 *
+	 * @param event the event received from the application.
+	 */
 	@FXML
-	private void panelRequestFocus(MouseEvent event) {
-		panelBox.requestFocus();
+	private void keyPressed(ActionEvent event) {
+//		Stage stage = new Stage();
+//
+//		stage.setResizable(true);
+//		stage.setMinWidth(400);
+//		stage.setMinHeight(400);
+//		stage.initModality(Modality.APPLICATION_MODAL);
+//		stage.setScene(new Scene(new GridPane()));
+//		Rectangle2D primScreenBounds = Screen.getPrimary().getVisualBounds();
+//
+//		System.out.println(primScreenBounds);
+//		System.out.println(stage.getWidth());
+//
+//		stage.setX((primScreenBounds.getWidth() - stage.getWidth()) / 2);
+//		stage.setY((primScreenBounds.getHeight() - stage.getHeight()) / 2);
+//
+//		System.out.println(stage.getX());
+//		System.out.println(stage.getY());
+//
+//		stage.show();
 	}
 }
