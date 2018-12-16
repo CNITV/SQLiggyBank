@@ -21,10 +21,10 @@ import static ro.lbi.sqliggybank.client.view.App.win_width;
 
 /**
  * This class implements the dashboard controller. It is the main window that the user encounters while
- * using the application. Here a user can see, create, delete banks, groups or goals.
+ * using the application. Here a user can see, create, delete different banks, groups or goals.
  *
  * @author Alexandru GHERGHESCU (alexghergh)
- * @since 2018-15-11 (v0.1)
+ * @since 2018-11-15 (v0.1)
  * @version 0.1
  *
  */
@@ -91,25 +91,6 @@ public class DashboardController {
 		this.user = user;
 		initController();
 	}
-
-//	/**
-//	 * This is the dependency injection of the window manager.
-//	 *
-//	 * @see #windowManager
-//	 */
-//	void setWindowManager(WindowManager windowManager) {
-//		this.windowManager = windowManager;
-//	}
-//
-//	/**
-//	 * This is the dependency injection of the user.
-//	 *
-//	 * @see #user
-//	 */
-//	void setUser(User user) {
-//		this.user = user;
-//		initController();
-//	}
 
 	/**
 	 * This method is called to initialize the variables needed by the application, mainly the user related

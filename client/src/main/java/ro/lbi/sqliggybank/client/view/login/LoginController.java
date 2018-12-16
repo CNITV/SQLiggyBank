@@ -28,7 +28,7 @@ import static ro.lbi.sqliggybank.client.view.App.win_width;
  * log in using an existing username/password combination or create a new one by registering to the server.
  *
  * @author Alexandru GHERGHESCU (alexghergh)
- * @since 2018-23-10 (v0.1)
+ * @since 2018-10-23 (v0.1)
  * @version 0.1
  *
  */
@@ -65,15 +65,6 @@ public class LoginController {
     @FXML
     private PasswordField passwordField;
 
-//    /**
-//     * This is the dependency injection of the window manager.
-//     *
-//     * @see #windowManager
-//     */
-//    void setWindowManager(WindowManager windowManager) {
-//        this.windowManager = windowManager;
-//    }
-
     /**
      * The default constructor for the controller.
      */
@@ -95,9 +86,11 @@ public class LoginController {
 
     /**
      * This method fires whenever the login button is pressed.
+     *
      * <p>
      * It takes the username/password combination introduced and checks them through the
      * <a href="https://documenter.getpostman.com/view/3806934/RWgwRFa8" target="_top">API</a>.
+     *
      * <p>
      * If the information is correct and the user exists in the database, then the program proceeds
      * to the dashboard.
@@ -147,7 +140,7 @@ public class LoginController {
                     /*
                     Get the user account from the server using the JWT.
                      */
-                    result = databaseHandler.findAuthenticatedUserInformation(account, JWT);
+                    result = databaseHandler.getUser(account, JWT);
 
                     Gson gson = new Gson();
                     User user = gson.fromJson(result, User.class);
@@ -208,6 +201,7 @@ public class LoginController {
 
     /**
      * This method fires whenever the user clicks on the Github link.
+     *
      * <p>
      * Redirects to the project's official <a href="https://github.com/CNITV/SQLiggyBank" target="_top">Github</a>.
      *
@@ -227,6 +221,7 @@ public class LoginController {
 
     /**
      * This method fires whenever the user clicks on the API link.
+     *
      * <p>
      * Redirects to the project's official
      * <a href="https://documenter.getpostman.com/view/3806934/RWgwRFa8" target="_top">API</a>.

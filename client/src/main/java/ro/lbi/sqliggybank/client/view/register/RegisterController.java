@@ -76,15 +76,6 @@ public class RegisterController {
 	@FXML
 	private TextField emailTextField;
 
-//	/**
-//	 * This is the dependency injection of the window manager.
-//	 *
-//	 * @see #windowManager
-//	 */
-//	void setWindowManager(WindowManager windowManager) {
-//		this.windowManager = windowManager;
-//	}
-
 	/**
 	 * The default constructor for the controller.
 	 */

@@ -15,7 +15,7 @@ import ro.lbi.sqliggybank.client.view.window_manager.WindowManagerImpl;
  * @see javafx.application.Application
  *
  * @author Alexandru GHERGHESCU (alexghergh)
- * @since 2018-23-11 (v0.1)
+ * @since 2018-10-23 (v0.1)
  * @version 0.1
  *
  */
@@ -66,12 +66,15 @@ public class App extends Application {
      * This is the starting point for the application. The {@link javafx.application.Application Application} class
      * first calls the init method {@link javafx.application.Application#init() init} to initialize the program and then
      * calls this method (start) to actually run the program.
+     *
      * <p>
      * This method then calls {@link ro.lbi.sqliggybank.client.view.login.LoginView#getView(WindowManager) getView} to
      * load the login view.
+     *
      * <p>
      * When the program finishes execution, the Application class calls the method
      * {@link javafx.application.Application#stop() stop} in order to close any connection with the server.
+     *
      * <p>
      * The application window minimum width is set to {@link #win_width} and the minimum height is set
      * to {@link #win_height}.
@@ -115,6 +118,7 @@ public class App extends Application {
 
     /**
      * Main function of the application.
+     *
      * <p>
      * It is not actually used for anything. This method is only here because some IDEs don't fully support
      * JavaFX. Running the program from the command-line should correctly call the method
