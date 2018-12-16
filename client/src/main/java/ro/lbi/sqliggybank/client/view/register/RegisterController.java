@@ -88,7 +88,11 @@ public class RegisterController {
 	/**
 	 * This method is the default initialize method for an FXML controller class.
 	 * <p>
-	 * It is called <u>before</u> any constructor to set any properties that might be needed in the GUI.
+	 * It is called <u>right after</u> the constructor finished execution and the @FXML annotated fields
+	 * are populated.
+	 *
+	 * <p>
+	 * This method then initializes any attributes needed in the GUI.
 	 */
 	@FXML
 	private void initialize() {
