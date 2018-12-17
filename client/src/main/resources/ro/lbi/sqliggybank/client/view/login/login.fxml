@@ -15,6 +15,12 @@
                     <Font name="Arial Italic" size="96.0"/>
                 </font>
             </Label>
+            <ProgressIndicator fx:id="progressIndicator" prefHeight="60.0" prefWidth="1080.0" progress="0.0"
+                               visible="false">
+                <VBox.margin>
+                    <Insets bottom="10.0"/>
+                </VBox.margin>
+            </ProgressIndicator>
             <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
                 <VBox prefHeight="100.0" prefWidth="188.0">
                     <Label prefHeight="50.0" prefWidth="182.0" text="Username:">
@@ -34,16 +40,15 @@
                 </VBox>
             </HBox>
             <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
-
-                <Button defaultButton="true" mnemonicParsing="false" onAction="#loginButtonPressed" prefHeight="50.0"
-                        prefWidth="150.0" text="Login">
+                <Button fx:id="loginButton" defaultButton="true" mnemonicParsing="false" onAction="#loginButtonPressed"
+                        prefHeight="50.0" prefWidth="150.0" text="Login">
                     <font>
                         <Font name="Arial" size="23.0"/>
                     </font>
                 </Button>
                 <HBox prefHeight="100.0" prefWidth="50.0"/>
-                <Button contentDisplay="CENTER" mnemonicParsing="false" onAction="#registerButtonPressed"
-                        prefHeight="50.0" prefWidth="150.0" text="Register">
+                <Button fx:id="registerButton" contentDisplay="CENTER" mnemonicParsing="false"
+                        onAction="#registerButtonPressed" prefHeight="50.0" prefWidth="150.0" text="Register">
                     <font>
                         <Font name="Arial" size="23.0"/>
                     </font>
