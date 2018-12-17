@@ -108,19 +108,20 @@ public class DashboardController {
 		/*
 		Initialize the groups, banks and goals.
 		*/
-		/*ImageView rootIcon = new ImageView(
+		//test groups
+		ImageView rootIcon = new ImageView(
 				new Image("/ro/lbi/sqliggybank/client/view/dashboard/image/folder.png",
 						20, 20, true, true)
 		);
 
-		TreeItem<String> rootItem = new TreeItem<String> ("Group 1", rootIcon);
+		TreeItem<String> rootItem = new TreeItem<> ("Group 1", rootIcon);
 		rootItem.setExpanded(true);
 		for (int i = 1; i < 100; i++) {
-			TreeItem<String> item = new TreeItem<String> ("Bank " + i);
+			TreeItem<String> item = new TreeItem<> ("Bank " + i);
 			rootItem.getChildren().add(item);
 		}
 		groupsTreeView.setRoot(rootItem);
-		rootItem.setExpanded(false);*/
+		rootItem.setExpanded(false);
 
 	}
 
