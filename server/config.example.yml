@@ -3,7 +3,7 @@
 # These are critical variables for SQLiggyBank-Server. You will need to configure these, otherwise the server will not
 # run.
 
-JWTSecret: [INSERT JWT SECRET KEY HERE]
+jwtsecret: [INSERT JWT SECRET KEY HERE]
 
 
 # ro.lbi.sqliggybank.server.Database settings.

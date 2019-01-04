@@ -18,6 +18,7 @@ import ro.lbi.sqliggybank.server.Responses.GenericResponse;
 import ro.lbi.sqliggybank.server.Responses.InternalErrorResponse;
 import ro.lbi.sqliggybank.server.Responses.JWTResponse;
 import ro.lbi.sqliggybank.server.Responses.NotFoundResponse;
+import ro.lbi.sqliggybank.server.Tools.BCryptHasher;
 
 import javax.persistence.NoResultException;
 import javax.ws.rs.*;
@@ -69,6 +70,11 @@ public class UserResource {
 	private final JWTVerifier authVerifier;
 
 	/**
+	 * hasher is the BCrypt hasher for all the passwords to be inserted in the database.
+	 */
+	private final BCryptHasher hasher;
+
+	/**
 	 * The constructor for UserResource. The parameters should be passed solely by the ServerApplication class.
 	 *
 	 * @param userDAO   The DAO to the users table in the database.
@@ -81,6 +87,7 @@ public class UserResource {
 		this.authVerifier = JWT.require(this.authAlgorithm)
 				.withIssuer("SQLiggyBank")
 				.build();
+		this.hasher = new BCryptHasher(12); // set at 12, decent value
 	}
 
 	/**
@@ -151,6 +158,25 @@ public class UserResource {
 	}
 
 	/**
+	 * Creates a JWT with an expiry time of 5 days for a user to use to login at any time.
+	 *
+	 * @param username The username of the user.
+	 * @param password The password of the user.
+	 * @return A JWT claiming those specific values to the server with an expiry time of 5 days.
+	 */
+	private String createJWT(String username, String password) {
+		LocalDate expiry = LocalDate.now();
+		expiry = expiry.plusDays(5);
+		Date expiryDate = Date.from(expiry.atStartOfDay(ZoneId.systemDefault()).toInstant()); // expiry date 5 days from now
+		return JWT.create()
+				.withIssuer("SQLiggyBank")
+				.withClaim("username", username)
+				.withClaim("password", password)
+				.withExpiresAt(expiryDate)
+				.sign(authAlgorithm); // create JWT for user
+	}
+
+	/**
 	 * The endpoint for registering an user.
 	 *
 	 * @param body The body of the POST request. This should be a JSON representation of the User class, sans the UUID.
@@ -167,16 +193,9 @@ public class UserResource {
 		try {
 			User user = mapper.readValue(body, User.class); // read new user body
 			user.setUuid(UUID.randomUUID()); // set random UUID, Hibernate needs it FeelsBadMan
+			String token = createJWT(user.getUsername(), user.getPassword()); // create the JWT before we hash the pass
+			user.setPassword(hasher.hash(user.getPassword())); // hash the password now
 			userDAO.create(user); // create user
-			LocalDate expiry = LocalDate.now();
-			expiry = expiry.plusDays(5);
-			Date expiryDate = Date.from(expiry.atStartOfDay(ZoneId.systemDefault()).toInstant()); // expiry date 5 days from now
-			String token = JWT.create()
-					.withIssuer("SQLiggyBank")
-					.withClaim("username", user.getUsername())
-					.withClaim("password", user.getPassword())
-					.withExpiresAt(expiryDate)
-					.sign(authAlgorithm); // create JWT for user
 			return Response // return token
 					.ok(new JWTResponse(Response.Status.OK.getStatusCode(), "Registration complete!", token))
 					.build();
@@ -211,18 +230,10 @@ public class UserResource {
 		try {
 			Account account = mapper.readValue(body, Account.class); // read object in Account class
 			User user = userDAO.findByUsername(account.getUsername()).orElseThrow(() -> new NotFoundException("No such username."));
-			if (!user.getPassword().equals(account.getPassword())) { // wrong password, eject client
+			if (!hasher.verifyHash(account.getPassword(), user.getPassword())) { // wrong password, eject client
 				return Response.status(Response.Status.FORBIDDEN).entity("Invalid username and password combination!").build();
 			}
-			LocalDate expiry = LocalDate.now();
-			expiry = expiry.plusDays(5);
-			Date expiryDate = Date.from(expiry.atStartOfDay(ZoneId.systemDefault()).toInstant()); // set expiry date 5 days from now
-			String token = JWT.create()
-					.withIssuer("SQLiggyBank")
-					.withClaim("username", account.getUsername())
-					.withClaim("password", account.getPassword())
-					.withExpiresAt(expiryDate)
-					.sign(authAlgorithm); // create JWT
+			String token = createJWT(account.getUsername(), account.getPassword());
 			return Response // return token
 					.ok(new JWTResponse(Response.Status.OK.getStatusCode(), "Login complete!", token))
 					.build();
@@ -282,7 +293,7 @@ public class UserResource {
 			User user = userDAO.findByUsername(username).orElseThrow(() -> new NotFoundException("No such username."));
 			DecodedJWT jwt = authVerifier.verify(authorization); // verify token
 			if (jwt.getClaim("username").asString().equals(username) &&
-					jwt.getClaim("password").asString().equals(user.getPassword())) { // correct token given, give legit user information
+					hasher.verifyHash(jwt.getClaim("password").asString(), user.getPassword())) { // correct token given, give legit user information
 				return Response.ok(user).build();
 			} else { // wrong password given, eject client
 				return Response
@@ -312,7 +323,7 @@ public class UserResource {
 			User user = userDAO.findByUsername(username).orElseThrow(() -> new NotFoundException("No such username."));
 			DecodedJWT jwt = authVerifier.verify(authorization); // verify token
 			if (jwt.getClaim("username").asString().equals(username) &&
-					jwt.getClaim("password").asString().equals(user.getPassword())) { // are they ok?
+					hasher.verifyHash(jwt.getClaim("password").asString(), user.getPassword())) { // are they ok?
 				User tempUser = new ObjectMapper().readValue(newUser, User.class); // create new User object
 				// Apparently, Hibernate doesn't like you modifying the objects it remembers in memory, even if they
 				// are functionally the same. In conclusion, crap code like this shows up, where I have to replace
@@ -378,7 +389,7 @@ public class UserResource {
 			User user = userDAO.findByUsername(username).orElseThrow(() -> new NotFoundException("No such username."));
 			DecodedJWT jwt = authVerifier.verify(authorization); // verify token
 			if (jwt.getClaim("username").asString().equals(username) &&
-					jwt.getClaim("password").asString().equals(user.getPassword())) { // if user is correct...
+					hasher.verifyHash(jwt.getClaim("password").asString(), user.getPassword())) { // if user is correct...
 				userDAO.delete(user); // delete that bad boi
 				return Response // return OK
 						.ok(new GenericResponse(Response.Status.OK.getStatusCode(), "Deleted! Sorry to see you go :("))
