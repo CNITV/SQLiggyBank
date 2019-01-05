@@ -152,7 +152,7 @@ public class UserResource {
 		} else { // why sabotage someone else's life on the website? :'(
 			return Response
 					.status(Response.Status.UNAUTHORIZED)
-					.entity(new GenericResponse(Response.Status.UNAUTHORIZED.getStatusCode(), "You must be authenticated to edit this user!"))
+					.entity(new GenericResponse(Response.Status.UNAUTHORIZED.getStatusCode(), "You must be authenticated to delete this user!"))
 					.build();
 		}
 	}
