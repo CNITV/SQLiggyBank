@@ -11,8 +11,8 @@
     <top>
         <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
             <HBox minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="166.0" HBox.hgrow="ALWAYS"/>
-            <Button mnemonicParsing="false" onAction="#loginMenuButtonPressed" prefHeight="33.0" prefWidth="211.0"
-                    text="Back to login menu">
+            <Button fx:id="loginMenuButton" mnemonicParsing="false" onAction="#loginMenuButtonPressed" prefHeight="33.0"
+                    prefWidth="211.0" text="Back to login menu">
                 <font>
                     <Font name="Arial" size="18.0"/>
                 </font>
@@ -21,7 +21,8 @@
         </HBox>
     </top>
     <center>
-        <VBox alignment="CENTER" prefHeight="513.0" prefWidth="1075.0" BorderPane.alignment="CENTER">
+        <VBox alignment="CENTER" prefHeight="550.0" prefWidth="1080.0" BorderPane.alignment="CENTER">
+            <ProgressIndicator fx:id="progressIndicator" progress="0.0" visible="false"/>
             <HBox alignment="CENTER" prefHeight="80.0" prefWidth="200.0">
                 <HBox prefHeight="100.0" prefWidth="200.0"/>
                 <Label prefHeight="50.0" prefWidth="140.0" text="Username:">
@@ -45,6 +46,7 @@
                 <HBox prefHeight="100.0" prefWidth="200.0"/>
             </HBox>
             <HBox alignment="CENTER" layoutX="10.0" layoutY="170.0" prefHeight="80.0" prefWidth="200.0">
+
                 <HBox prefHeight="100.0" prefWidth="200.0"/>
                 <Label prefHeight="50.0" prefWidth="140.0" text="First name*:">
                     <font>
@@ -74,8 +76,8 @@
                 <TextField fx:id="emailTextField" prefHeight="50.0" prefWidth="300.0" promptText="Your e-mail"/>
                 <HBox prefHeight="100.0" prefWidth="200.0"/>
             </HBox>
-            <Button defaultButton="true" mnemonicParsing="false" onAction="#signUpButtonPressed" prefHeight="60.0"
-                    prefWidth="205.0" text="Sign up!">
+            <Button fx:id="signUpButton" defaultButton="true" mnemonicParsing="false" onAction="#signUpButtonPressed"
+                    prefHeight="60.0" prefWidth="205.0" text="Sign up!">
                 <font>
                     <Font name="Arial Narrow Bold" size="30.0"/>
                 </font>

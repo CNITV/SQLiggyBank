@@ -1,9 +1,13 @@
 package ro.lbi.sqliggybank.client.view.register;
 
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Region;
 import org.apache.log4j.Level;
@@ -14,6 +18,7 @@ import ro.lbi.sqliggybank.client.view.window_manager.WindowManager;
 
 import java.io.IOException;
 import java.net.ConnectException;
+import java.util.concurrent.ExecutionException;
 
 import static ro.lbi.sqliggybank.client.view.App.win_height;
 import static ro.lbi.sqliggybank.client.view.App.win_width;
@@ -47,6 +52,13 @@ public class RegisterController {
 	private DatabaseHandler databaseHandler;
 
 	/**
+	 * The progress indicator. It tells the user to wait until the connection with the server is
+	 * established.
+	 */
+	@FXML
+	private ProgressIndicator progressIndicator;
+
+	/**
 	 * The username text field.
 	 */
 	@FXML
@@ -77,12 +89,111 @@ public class RegisterController {
 	private TextField emailTextField;
 
 	/**
+	 * Redirects the user back to the login screen.
+	 */
+	@FXML
+	private Button loginMenuButton;
+
+	/**
+	 * The sign-up button.
+	 */
+	@FXML
+	private Button signUpButton;
+
+	/**
 	 * The default constructor for the controller.
 	 */
 	RegisterController(WindowManager windowManager) {
 		this.windowManager = windowManager;
 
 		databaseHandler = new DatabaseHandler();
+	}
+
+	/**
+	 * This method creates a task for the register. It creates a new Thread in the background with the
+	 * task specified and start it while the application is running.
+	 *
+	 * <p>
+	 * It displays a loading progress indicator while the background process takes the username and the
+	 * password and checks for them in the database. If they already exist, and error prompt tells the user
+	 * something went wrong.
+	 *
+	 * @return it returns the task created.
+	 */
+	private Task<Boolean> createWorker() {
+		return new Task<Boolean>() {
+			@Override
+			protected Boolean call() {
+				try {
+					String result;
+
+					if (usernameTextField.getText().equals("") || passwordField.getText().equals("")) {
+						throw new IllegalStateException("Username and password cannot be empty!");
+					}
+
+					result = databaseHandler.registerUser(
+							usernameTextField.getText(),
+							passwordField.getText(),
+							firstNameTextField.getText(),
+							lastNameTextField.getText(),
+							emailTextField.getText()
+					);
+
+					if (result != null) {
+						javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.INFORMATION);
+						alert.setTitle("User registered");
+						alert.setHeaderText(null);
+						alert.setContentText("User registration complete! You successfully signed up!");
+						alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+
+						alert.showAndWait();
+
+						return true;
+					}
+				} catch (ConnectException e) {
+					setButtonsEnabled(true);
+					showAlert("Failed to connect to server", "Failed to connect to the database!" +
+							" This might be due to the server not currently working! Please try again in a few moments!");
+					LOGGER.log(Level.ERROR, "Server connection error", e);
+				} catch (IOException e) {
+					setButtonsEnabled(true);
+					showAlert("Error", e.getMessage());
+					LOGGER.log(Level.ERROR, "Server error", e);
+				} catch (IllegalStateException e) {
+					setButtonsEnabled(true);
+					showAlert("Error", e.getMessage());
+					LOGGER.log(Level.ERROR, e.getMessage(), e);
+				}
+				return false;
+			}
+		};
+	}
+
+	/**
+	 * This method enables or disables all the buttons in the scene.
+	 */
+	private void setButtonsEnabled(boolean value) {
+		progressIndicator.setVisible(!value);
+		progressIndicator.setProgress(ProgressIndicator.INDETERMINATE_PROGRESS);
+		loginMenuButton.setDisable(!value);
+		signUpButton.setDisable(!value);
+		usernameTextField.setEditable(value);
+		passwordField.setEditable(value);
+		firstNameTextField.setEditable(value);
+		lastNameTextField.setEditable(value);
+		emailTextField.setEditable(value);
+	}
+
+	/**
+	 * This method displays an alert pop-up in another thread.
+	 *
+	 * @param title the title of the error alert.
+	 * @param message the message of the error alert.
+	 */
+	private void showAlert(String title, String message) {
+		Platform.runLater(() ->
+				Alert.errorAlert(title, message)
+		);
 	}
 
 	/**
@@ -138,43 +249,37 @@ public class RegisterController {
 		win_width = (int) ((Node) event.getSource()).getScene().getWidth();
 		win_height = (int) ((Node) event.getSource()).getScene().getHeight();
 
+		/*
+		Prepare to start the login thread.
+		 */
+		setButtonsEnabled(false);
 
-		try {
-			String result;
+		/*
+		Create the login thread task and start it.
+		 */
+		Task<Boolean> registerTask = createWorker();
+		Thread registerThread = new Thread(registerTask);
+		registerThread.setDaemon(true);
+		registerThread.start();
 
-			if (usernameTextField.getText().equals("") || passwordField.getText().equals("")) {
-				throw new IllegalStateException("Username and password cannot be empty!");
+		/*
+		Check if the register thread finished execution.
+		 */
+		if (!registerThread.isAlive()) {
+			Boolean result = false;
+			try {
+				result = registerTask.get();
+			} catch (InterruptedException | ExecutionException e) {
+				e.printStackTrace();
+				Platform.exit();
 			}
 
-			result = databaseHandler.registerUser(
-					usernameTextField.getText(),
-					passwordField.getText(),
-					firstNameTextField.getText(),
-					lastNameTextField.getText(),
-					emailTextField.getText()
-			);
-
-			if (result != null) {
-				javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.INFORMATION);
-				alert.setTitle("User registered");
-				alert.setHeaderText(null);
-				alert.setContentText("User registration complete! You successfully signed up!");
-				alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
-
-				alert.showAndWait();
-
+			/*
+			Redirect the user to the login menu.
+		     */
+			if (result) {
 				windowManager.loginMenu();
 			}
-		} catch (ConnectException e) {
-			Alert.errorAlert("Failed to connect to server", "Failed to connect to the database!" +
-					" This might be due to the server not currently working! Please try again in a few moments!");
-			LOGGER.log(Level.ERROR, "Server connection error", e);
-		} catch (IOException e) {
-			Alert.errorAlert("Error", e.getMessage());
-			LOGGER.log(Level.ERROR, "Server error", e);
-		} catch (IllegalStateException e) {
-			Alert.errorAlert("Error", e.getMessage());
-			LOGGER.log(Level.ERROR, e.getMessage(), e);
 		}
 	}
 
