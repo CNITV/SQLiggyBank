@@ -63,4 +63,20 @@ public class Alert {
         return alert.showAndWait();
     }
 
+	/**
+	 * This method fires an information message.
+	 *
+	 * @param title the title for the info alert.
+	 * @param message the message for the info alert.
+	 */
+    public static void infoAlert(String title, String message) {
+	    javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.INFORMATION);
+	    alert.setTitle(title);
+	    alert.setHeaderText(null);
+	    alert.setContentText(message);
+	    alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+
+	    alert.showAndWait();
+    }
+
 }

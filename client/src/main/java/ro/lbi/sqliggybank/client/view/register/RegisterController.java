@@ -140,13 +140,8 @@ public class RegisterController {
 					);
 
 					if (result != null) {
-						javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.INFORMATION);
-						alert.setTitle("User registered");
-						alert.setHeaderText(null);
-						alert.setContentText("User registration complete! You successfully signed up!");
-						alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
-
-						alert.showAndWait();
+						Alert.infoAlert("User registered", "User registration complete! You successfully" +
+								"signed up!");
 
 						return true;
 					}
