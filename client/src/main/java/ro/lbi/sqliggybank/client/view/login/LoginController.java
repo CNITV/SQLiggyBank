@@ -262,21 +262,26 @@ public class LoginController {
 		loginThread.start();
 
 		/*
-		Get the user created in the login thread.
+		Check if the login thread finished execution.
 		 */
-		User user = null;
-		try {
-			user = loginTask.get();
-		} catch (InterruptedException | ExecutionException e) {
-			e.printStackTrace();
-			Platform.exit();
-		}
+		if (!loginThread.isAlive()) {
+			/*
+			Get the user created in the login thread.
+		     */
+			User user = null;
+			try {
+				user = loginTask.get();
+			} catch (InterruptedException | ExecutionException e) {
+				e.printStackTrace();
+				Platform.exit();
+			}
 
-		/*
-		Redirect the user to their dashboard.
-		 */
-		if (user != null) {
-			windowManager.dashboardMenu(user);
+			/*
+			Redirect the user to their dashboard.
+		     */
+			if (user != null) {
+				windowManager.dashboardMenu(user);
+			}
 		}
 	}
 
