@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -215,9 +216,9 @@ public class UserResource {
 	}
 
 	/**
-	 * The endpoint for registering an user.
+	 * The endpoint for logging in an user.
 	 *
-	 * @param body The body of the POST request. This should be a JSON representation of the User class, sans the UUID.
+	 * @param body The body of the POST request. This should be a JSON representation of the Account class.
 	 * @return A response according to the SQLiggyBank API Documentation. In general, it returns a JWT for the login session.
 	 * @see ro.lbi.sqliggybank.server.Core.User
 	 * @see <a href="https://documenter.getpostman.com/view/3806934/RWgwRFa8#b36c3c0a-be7a-441e-9410-6378ce908f3d">API Documentation</a>
@@ -290,17 +291,27 @@ public class UserResource {
 	private Response findAuthenticatedUsername(String username, String authorization) {
 		authorization = authorization.substring(authorization.indexOf(" ") + 1); // remove "Bearer" from Authorization header
 		try {
-			User user = userDAO.findByUsername(username).orElseThrow(() -> new NotFoundException("No such username."));
+			User user = null;
+			try {
+				user = userDAO.findByUsername(username).orElseThrow(() -> new NotFoundException("No such username."));
+			} catch (NoResultException e) {
+				return Response
+						.status(Response.Status.NOT_FOUND)
+						.entity(new NotFoundResponse("Could not find user with supplied username!"))
+						.build();
+			}
 			DecodedJWT jwt = authVerifier.verify(authorization); // verify token
 			if (jwt.getClaim("username").asString().equals(username) &&
 					hasher.verifyHash(jwt.getClaim("password").asString(), user.getPassword())) { // correct token given, give legit user information
 				return Response.ok(user).build();
-			} else { // wrong password given, eject client
-				return Response
-						.status(Response.Status.FORBIDDEN)
-						.entity(new GenericResponse(Response.Status.FORBIDDEN.getStatusCode(), "Wrong username and password combination!"))
-						.build();
+			} else { // wrong password given, send to redacted information
+				return findUsername(username);
 			}
+		} catch (TokenExpiredException e) {
+			return Response
+					.status(Response.Status.UNAUTHORIZED)
+					.entity(new GenericResponse(Response.Status.UNAUTHORIZED.getStatusCode(), "Token expired! Log in again!"))
+					.build();
 		} catch (JWTVerificationException e) { // invalid token, eject client
 			return Response
 					.status(Response.Status.UNAUTHORIZED)
@@ -355,6 +366,11 @@ public class UserResource {
 						.entity(new GenericResponse(Response.Status.FORBIDDEN.getStatusCode(), "Wrong username and password combination!"))
 						.build();
 			}
+		} catch (TokenExpiredException e) {
+			return Response
+					.status(Response.Status.UNAUTHORIZED)
+					.entity(new GenericResponse(Response.Status.UNAUTHORIZED.getStatusCode(), "Token expired! Log in again!"))
+					.build();
 		} catch (JWTVerificationException e) { // invalid token, eject client
 			return Response
 					.status(Response.Status.UNAUTHORIZED)
@@ -401,6 +417,11 @@ public class UserResource {
 						.entity(new GenericResponse(Response.Status.FORBIDDEN.getStatusCode(), "Wrong username and password combination!"))
 						.build();
 			}
+		} catch (TokenExpiredException e) {
+			return Response
+					.status(Response.Status.UNAUTHORIZED)
+					.entity(new GenericResponse(Response.Status.UNAUTHORIZED.getStatusCode(), "Token expired! Log in again!"))
+					.build();
 		} catch (JWTVerificationException e) { // token's screwed, eject client
 			return Response
 					.status(Response.Status.UNAUTHORIZED)
