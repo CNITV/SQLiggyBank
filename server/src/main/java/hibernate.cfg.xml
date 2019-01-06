@@ -11,5 +11,8 @@
 
     <!-- DB schema will be updated if needed -->
     <!-- <property name="hbm2ddl.auto">update</property> -->
+
+      <mapping class="ro.lbi.sqliggybank.server.Core.User"/>
+      <mapping class="ro.lbi.sqliggybank.server.Core.Group"/>
   </session-factory>
 </hibernate-configuration>

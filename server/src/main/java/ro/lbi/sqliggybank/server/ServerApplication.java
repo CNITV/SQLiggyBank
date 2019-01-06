@@ -9,7 +9,10 @@ import io.dropwizard.migrations.MigrationsBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import ro.lbi.sqliggybank.server.Core.User;
+import ro.lbi.sqliggybank.server.Database.GroupDAO;
+import ro.lbi.sqliggybank.server.Database.GroupListDAO;
 import ro.lbi.sqliggybank.server.Database.UserDAO;
+import ro.lbi.sqliggybank.server.Resources.GroupResource;
 import ro.lbi.sqliggybank.server.Resources.UserResource;
 
 /**
@@ -86,8 +89,11 @@ public class ServerApplication extends Application<ServerConfiguration> {
 	@Override
 	public void run(ServerConfiguration configuration, Environment environment) {
 		final UserDAO userDAO = new UserDAO(hibernateBundle.getSessionFactory());
+		final GroupDAO groupDAO = new GroupDAO(hibernateBundle.getSessionFactory());
+		final GroupListDAO groupListDAO = new GroupListDAO(hibernateBundle.getSessionFactory(), userDAO);
 		final String JWTSecret = configuration.getJWTSecret();
 		final byte[] secret = JWTSecret.getBytes();
 		environment.jersey().register(new UserResource(userDAO, secret));
+		environment.jersey().register(new GroupResource(groupDAO, groupListDAO, userDAO, secret));
 	}
 }

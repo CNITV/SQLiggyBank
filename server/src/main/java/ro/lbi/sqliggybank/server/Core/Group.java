@@ -18,11 +18,19 @@ import java.util.UUID;
 				),
 				@NamedQuery(
 						name = "ro.lbi.sqliggybank.server.Core.Group.findByName",
-						query = "SELECT g FROM Group g WHERE g.name = :name"
+						query = "SELECT g FROM ro.lbi.sqliggybank.server.Core.Group g WHERE g.name = :name"
 				),
 				@NamedQuery(
 						name = "ro.lbi.sqliggybank.server.Core.Group.findByOwner",
-						query = "SELECT g FROM Group g WHERE g.owner_uuid = :owner_uuid"
+						query = "SELECT g FROM Group g WHERE g.owner = :owner_uuid"
+				),
+				@NamedQuery(
+						name = "ro.lbi.sqliggybank.server.Core.Group.isUserPartOfGroup",
+						query = "SELECT CASE WHEN EXISTS( SELECT group_lists.id, users.username, groups.name FROM group_lists JOIN users ON group_lists.user_uuid = users.uuid JOIN groups ON group_lists.group_uuid = groups.uuid WHERE users.username = :username AND groups.name = :groupName) THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END;"
+				),
+				@NamedQuery(
+						name = "ro.lbi.sqliggybank.server.Core.Group.isUserOwnerOfGroup",
+						query = "SELECT CASE WHEN EXISTS( SELECT groups.name, users.username FROM groups JOIN users ON groups.owner_uid = users.uuid WHERE users.username = :username AND groups.name = :groupName) THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END;"
 				),
 		})
 public class Group {
@@ -38,6 +46,9 @@ public class Group {
 
 	@OneToOne
 	private User owner;
+
+	public Group() {
+	}
 
 	public Group(UUID uuid, String name, String description, User owner) {
 		if (name == null || name.equals("")) {

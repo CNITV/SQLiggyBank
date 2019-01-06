@@ -36,10 +36,24 @@ public class GroupDAO extends AbstractDAO<Group> {
 	 * @return Optional of any found group.
 	 */
 	public Optional<Group> findByName(String name) {
-		Query query = namedQuery("ro.lbi.sqliggybank.server.Core.Group.findByName");
-		query.setParameter("name", name);
+		Query query = currentSession().createQuery("SELECT g FROM ro.lbi.sqliggybank.server.Core.Group g WHERE g.name = 'Test Group'");
 		Group group = (Group) query.getSingleResult();
 		return Optional.of(group);
+	}
+
+	// TODO Make these two functions work
+	public boolean isUserPartOfGroup(String username, String groupName) {
+		Query query = namedQuery("ro.lbi.sqliggybank.server.Core.GroupEntry.isUserPartOfGroup");
+		query.setParameter("username", username);
+		query.setParameter("groupName", groupName);
+		return (boolean) query.getSingleResult();
+	}
+
+	public boolean isUserOwnerOfGroup(String username, String groupName) {
+		Query query = namedQuery("ro.lbi.sqliggybank.server.Core.GroupEntry.isUserOwnerOfGroup");
+		query.setParameter("username", username);
+		query.setParameter("groupName", groupName);
+		return (boolean) query.getSingleResult();
 	}
 
 	/**
