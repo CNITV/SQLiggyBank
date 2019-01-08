@@ -232,7 +232,10 @@ public class UserResource {
 			Account account = mapper.readValue(body, Account.class); // read object in Account class
 			User user = userDAO.findByUsername(account.getUsername()).orElseThrow(() -> new NotFoundException("No such username."));
 			if (!hasher.verifyHash(account.getPassword(), user.getPassword())) { // wrong password, eject client
-				return Response.status(Response.Status.FORBIDDEN).entity("Invalid username and password combination!").build();
+				return Response.
+						status(Response.Status.FORBIDDEN).
+						entity(new GenericResponse(Response.Status.FORBIDDEN.getStatusCode(), "Invalid username and password combination!"))
+						.build();
 			}
 			String token = createJWT(account.getUsername(), account.getPassword());
 			return Response // return token
