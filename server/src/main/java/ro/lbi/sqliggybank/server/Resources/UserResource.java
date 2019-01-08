@@ -231,8 +231,17 @@ public class UserResource {
 		try {
 			Account account = mapper.readValue(body, Account.class); // read object in Account class
 			User user = userDAO.findByUsername(account.getUsername()).orElseThrow(() -> new NotFoundException("No such username."));
+			if (account.getPassword().equals("") || account.getUsername().equals("")) {
+				return Response
+						.status(Response.Status.FORBIDDEN)
+						.entity(new GenericResponse(Response.Status.FORBIDDEN.getStatusCode(), "No empty usernames or passwords allowed!"))
+						.build();
+			}
 			if (!hasher.verifyHash(account.getPassword(), user.getPassword())) { // wrong password, eject client
-				return Response.status(Response.Status.FORBIDDEN).entity("Invalid username and password combination!").build();
+				return Response
+						.status(Response.Status.FORBIDDEN)
+						.entity(new GenericResponse(Response.Status.FORBIDDEN.getStatusCode(), "Invalid username and password combination!"))
+						.build();
 			}
 			String token = createJWT(account.getUsername(), account.getPassword());
 			return Response // return token
@@ -333,9 +342,16 @@ public class UserResource {
 		try {
 			User user = userDAO.findByUsername(username).orElseThrow(() -> new NotFoundException("No such username."));
 			DecodedJWT jwt = authVerifier.verify(authorization); // verify token
+
 			if (jwt.getClaim("username").asString().equals(username) &&
 					hasher.verifyHash(jwt.getClaim("password").asString(), user.getPassword())) { // are they ok?
 				User tempUser = new ObjectMapper().readValue(newUser, User.class); // create new User object
+				if (tempUser.getPassword().equals("") || tempUser.getUsername().equals("")) {
+					return Response
+							.status(Response.Status.FORBIDDEN)
+							.entity(new GenericResponse(Response.Status.FORBIDDEN.getStatusCode(), "No empty usernames or passwords allowed!"))
+							.build();
+				}
 				// Apparently, Hibernate doesn't like you modifying the objects it remembers in memory, even if they
 				// are functionally the same. In conclusion, crap code like this shows up, where I have to replace
 				// everything in the original one.
