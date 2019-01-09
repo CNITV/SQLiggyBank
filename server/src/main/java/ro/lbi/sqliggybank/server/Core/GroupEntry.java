@@ -16,31 +16,37 @@ import java.util.UUID;
 				),
 				@NamedQuery(
 						name = "ro.lbi.sqliggybank.server.Core.GroupEntry.findByID",
-						query = "SELECT l FROM GroupEntry l WHERE l.uuid = :uuid"
+						query = "SELECT l FROM GroupEntry l WHERE l.id = :id"
 				),
 				@NamedQuery(
 						name = "ro.lbi.sqliggybank.server.Core.GroupEntry.isUserPartOfGroup",
-						query = "SELECT CASE WHEN EXISTS( SELECT group_lists.id, users.username, groups.name FROM group_lists JOIN users ON group_lists.user_uuid = users.uuid JOIN groups ON group_lists.group_uuid = groups.uuid WHERE users.username = :username AND groups.name = :groupName) THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END;"
+						query = "SELECT l FROM GroupEntry l WHERE l.user.username = :username AND l.group.name = :groupName"
 				),
 		})
 public class GroupEntry {
 	@Id
-	private UUID uuid;
+	@GeneratedValue
+	private Integer id;
 
-	@OneToOne
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "user_uuid")
 	private User user;
 
-	@OneToOne
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "group_uuid")
 	private Group group;
 
-	public GroupEntry(UUID uuid, User user, Group group) {
-		this.uuid = uuid;
+	public GroupEntry () {
+
+	}
+
+	public GroupEntry(User user, Group group) {
 		this.user = user;
 		this.group = group;
 	}
 
-	public UUID getUuid() {
-		return uuid;
+	public Integer getId() {
+		return id;
 	}
 
 	public User getUser() {
@@ -51,8 +57,8 @@ public class GroupEntry {
 		return group;
 	}
 
-	public void setUuid(UUID uuid) {
-		this.uuid = uuid;
+	public void setId(Integer id) {
+		this.id = id;
 	}
 
 	public void setUser(User user) {
@@ -68,13 +74,13 @@ public class GroupEntry {
 		if (this == o) return true;
 		if (!(o instanceof GroupEntry)) return false;
 		GroupEntry that = (GroupEntry) o;
-		return Objects.equals(uuid, that.uuid) &&
+		return Objects.equals(id, that.id) &&
 				Objects.equals(user, that.user) &&
 				Objects.equals(group, that.group);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(uuid, user, group);
+		return Objects.hash(id, user, group);
 	}
 }
