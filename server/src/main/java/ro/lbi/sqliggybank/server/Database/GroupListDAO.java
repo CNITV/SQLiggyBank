@@ -30,6 +30,12 @@ public class GroupListDAO extends AbstractDAO<GroupEntry> {
 		return Optional.ofNullable(get(id));
 	}
 
+	public boolean isUserPartOfGroup(String username, String groupName) {
+		Query query = namedQuery("ro.lbi.sqliggybank.server.Core.GroupEntry.isUserPartOfGroup");
+		query.setParameter("username", username);
+		query.setParameter("groupName", groupName);
+		return !query.getResultList().isEmpty();
+	}
 
 	/**
 	 * Creates a group list in the database.
@@ -41,7 +47,7 @@ public class GroupListDAO extends AbstractDAO<GroupEntry> {
 	}
 
 	public void addUserToGroup(User user, Group group) {
-		GroupEntry entry = new GroupEntry(UUID.randomUUID(), user, group);
+		GroupEntry entry = new GroupEntry(user, group);
 		create(entry);
 	}
 
