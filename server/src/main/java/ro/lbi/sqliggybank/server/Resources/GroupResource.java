@@ -203,6 +203,52 @@ public class GroupResource {
 		}
 	}
 
+	@POST
+	@UnitOfWork
+	@Path("/new")
+	public Response addGroup(@HeaderParam("Authorization") String authorization, String body) {
+		if (authorization != null) { // let's create a group
+			return createGroup(authorization, body);
+		} else { // if not logged in, eject client
+			return Response
+					.status(Response.Status.FORBIDDEN)
+					.entity(new GenericResponse(Response.Status.FORBIDDEN.getStatusCode(), "You must be the group owner to generate invite links for this group!"))
+					.build();
+		}
+	}
+
+	private Response createGroup(String authorization, String groupBody) {
+		authorization = authorization.substring(authorization.indexOf(" ") + 1); // remove "Bearer" from Authorization header
+		try {
+			DecodedJWT jwt = authVerifier.verify(authorization); // verify token
+			User owner = userDAO.findByUsername(jwt.getClaim("username").asString()).orElseThrow(() -> new NotFoundException("User not found!"));
+			Group tempGroup = new ObjectMapper().readValue(groupBody, Group.class); // create new Group object
+			tempGroup.setOwner(owner);
+			groupDAO.create(tempGroup);
+			return addUserToGroup(authorization, tempGroup.getName());
+		} catch (TokenExpiredException e) {
+			return Response
+					.status(Response.Status.UNAUTHORIZED)
+					.entity(new GenericResponse(Response.Status.UNAUTHORIZED.getStatusCode(), "Token expired! Log in again!"))
+					.build();
+		} catch (JWTVerificationException e) { // invalid token, eject client
+			return Response
+					.status(Response.Status.UNAUTHORIZED)
+					.entity(new GenericResponse(Response.Status.UNAUTHORIZED.getStatusCode(), "Invalid authentication scheme!"))
+					.build();
+		} catch (JsonParseException | JsonMappingException e) {
+			return Response
+					.status(Response.Status.BAD_REQUEST)
+					.entity(new InternalErrorResponse(Response.Status.BAD_REQUEST.getStatusCode(), "Cannot parse submitted group body!", e.getMessage()))
+					.build();
+		} catch (IOException e) {
+			return Response
+					.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(new InternalErrorResponse(e.getMessage()))
+					.build();
+		}
+	}
+
 	private Response addUserToGroup(String authorization, String groupName) {
 		authorization = authorization.substring(authorization.indexOf(" ") + 1); // remove "Bearer" from Authorization header
 		try {
