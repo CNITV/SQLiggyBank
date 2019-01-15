@@ -346,7 +346,7 @@ public class UserResource {
 			if (jwt.getClaim("username").asString().equals(username) &&
 					hasher.verifyHash(jwt.getClaim("password").asString(), user.getPassword())) { // are they ok?
 				User tempUser = new ObjectMapper().readValue(newUser, User.class); // create new User object
-				if (tempUser.getPassword().equals("") || tempUser.getUsername().equals("")) {
+				if (tempUser.getPassword().trim().equals("") || tempUser.getUsername().trim().equals("")) {
 					return Response
 							.status(Response.Status.FORBIDDEN)
 							.entity(new GenericResponse(Response.Status.FORBIDDEN.getStatusCode(), "No empty usernames or passwords allowed!"))
@@ -358,7 +358,7 @@ public class UserResource {
 				//
 				// I'm just happy I don't have to make my own actual SQL queries :)
 				user.setUsername(tempUser.getUsername());
-				user.setPassword(tempUser.getPassword());
+				user.setPassword(hasher.hash(tempUser.getPassword()));
 				user.setFirst_name(tempUser.getFirst_name());
 				user.setLast_name(tempUser.getLast_name());
 				user.setEmail(tempUser.getEmail());
@@ -370,7 +370,7 @@ public class UserResource {
 				String token = JWT.create()
 						.withIssuer("SQLiggyBank")
 						.withClaim("username", user.getUsername())
-						.withClaim("password", user.getPassword())
+						.withClaim("password", tempUser.getPassword())
 						.withExpiresAt(expiryDate)
 						.sign(authAlgorithm); // create JWT for user
 				return Response // return token

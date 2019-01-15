@@ -77,7 +77,7 @@ public class GroupResource {
 		try {
 			DecodedJWT jwt = authVerifier.verify(authorization); // verify token
 			Group group = groupDAO.findByName(groupName).orElseThrow(() -> new NotFoundException("No such group."));
-			if (groupDAO.isUserPartOfGroup(jwt.getClaim("username").asString(), groupName)) { // user part of group, give group information
+			if (groupListDAO.isUserPartOfGroup(jwt.getClaim("username").asString(), groupName)) { // user part of group, give group information
 				return Response.ok(group).build();
 			} else { // not part of group, eject client
 				return Response
@@ -254,7 +254,7 @@ public class GroupResource {
 		try {
 			DecodedJWT jwt = authVerifier.verify(authorization); // verify token
 			Group group = groupDAO.findByName(groupName).orElseThrow(() -> new NotFoundException("No such group."));
-			if (!groupDAO.isUserPartOfGroup(jwt.getClaim("username").asString(), groupName)) { // user not part of group, put them in
+			if (!groupListDAO.isUserPartOfGroup(jwt.getClaim("username").asString(), groupName)) { // user not part of group, put them in
 				groupListDAO.addUserToGroup(userDAO.findByUsername(jwt.getClaim("username").asString()).orElseThrow(() -> new NotFoundException("No user found!")), group);
 				return Response
 						.ok()
