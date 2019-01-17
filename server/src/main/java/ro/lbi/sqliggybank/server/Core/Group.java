@@ -41,7 +41,7 @@ public class Group {
 	private String description;
 
 	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "owner_uid")
+	@JoinColumn(name = "owner_uid", nullable = false)
 	private User owner;
 
 	public Group() {

@@ -25,7 +25,8 @@ import java.util.UUID;
 		})
 public class GroupEntry {
 	@Id
-	@GeneratedValue
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "group_lists_id")
+	@SequenceGenerator(name = "group_lists_id", sequenceName = "group_lists_id_seq", allocationSize = 1)
 	private Integer id;
 
 	@OneToOne(fetch = FetchType.LAZY)
