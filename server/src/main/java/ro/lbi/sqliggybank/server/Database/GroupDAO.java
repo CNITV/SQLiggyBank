@@ -43,7 +43,7 @@ public class GroupDAO extends AbstractDAO<Group> {
 	}
 
 	public boolean isUserOwnerOfGroup(String username, String groupName) {
-		Query query = namedQuery("ro.lbi.sqliggybank.server.Core.GroupEntry.isUserOwnerOfGroup");
+		Query query = namedQuery("ro.lbi.sqliggybank.server.Core.Group.isUserOwnerOfGroup");
 		query.setParameter("username", username);
 		query.setParameter("groupName", groupName);
 		return !query.getResultList().isEmpty();
