@@ -22,6 +22,10 @@ import java.util.UUID;
 						name = "ro.lbi.sqliggybank.server.Core.GroupEntry.isUserPartOfGroup",
 						query = "SELECT l FROM GroupEntry l WHERE l.user.username = :username AND l.group.name = :groupName"
 				),
+				@NamedQuery(
+						name = "ro.lbi.sqliggybank.server.Core.GroupEntry.deleteUsersFromGroup",
+						query = "DELETE FROM GroupEntry l WHERE l.group IN (SELECT grp FROM Group grp WHERE grp.name = :groupName)"
+				)
 		})
 public class GroupEntry {
 	@Id

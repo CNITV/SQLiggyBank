@@ -59,11 +59,14 @@ public class GroupDAO extends AbstractDAO<Group> {
 	}
 
 	/**
-	 * Deletes a group from the database.
+	 * Deletes all the users in a group and then deletes the group from the database.
 	 *
 	 * @param group The group to be deleted.
 	 */
 	public void delete(Group group) {
+		Query query = namedQuery("ro.lbi.sqliggybank.server.Core.GroupEntry.deleteUsersFromGroup");
+		query.setParameter("groupName", group.getName());
+		query.executeUpdate();
 		currentSession().delete(group);
 	}
 
