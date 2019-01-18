@@ -223,6 +223,7 @@ public class GroupResource {
 			DecodedJWT jwt = authVerifier.verify(authorization); // verify token
 			User owner = userDAO.findByUsername(jwt.getClaim("username").asString()).orElseThrow(() -> new NotFoundException("User not found!"));
 			Group tempGroup = new ObjectMapper().readValue(groupBody, Group.class); // create new Group object
+			tempGroup.setUuid(UUID.randomUUID()); // set random UUID, Hibernate needs it FeelsBadMan
 			tempGroup.setOwner(owner);
 			groupDAO.create(tempGroup);
 			return addUserToGroup(authorization, tempGroup.getName());
