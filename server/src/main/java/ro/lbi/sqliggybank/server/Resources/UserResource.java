@@ -236,7 +236,7 @@ public class UserResource {
 		ObjectMapper mapper = new ObjectMapper();
 		try {
 			Account account = mapper.readValue(body, Account.class); // read object in Account class
-			User user = userDAO.findByUsername(account.getUsername()).orElseThrow(() -> new NotFoundException("No such username."));
+			User user = userDAO.findByUsername(account.getUsername());
 			if (account.getPassword().equals("") || account.getUsername().equals("")) {
 				return Response
 						.status(Response.Status.FORBIDDEN)
@@ -259,7 +259,7 @@ public class UserResource {
 					.serverError()
 					.entity(new InternalErrorResponse("Could not access database!"))
 					.build();
-		} catch (NoResultException e) { // user not found, eject client
+		} catch (NotFoundException e) { // user not found, eject client
 			e.printStackTrace();
 			return Response
 					.status(Response.Status.NOT_FOUND)
@@ -278,13 +278,13 @@ public class UserResource {
 	 */
 	private Response findUsername(String username) {
 		try {
-			User user = userDAO.findByUsername(username).orElseThrow(() -> new NotFoundException("No such username."));
+			User user = userDAO.findByUsername(username);
 			// we need to redact some stuff, password is redacted and user has UUID set to the zero UUID.
 			User redactedUser = new User(new UUID(0, 0), user.getUsername(), "[REDACTED]", user.getFirst_name(), user.getLast_name(), user.getEmail());
 			return Response // give user
 					.ok(redactedUser)
 					.build();
-		} catch (NoResultException e) { // can't find user, return error
+		} catch (NotFoundException e) { // can't find user, return error
 			return Response
 					.status(Response.Status.NOT_FOUND)
 					.entity(new NotFoundResponse("Could not find user!"))
@@ -308,11 +308,11 @@ public class UserResource {
 		try {
 			User user;
 			try {
-				user = userDAO.findByUsername(username).orElseThrow(() -> new NotFoundException("No such username."));
-			} catch (NoResultException e) {
+				user = userDAO.findByUsername(username);
+			} catch (NotFoundException e) { // can't find user, eject client
 				return Response
 						.status(Response.Status.NOT_FOUND)
-						.entity(new NotFoundResponse("Could not find user with supplied username!"))
+						.entity(new NotFoundResponse("Could not find user with supplied password!"))
 						.build();
 			}
 			DecodedJWT jwt = authVerifier.verify(authorization); // verify token
@@ -346,7 +346,7 @@ public class UserResource {
 	private Response updateUser(String username, String authorization, String newUser) {
 		authorization = authorization.substring(authorization.indexOf(" ") + 1); // remove "Bearer" from Authorization header
 		try {
-			User user = userDAO.findByUsername(username).orElseThrow(() -> new NotFoundException("No such username."));
+			User user = userDAO.findByUsername(username);
 			DecodedJWT jwt = authVerifier.verify(authorization); // verify token
 
 			if (jwt.getClaim("username").asString().equals(username) &&
@@ -410,6 +410,11 @@ public class UserResource {
 					.serverError()
 					.entity(new InternalErrorResponse("Could not access database!"))
 					.build();
+		} catch (NotFoundException e) { // can't find user, eject client
+			return Response
+					.status(Response.Status.NOT_FOUND)
+					.entity(new NotFoundResponse("Could not find user!"))
+					.build();
 		}
 	}
 
@@ -424,7 +429,7 @@ public class UserResource {
 	private Response removeUser(String username, String authorization) {
 		authorization = authorization.substring(authorization.indexOf(" ") + 1); // remove "Bearer" from Authorization header
 		try {
-			User user = userDAO.findByUsername(username).orElseThrow(() -> new NotFoundException("No such username."));
+			User user = userDAO.findByUsername(username);
 			DecodedJWT jwt = authVerifier.verify(authorization); // verify token
 			if (jwt.getClaim("username").asString().equals(username) &&
 					hasher.verifyHash(jwt.getClaim("password").asString(), user.getPassword())) { // if user is correct...
@@ -448,6 +453,11 @@ public class UserResource {
 			return Response
 					.status(Response.Status.UNAUTHORIZED)
 					.entity(new GenericResponse(Response.Status.UNAUTHORIZED.getStatusCode(), "Invalid authentication scheme!"))
+					.build();
+		} catch (NotFoundException e) { // can't find user, eject client
+			return Response
+					.status(Response.Status.NOT_FOUND)
+					.entity(new NotFoundResponse("Could not find user!"))
 					.build();
 		}
 	}

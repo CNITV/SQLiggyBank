@@ -5,6 +5,8 @@ import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import ro.lbi.sqliggybank.server.Core.Group;
 
+import javax.persistence.NoResultException;
+import javax.ws.rs.NotFoundException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -35,11 +37,16 @@ public class GroupDAO extends AbstractDAO<Group> {
 	 * @param name The name of the group.
 	 * @return Optional of any found group.
 	 */
-	public Optional<Group> findByName(String name) {
+	public Group findByName(String name) throws NotFoundException {
 		Query query = namedQuery("ro.lbi.sqliggybank.server.Core.Group.findByName");
 		query.setParameter("name", name);
-		Group group = (Group) query.getSingleResult();
-		return Optional.of(group);
+		Group group;
+		try {
+			group = (Group) query.getSingleResult();
+		} catch (NoResultException e) {
+			throw new NotFoundException("No such group.");
+		}
+		return group;
 	}
 
 	public boolean isUserOwnerOfGroup(String username, String groupName) {

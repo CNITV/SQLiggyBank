@@ -18,10 +18,7 @@ import ro.lbi.sqliggybank.server.Core.User;
 import ro.lbi.sqliggybank.server.Database.GroupDAO;
 import ro.lbi.sqliggybank.server.Database.GroupListDAO;
 import ro.lbi.sqliggybank.server.Database.UserDAO;
-import ro.lbi.sqliggybank.server.Responses.GenericResponse;
-import ro.lbi.sqliggybank.server.Responses.InternalErrorResponse;
-import ro.lbi.sqliggybank.server.Responses.JWTResponse;
-import ro.lbi.sqliggybank.server.Responses.JoinedGroupResponse;
+import ro.lbi.sqliggybank.server.Responses.*;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -76,7 +73,7 @@ public class GroupResource {
 		authorization = authorization.substring(authorization.indexOf(" ") + 1); // remove "Bearer" from Authorization header
 		try {
 			DecodedJWT jwt = authVerifier.verify(authorization); // verify token
-			Group group = groupDAO.findByName(groupName).orElseThrow(() -> new NotFoundException("No such group."));
+			Group group = groupDAO.findByName(groupName);
 			if (groupListDAO.isUserPartOfGroup(jwt.getClaim("username").asString(), groupName)) { // user part of group, give group information
 				return Response.ok(group).build();
 			} else { // not part of group, eject client
@@ -94,6 +91,11 @@ public class GroupResource {
 			return Response
 					.status(Response.Status.UNAUTHORIZED)
 					.entity(new GenericResponse(Response.Status.UNAUTHORIZED.getStatusCode(), "Invalid authentication scheme!"))
+					.build();
+		} catch (NotFoundException e) {
+			return Response
+					.status(Response.Status.NOT_FOUND)
+					.entity(new NotFoundResponse("No such group."))
 					.build();
 		}
 	}
@@ -116,7 +118,7 @@ public class GroupResource {
 		authorization = authorization.substring(authorization.indexOf(" ") + 1); // remove "Bearer" from Authorization header
 		try {
 			DecodedJWT jwt = authVerifier.verify(authorization); // verify token
-			Group group = groupDAO.findByName(groupName).orElseThrow(() -> new NotFoundException("No such group."));
+			Group group = groupDAO.findByName(groupName);
 			if (groupDAO.isUserOwnerOfGroup(jwt.getClaim("username").asString(), groupName)) { // user owner of group, give group invites
 				ArrayList<Invite> groupInvites = new ArrayList<>();
 				for (Invite invite :
@@ -142,6 +144,11 @@ public class GroupResource {
 					.status(Response.Status.UNAUTHORIZED)
 					.entity(new GenericResponse(Response.Status.UNAUTHORIZED.getStatusCode(), "Invalid authentication scheme!"))
 					.build();
+		} catch (NotFoundException e) {
+			return Response
+					.status(Response.Status.NOT_FOUND)
+					.entity(new NotFoundResponse(Response.Status.NOT_FOUND.getStatusCode(), "Resource not found!", "No such group!"))
+					.build();
 		}
 	}
 
@@ -163,7 +170,7 @@ public class GroupResource {
 		authorization = authorization.substring(authorization.indexOf(" ") + 1); // remove "Bearer" from Authorization header
 		try {
 			DecodedJWT jwt = authVerifier.verify(authorization); // verify token
-			Group group = groupDAO.findByName(groupName).orElseThrow(() -> new NotFoundException("No such group."));
+			//Group group = groupDAO.findByName(groupName).orElseThrow(() -> new NotFoundException("No such group."));
 			if (groupDAO.isUserOwnerOfGroup(jwt.getClaim("username").asString(), groupName)) { // user owner of group, give group invites
 				Invite invite = new Invite(groupName, new Date());
 				invites.add(invite);
@@ -221,7 +228,7 @@ public class GroupResource {
 		authorization = authorization.substring(authorization.indexOf(" ") + 1); // remove "Bearer" from Authorization header
 		try {
 			DecodedJWT jwt = authVerifier.verify(authorization); // verify token
-			User owner = userDAO.findByUsername(jwt.getClaim("username").asString()).orElseThrow(() -> new NotFoundException("User not found!"));
+			User owner = userDAO.findByUsername(jwt.getClaim("username").asString());
 			Group tempGroup = new ObjectMapper().readValue(groupBody, Group.class); // create new Group object
 			tempGroup.setUuid(UUID.randomUUID()); // set random UUID, Hibernate needs it FeelsBadMan
 			tempGroup.setOwner(owner);
@@ -247,6 +254,11 @@ public class GroupResource {
 					.status(Response.Status.INTERNAL_SERVER_ERROR)
 					.entity(new InternalErrorResponse(e.getMessage()))
 					.build();
+		} catch (NotFoundException e) {
+			return Response
+					.status(Response.Status.NOT_FOUND)
+					.entity(new NotFoundResponse("User not found!"))
+					.build();
 		}
 	}
 
@@ -254,9 +266,9 @@ public class GroupResource {
 		authorization = authorization.substring(authorization.indexOf(" ") + 1); // remove "Bearer" from Authorization header
 		try {
 			DecodedJWT jwt = authVerifier.verify(authorization); // verify token
-			Group group = groupDAO.findByName(groupName).orElseThrow(() -> new NotFoundException("No such group."));
+			Group group = groupDAO.findByName(groupName);
 			if (!groupListDAO.isUserPartOfGroup(jwt.getClaim("username").asString(), groupName)) { // user not part of group, put them in
-				groupListDAO.addUserToGroup(userDAO.findByUsername(jwt.getClaim("username").asString()).orElseThrow(() -> new NotFoundException("No user found!")), group);
+				groupListDAO.addUserToGroup(userDAO.findByUsername(jwt.getClaim("username").asString()), group);
 				return Response
 						.ok()
 						.entity(new JoinedGroupResponse(group.getUuid()))
@@ -276,6 +288,11 @@ public class GroupResource {
 			return Response
 					.status(Response.Status.UNAUTHORIZED)
 					.entity(new GenericResponse(Response.Status.UNAUTHORIZED.getStatusCode(), "Invalid authentication scheme!"))
+					.build();
+		} catch (NotFoundException e) {
+			return Response
+					.status(Response.Status.NOT_FOUND)
+					.entity(new NotFoundResponse(e.getMessage()))
 					.build();
 		}
 	}
@@ -297,7 +314,7 @@ public class GroupResource {
 	private Response editGroup(String authorization, String groupName, String newGroup) {
 		authorization = authorization.substring(authorization.indexOf(" ") + 1); // remove "Bearer" from Authorization header
 		try {
-			Group group = groupDAO.findByName(groupName).orElseThrow(() -> new NotFoundException("No such group."));
+			Group group = groupDAO.findByName(groupName);
 			DecodedJWT jwt = authVerifier.verify(authorization); // verify token
 			if (groupDAO.isUserOwnerOfGroup(jwt.getClaim("username").asString(), groupName)) { // are they ok?
 				Group tempGroup = new ObjectMapper().readValue(newGroup, Group.class); // create new Group object
@@ -342,6 +359,11 @@ public class GroupResource {
 					.serverError()
 					.entity(new InternalErrorResponse("Could not access database!"))
 					.build();
+		} catch (NotFoundException e) {
+			return Response
+					.status(Response.Status.NOT_FOUND)
+					.entity(new NotFoundResponse(e.getMessage()))
+					.build();
 		}
 	}
 
@@ -362,7 +384,7 @@ public class GroupResource {
 	private Response removeGroup(String authorization, String groupName) {
 		authorization = authorization.substring(authorization.indexOf(" ") + 1); // remove "Bearer" from Authorization header
 		try {
-			Group group = groupDAO.findByName(groupName).orElseThrow(() -> new NotFoundException("No such username."));
+			Group group = groupDAO.findByName(groupName);
 			DecodedJWT jwt = authVerifier.verify(authorization); // verify token
 			if (groupDAO.isUserOwnerOfGroup(jwt.getClaim("username").asString(), groupName)) { // if user is correct...
 				groupDAO.delete(group); // delete that group of bad boiz
@@ -385,6 +407,11 @@ public class GroupResource {
 			return Response
 					.status(Response.Status.UNAUTHORIZED)
 					.entity(new GenericResponse(Response.Status.UNAUTHORIZED.getStatusCode(), "Invalid authentication scheme!"))
+					.build();
+		} catch (NotFoundException e) {
+			return Response
+					.status(Response.Status.NOT_FOUND)
+					.entity(new NotFoundResponse(e.getMessage()))
 					.build();
 		}
 	}

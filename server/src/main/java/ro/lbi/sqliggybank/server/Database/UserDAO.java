@@ -5,8 +5,9 @@ import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import ro.lbi.sqliggybank.server.Core.User;
 
+import javax.persistence.NoResultException;
+import javax.ws.rs.NotFoundException;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -33,8 +34,8 @@ public class UserDAO extends AbstractDAO<User> {
 	 * @param id The UUID of the user.
 	 * @return Optional of any found user.
 	 */
-	public Optional<User> findByID(UUID id) {
-		return Optional.ofNullable(get(id));
+	public User findByID(UUID id) {
+		return get(id);
 	}
 
 	/**
@@ -43,11 +44,16 @@ public class UserDAO extends AbstractDAO<User> {
 	 * @param username The username of the user.
 	 * @return Optional of any found user.
 	 */
-	public Optional<User> findByUsername(String username) {
+	public User findByUsername(String username) throws NotFoundException {
 		Query query = namedQuery("ro.lbi.sqliggybank.server.Core.User.findByUsername");
 		query.setParameter("username", username);
-		User user = (User) query.getSingleResult();
-		return Optional.of(user);
+		User user;
+		try {
+			user = (User) query.getSingleResult();
+		} catch (NoResultException e) {
+			throw new NotFoundException("No such username.");
+		}
+		return user;
 	}
 
 	/**
