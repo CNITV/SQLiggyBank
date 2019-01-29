@@ -13,7 +13,9 @@ import ro.lbi.sqliggybank.server.Core.GroupEntry;
 import ro.lbi.sqliggybank.server.Core.User;
 import ro.lbi.sqliggybank.server.Database.GroupDAO;
 import ro.lbi.sqliggybank.server.Database.GroupListDAO;
+import ro.lbi.sqliggybank.server.Database.PiggyBankDAO;
 import ro.lbi.sqliggybank.server.Database.UserDAO;
+import ro.lbi.sqliggybank.server.Resources.BanksResource;
 import ro.lbi.sqliggybank.server.Resources.GroupResource;
 import ro.lbi.sqliggybank.server.Resources.UserResource;
 
@@ -93,9 +95,11 @@ public class ServerApplication extends Application<ServerConfiguration> {
 		final UserDAO userDAO = new UserDAO(hibernateBundle.getSessionFactory());
 		final GroupDAO groupDAO = new GroupDAO(hibernateBundle.getSessionFactory());
 		final GroupListDAO groupListDAO = new GroupListDAO(hibernateBundle.getSessionFactory(), userDAO);
+		final PiggyBankDAO piggyBankDAO = new PiggyBankDAO(hibernateBundle.getSessionFactory());
 		final String JWTSecret = configuration.getJWTSecret();
 		final byte[] secret = JWTSecret.getBytes();
 		environment.jersey().register(new UserResource(userDAO, secret));
 		environment.jersey().register(new GroupResource(groupDAO, groupListDAO, userDAO, secret));
+		environment.jersey().register(new BanksResource(groupDAO, groupListDAO, userDAO, piggyBankDAO, secret));
 	}
 }
