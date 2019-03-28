@@ -53,6 +53,7 @@ public class PiggyBank {
 		this.uuid = uuid;
 		this.name = name;
 		this.description = description;
+		this.group = group;
 	}
 
 	public UUID getUuid() {

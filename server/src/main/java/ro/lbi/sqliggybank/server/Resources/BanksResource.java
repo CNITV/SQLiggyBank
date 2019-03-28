@@ -11,7 +11,6 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.dropwizard.hibernate.UnitOfWork;
 import io.dropwizard.jersey.PATCH;
-import org.omg.CosNaming.NamingContextPackage.NotFound;
 import ro.lbi.sqliggybank.server.Core.Group;
 import ro.lbi.sqliggybank.server.Core.PiggyBank;
 import ro.lbi.sqliggybank.server.Database.GroupDAO;
@@ -20,7 +19,6 @@ import ro.lbi.sqliggybank.server.Database.PiggyBankDAO;
 import ro.lbi.sqliggybank.server.Database.UserDAO;
 import ro.lbi.sqliggybank.server.Responses.GenericResponse;
 import ro.lbi.sqliggybank.server.Responses.InternalErrorResponse;
-import sun.net.www.content.text.Generic;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -74,7 +72,7 @@ public class BanksResource {
 		} else {
 			return Response
 					.status(Response.Status.FORBIDDEN)
-					.entity(new GenericResponse(Response.Status.FORBIDDEN.getStatusCode(), "You must be logged in to view piggy bank information!"))
+					.entity(new GenericResponse(Response.Status.FORBIDDEN.getStatusCode(), "You must be logged in to create a piggy bank!"))
 					.build();
 		}
 	}
@@ -96,9 +94,9 @@ public class BanksResource {
 	@DELETE
 	@UnitOfWork
 	@Path("{groupName}/{bankName}")
-	public Response editPiggyBankInfo(@HeaderParam("Authorization") String authorization, @PathParam("groupName") String groupName, @PathParam("bankName") String bankName) {
+	public Response deletePiggyBank(@HeaderParam("Authorization") String authorization, @PathParam("groupName") String groupName, @PathParam("bankName") String bankName) {
 		if (authorization != null) { // are they a user? Let's see if they pass the test.
-			return deletePiggyBank(groupName, bankName, authorization);
+			return removePiggyBank(groupName, bankName, authorization);
 		} else {
 			return Response
 					.status(Response.Status.FORBIDDEN)
@@ -220,7 +218,7 @@ public class BanksResource {
 		}
 	}
 
-	private Response deletePiggyBank(String groupName, String bankName, String authorization) {
+	private Response removePiggyBank(String groupName, String bankName, String authorization) {
 		authorization = authorization.substring(authorization.indexOf(" ") + 1); // remove "Bearer" from Authorization header
 		try {
 			DecodedJWT jwt = authVerifier.verify(authorization); // verify token
