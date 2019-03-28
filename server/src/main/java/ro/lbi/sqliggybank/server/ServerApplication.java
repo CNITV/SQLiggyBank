@@ -11,13 +11,8 @@ import io.dropwizard.setup.Environment;
 import ro.lbi.sqliggybank.server.Core.Group;
 import ro.lbi.sqliggybank.server.Core.GroupEntry;
 import ro.lbi.sqliggybank.server.Core.User;
-import ro.lbi.sqliggybank.server.Database.GroupDAO;
-import ro.lbi.sqliggybank.server.Database.GroupListDAO;
-import ro.lbi.sqliggybank.server.Database.PiggyBankDAO;
-import ro.lbi.sqliggybank.server.Database.UserDAO;
-import ro.lbi.sqliggybank.server.Resources.BanksResource;
-import ro.lbi.sqliggybank.server.Resources.GroupResource;
-import ro.lbi.sqliggybank.server.Resources.UserResource;
+import ro.lbi.sqliggybank.server.Database.*;
+import ro.lbi.sqliggybank.server.Resources.*;
 
 /**
  * ServerApplication is the main entry point of the server. It builds the Hibernate bundle, reads the configuration,
@@ -96,10 +91,15 @@ public class ServerApplication extends Application<ServerConfiguration> {
 		final GroupDAO groupDAO = new GroupDAO(hibernateBundle.getSessionFactory());
 		final GroupListDAO groupListDAO = new GroupListDAO(hibernateBundle.getSessionFactory(), userDAO);
 		final PiggyBankDAO piggyBankDAO = new PiggyBankDAO(hibernateBundle.getSessionFactory());
+		final DepositDAO depositDAO = new DepositDAO(hibernateBundle.getSessionFactory());
+		final WithdrawalDAO withdrawalDAO = new WithdrawalDAO(hibernateBundle.getSessionFactory());
+		final GoalDAO goalDAO = new GoalDAO(hibernateBundle.getSessionFactory());
 		final String JWTSecret = configuration.getJWTSecret();
 		final byte[] secret = JWTSecret.getBytes();
 		environment.jersey().register(new UserResource(userDAO, secret));
 		environment.jersey().register(new GroupResource(groupDAO, groupListDAO, userDAO, secret));
 		environment.jersey().register(new BanksResource(groupDAO, groupListDAO, userDAO, piggyBankDAO, secret));
+		environment.jersey().register(new TransactionsResource(groupDAO, groupListDAO, userDAO, depositDAO, withdrawalDAO, piggyBankDAO, secret));
+		environment.jersey().register(new GoalResource(groupDAO, groupListDAO, userDAO, piggyBankDAO, goalDAO, secret));
 	}
 }

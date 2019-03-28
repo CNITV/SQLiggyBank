@@ -14,6 +14,9 @@
 
     <mapping class="ro.lbi.sqliggybank.server.Core.User"/>
     <mapping class="ro.lbi.sqliggybank.server.Core.Group"/>
+    <mapping class="ro.lbi.sqliggybank.server.Core.Deposit"/>
+    <mapping class="ro.lbi.sqliggybank.server.Core.Withdrawal"/>
+    <mapping class="ro.lbi.sqliggybank.server.Core.Goal"/>
     <mapping class="ro.lbi.sqliggybank.server.Core.GroupEntry"/>
     <mapping class="ro.lbi.sqliggybank.server.Core.PiggyBank"/>
   </session-factory>
