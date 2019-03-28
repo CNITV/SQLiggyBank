@@ -37,6 +37,13 @@ public class GroupListDAO extends AbstractDAO<GroupEntry> {
 		return !query.getResultList().isEmpty();
 	}
 
+	@SuppressWarnings("unchecked")
+	public List<GroupEntry> findByGroup(Group group) {
+		Query query = namedQuery("ro.lbi.sqliggybank.server.Core.GroupEntry.isUserPartOfGroup");
+		query.setParameter("passed_group", group);
+		return list((Query<GroupEntry>) query);
+	}
+
 	/**
 	 * Creates a group list in the database.
 	 *

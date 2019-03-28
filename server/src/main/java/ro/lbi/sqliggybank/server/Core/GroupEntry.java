@@ -1,10 +1,7 @@
 package ro.lbi.sqliggybank.server.Core;
 
-import org.eclipse.jetty.util.annotation.Name;
-
 import javax.persistence.*;
 import java.util.Objects;
-import java.util.UUID;
 
 @Entity
 @Table(name = "group_lists")
@@ -17,6 +14,10 @@ import java.util.UUID;
 				@NamedQuery(
 						name = "ro.lbi.sqliggybank.server.Core.GroupEntry.findByID",
 						query = "SELECT l FROM GroupEntry l WHERE l.id = :id"
+				),
+				@NamedQuery(
+						name = "ro.lbi.sqliggybank.server.Core.GroupEntry.findByGroup",
+						query = "SELECT l FROM GroupEntry l WHERE l.group = :passed_group"
 				),
 				@NamedQuery(
 						name = "ro.lbi.sqliggybank.server.Core.GroupEntry.isUserPartOfGroup",
