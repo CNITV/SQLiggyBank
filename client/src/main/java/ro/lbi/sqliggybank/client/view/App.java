@@ -15,8 +15,7 @@ import ro.lbi.sqliggybank.client.view.window_manager.WindowManagerImpl;
  * @see javafx.application.Application
  *
  * @author Alexandru GHERGHESCU (alexghergh)
- * @since 2018-10-23 (v0.1)
- * @version 0.1
+ * @since 2018-10-23
  *
  */
 public class App extends Application {

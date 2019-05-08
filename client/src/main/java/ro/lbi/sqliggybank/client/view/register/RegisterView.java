@@ -14,8 +14,7 @@ import java.io.IOException;
  * @see ro.lbi.sqliggybank.client.view.register.RegisterController
  *
  * @author Alexandru GHERGHESCU (alexghergh)
- * @since 2018-11-15 (v0.1)
- * @version 0.1
+ * @since 2018-11-15
  *
  */
 public class RegisterView {

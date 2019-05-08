@@ -10,11 +10,11 @@ import java.io.IOException;
  * This class is the login menu view. Its purpose is to connect the main application class and the login controller
  * class.
  *
- * @author Alexandru GHERGHESCU (alexghergh)
- * @version 0.1
  * @see ro.lbi.sqliggybank.client.view.App
  * @see ro.lbi.sqliggybank.client.view.login.LoginController
- * @since 2018-11-23 (v0.1)
+ *
+ * @author Alexandru GHERGHESCU (alexghergh)
+ * @since 2018-11-23
  */
 public class LoginView {
 

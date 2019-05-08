@@ -24,8 +24,7 @@ import static ro.lbi.sqliggybank.client.view.App.win_width;
  * @see ro.lbi.sqliggybank.client.view.window_manager.WindowManager
  *
  * @author Alexandru GHERGHESCU (alexghergh)
- * @since 2018-10-23 (v0.1)
- * @version 0.1
+ * @since 2018-10-23
  */
 public class WindowManagerImpl implements WindowManager {
 

@@ -17,7 +17,6 @@ import ro.lbi.sqliggybank.client.util.Alert;
 import ro.lbi.sqliggybank.client.view.window_manager.WindowManager;
 
 import java.io.IOException;
-import java.net.ConnectException;
 import java.util.concurrent.ExecutionException;
 
 import static ro.lbi.sqliggybank.client.view.App.win_height;
@@ -27,8 +26,7 @@ import static ro.lbi.sqliggybank.client.view.App.win_width;
  * This class implements the register controller. It prompts the user to create a new account.
  *
  * @author Alexandru GHERGHESCU (alexghergh)
- * @version 0.1
- * @since 2018-15-11 (v0.1)
+ * @since 2018-11-15
  */
 public class RegisterController {
 
@@ -145,15 +143,11 @@ public class RegisterController {
 
 						return true;
 					}
-				} catch (ConnectException e) {
+				} catch (IOException e) {
 					setButtonsEnabled(true);
 					showAlert("Failed to connect to server", "Failed to connect to the database!" +
 							" This might be due to the server not currently working! Please try again in a few moments!");
 					LOGGER.log(Level.ERROR, "Server connection error", e);
-				} catch (IOException e) {
-					setButtonsEnabled(true);
-					showAlert("Error", e.getMessage());
-					LOGGER.log(Level.ERROR, "Server error", e);
 				} catch (IllegalStateException e) {
 					setButtonsEnabled(true);
 					showAlert("Error", e.getMessage());

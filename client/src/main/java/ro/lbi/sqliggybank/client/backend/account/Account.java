@@ -8,8 +8,7 @@ import lombok.Getter;
  * (Credits to @StormFireFox1 for initially designing this)
  *
  * @author Alexandru GHERGHESCU (alexghergh)
- * @since 2018-12-06 (v0.1)
- * @version 0.1
+ * @since 2018-12-06
  */
 @Getter
 public class Account {

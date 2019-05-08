@@ -11,11 +11,11 @@ import java.io.IOException;
  * This class is the dashboard menu view. Its purpose is to connect the main application class and the
  * dashboard controller class.
  *
- * @author Alexandru GHERGHESCU (alexghergh)
- * @version 0.1
  * @see ro.lbi.sqliggybank.client.view.App
  * @see ro.lbi.sqliggybank.client.view.dashboard.DashboardController
- * @since 2018-11-26 (v0.1)
+ * 
+ * @author Alexandru GHERGHESCU (alexghergh)
+ * @since 2018-11-26
  */
 public class DashboardView {
 

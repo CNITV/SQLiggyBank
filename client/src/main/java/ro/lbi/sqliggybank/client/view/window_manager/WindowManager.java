@@ -6,8 +6,7 @@ import ro.lbi.sqliggybank.client.backend.user.User;
  * This is just an interface for the windows that need to be implemented in the application.
  *
  * @author Alexandru GHERGHESCU (alexghergh)
- * @since 2018-10-23 (v0.1)
- * @version 0.1
+ * @since 2018-10-23
  */
 public interface WindowManager {
 
