@@ -15,8 +15,6 @@ import java.util.Optional;
  *
  * @author Alexandru GHERGHESCU (alexghergh)
  * @since 2018-11-23 (v0.1)
- * @version 0.1
- *
  */
 public class Alert {
 

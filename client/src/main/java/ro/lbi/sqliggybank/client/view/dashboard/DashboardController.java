@@ -1,25 +1,29 @@
 package ro.lbi.sqliggybank.client.view.dashboard;
 
+import com.google.gson.Gson;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
-import javafx.scene.Scene;
+
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.GridPane;
+
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
-import javafx.stage.Modality;
-import javafx.stage.Screen;
-import javafx.stage.Stage;
+
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import ro.lbi.sqliggybank.client.backend.account.Account;
+import ro.lbi.sqliggybank.client.backend.database.DatabaseHandler;
+import ro.lbi.sqliggybank.client.backend.exceptions.NotFoundException;
+import ro.lbi.sqliggybank.client.backend.exceptions.UnauthorizedException;
 import ro.lbi.sqliggybank.client.backend.user.User;
 import ro.lbi.sqliggybank.client.util.Alert;
 import ro.lbi.sqliggybank.client.view.window_manager.WindowManager;
 
+import java.io.IOException;
 import java.util.Optional;
 
 import static ro.lbi.sqliggybank.client.view.App.win_height;
@@ -30,9 +34,7 @@ import static ro.lbi.sqliggybank.client.view.App.win_width;
  * using the application. Here a user can see, create, delete different banks, groups or goals.
  *
  * @author Alexandru GHERGHESCU (alexghergh)
- * @since 2018-11-15 (v0.1)
- * @version 0.1
- *
+ * @since 2018-11-15
  */
 public class DashboardController {
 
@@ -40,6 +42,13 @@ public class DashboardController {
 	 * This is the default logger for the program view. The framework used is log4j.
 	 */
 	private static final Logger LOGGER = Logger.getLogger(DashboardController.class);
+
+	/**
+	 * This is the database handler. It handles API calls to the server.
+	 *
+	 * @see ro.lbi.sqliggybank.client.backend.database.DatabaseHandler
+	 */
+	private DatabaseHandler databaseHandler;
 
 	/**
 	 * This is the window manager. This way the controller can switch to other scenes, like for example the
@@ -75,6 +84,12 @@ public class DashboardController {
 	private Circle profilePicture;
 
 	/**
+	 * Search bar for another user.
+	 */
+	@FXML
+	private TextField searchBar;
+
+	/**
 	 * The groups tree view structure.
 	 */
 	@FXML
@@ -83,6 +98,7 @@ public class DashboardController {
 	DashboardController(WindowManager windowManager, User user) {
 		this.windowManager = windowManager;
 		this.user = user;
+		databaseHandler = new DatabaseHandler();
 	}
 
 	/**
@@ -96,7 +112,7 @@ public class DashboardController {
 		usernameLabel.setText(user.getUsername());
 		nameLabel.setText(
 				(user.getFirst_name() != null ? user.getFirst_name() : "") + " " +
-				(user.getLast_name() != null ? user.getLast_name() : "")
+						(user.getLast_name() != null ? user.getLast_name() : "")
 		);
 
 		/*
@@ -114,10 +130,10 @@ public class DashboardController {
 						20, 20, true, true)
 		);
 
-		TreeItem<String> rootItem = new TreeItem<> ("Group 1", rootIcon);
+		TreeItem<String> rootItem = new TreeItem<>("Group 1", rootIcon);
 		rootItem.setExpanded(true);
 		for (int i = 1; i < 100; i++) {
-			TreeItem<String> item = new TreeItem<> ("Bank " + i);
+			TreeItem<String> item = new TreeItem<>("Bank " + i);
 			rootItem.getChildren().add(item);
 		}
 		groupsTreeView.setRoot(rootItem);
@@ -151,8 +167,8 @@ public class DashboardController {
 		/*
         Persist the current window settings throughout the application.
          */
-		win_width = (int)((Node)event.getSource()).getScene().getWidth();
-		win_height = (int)((Node)event.getSource()).getScene().getHeight();
+		win_width = (int) ((Node) event.getSource()).getScene().getWidth();
+		win_height = (int) ((Node) event.getSource()).getScene().getHeight();
 
 		/*
 		Prompt the user if they really want to logout.
@@ -190,24 +206,40 @@ public class DashboardController {
 	 */
 	@FXML
 	private void keyPressed(ActionEvent event) {
-//		Stage stage = new Stage();
-//
-//		stage.setResizable(true);
-//		stage.setMinWidth(400);
-//		stage.setMinHeight(400);
-//		stage.initModality(Modality.APPLICATION_MODAL);
-//		stage.setScene(new Scene(new GridPane()));
-//		Rectangle2D primScreenBounds = Screen.getPrimary().getVisualBounds();
-//
-//		System.out.println(primScreenBounds);
-//		System.out.println(stage.getWidth());
-//
-//		stage.setX((primScreenBounds.getWidth() - stage.getWidth()) / 2);
-//		stage.setY((primScreenBounds.getHeight() - stage.getHeight()) / 2);
-//
-//		System.out.println(stage.getX());
-//		System.out.println(stage.getY());
-//
-//		stage.show();
+		try {
+			/*
+			Search for user in the database.
+		    */
+			// TODO maybe put this in a separate thread so it doesn't block the main application thread
+			String result = databaseHandler.getUser(new Account(searchBar.getText(), "password"), user.getJWT());
+
+			Gson gson = new Gson();
+			User searchedUser = gson.fromJson(result, User.class);
+
+			javafx.scene.control.Alert userInfo = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.INFORMATION);
+			userInfo.setTitle("Information for the user " + searchBar.getText());
+			userInfo.setContentText("Username: " + searchedUser.getUsername() + "\n" +
+					"Last name: " + searchedUser.getLast_name() + "\n" +
+					"First name: " + searchedUser.getFirst_name() + "\n" +
+					"Email: " + searchedUser.getEmail());
+			userInfo.showAndWait();
+
+		} catch (IOException e) {
+			Platform.runLater(() ->
+					Alert.errorAlert("Error", "Failed to connect to the database!" +
+							" This might be due to the server not currently working! Please try again in a few moments!")
+			);
+			LOGGER.log(Level.ERROR, "Server error", e);
+		} catch (UnauthorizedException e) {
+			Platform.runLater(() ->
+					Alert.errorAlert("Wrong authorization schema", e.getMessage())
+			);
+			LOGGER.log(Level.ERROR, "Wrong authorization schema", e);
+		} catch (NotFoundException e) {
+			Platform.runLater(() ->
+					Alert.errorAlert("User not found", e.getMessage())
+			);
+			LOGGER.log(Level.ERROR, "User not found", e);
+		}
 	}
 }

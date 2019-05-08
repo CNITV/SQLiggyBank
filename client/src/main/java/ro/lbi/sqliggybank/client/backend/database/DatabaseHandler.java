@@ -2,6 +2,10 @@ package ro.lbi.sqliggybank.client.backend.database;
 
 import okhttp3.*;
 import ro.lbi.sqliggybank.client.backend.account.Account;
+import ro.lbi.sqliggybank.client.backend.exceptions.BadRequestException;
+import ro.lbi.sqliggybank.client.backend.exceptions.ForbiddenException;
+import ro.lbi.sqliggybank.client.backend.exceptions.NotFoundException;
+import ro.lbi.sqliggybank.client.backend.exceptions.UnauthorizedException;
 import ro.lbi.sqliggybank.client.backend.user.User;
 
 import java.io.IOException;
@@ -13,12 +17,11 @@ import java.io.IOException;
  * The connection between the client and the server is made through this class.
  *
  * @author Alexandru GHERGHESCU (alexghergh)
- * @since 2018-12-15 (v0.1)
- * @version 0.1
+ * @since 2018-12-15
  */
 public class DatabaseHandler {
 
-	private String serverUrl = "http://localhost:8080";
+	private String serverUrl = "http://localhost:8010";
 
 	/**
 	 * This method is used to log in a user.
@@ -30,9 +33,10 @@ public class DatabaseHandler {
 	 * @param account the account data introduced by the user on the client side.
 	 * @return the user credentials gotten from the server.
 	 * @throws IOException throws this exception if something went wrong with the http call.
-	 * @throws IllegalAccessException throws this exception if the user inputted a wrong account.
+	 * @throws ForbiddenException throws this exception if the user's login username/password combination was wrong.
+	 * @throws NotFoundException throws this exception if the username wasn't found in the database.
 	 */
-	public String loginUser(Account account) throws IOException, IllegalAccessException {
+	public String loginUser(Account account) throws IOException, ForbiddenException, NotFoundException {
 		OkHttpClient httpClient = new OkHttpClient();
 
 		MediaType JSON = MediaType.parse("application/json; charset=utf-8");
@@ -49,16 +53,10 @@ public class DatabaseHandler {
 		Response response = httpClient.newCall(request).execute();
 
 		if (response.code() == 404) {
-			/*
-			Username doesn't exist in the database.
-			 */
-			throw new IllegalAccessException("Incorrect username or password!");
+			throw new NotFoundException("Incorrect username or password!");
 		}
 		if (response.code() == 403) {
-			/*
-			Wrong username/password combination.
-			 */
-			throw new IllegalAccessException("Invalid username and password combination!");
+			throw new ForbiddenException("Invalid username and password combination!");
 		}
 
 		String result;
@@ -83,9 +81,10 @@ public class DatabaseHandler {
 	 * @param JWT the JWT needed for the authorization schema (if the JWT is wrong, only public fields are given).
 	 * @return a JSON containing the user information.
 	 * @throws IOException throws this exception if something went wrong with the http call.
-	 * @throws IllegalAccessException throws this exception if the user inputted a wrong account.
+	 * @throws UnauthorizedException throws this exception if the user has an invalid authorization header.
+	 * @throws NotFoundException throws this exception if the user resource wasn't found in the database.
 	 */
-	public String getUser(Account account, String JWT) throws IOException, IllegalAccessException {
+	public String getUser(Account account, String JWT) throws IOException, UnauthorizedException, NotFoundException {
 		OkHttpClient httpClient = new OkHttpClient();
 
 		Request request = new Request.Builder()
@@ -96,8 +95,12 @@ public class DatabaseHandler {
 
 		Response response = httpClient.newCall(request).execute();
 
+		if (response.code() == 404) {
+			throw new NotFoundException("That username doesn't exist!");
+		}
+
 		if (response.code() == 401) {
-			throw new IllegalAccessException("Invalid authorization header!");
+			throw new UnauthorizedException("Invalid authorization header or token!");
 		}
 
 		String result;
@@ -121,10 +124,10 @@ public class DatabaseHandler {
 	 * @param user the user to be deleted.
 	 * @return returns an OK response if everything went right.
 	 * @throws IOException throws this exception if something went wrong with the http call.
-	 * @throws IllegalAccessException throws this exception if the user inputted a wrong account.
+	 * @throws UnauthorizedException throws this exception if the user has an invalid authorization header.
 	 */
 	@SuppressWarnings("Duplicates")
-	public String deleteUser(User user) throws IOException, IllegalAccessException {
+	public String deleteUser(User user) throws IOException, UnauthorizedException {
 		OkHttpClient httpClient = new OkHttpClient();
 
 		Request request = new Request.Builder()
@@ -136,7 +139,7 @@ public class DatabaseHandler {
 		Response response = httpClient.newCall(request).execute();
 
 		if (response.code() == 401) {
-			throw new IllegalAccessException("Invalid authorization header!");
+			throw new UnauthorizedException("Invalid authorization header!");
 		}
 
 		String result;
@@ -166,6 +169,7 @@ public class DatabaseHandler {
 	 * @throws IOException throws this exception if something went wrong with the http call.
 	 * @throws IllegalStateException throws this exception if the user inputted an account that already exists.
 	 */
+	@SuppressWarnings("Duplicates")
 	public String registerUser(String username, String password, String first_name, String last_name, String email)
 			throws IOException, IllegalStateException {
 		OkHttpClient httpClient = new OkHttpClient();
@@ -186,6 +190,7 @@ public class DatabaseHandler {
 
 		Response response = httpClient.newCall(request).execute();
 
+		//TODO change this to an actual code
 		if (response.code() == 500) {
 			/*
 			Username/email already exists in the database.
@@ -220,10 +225,12 @@ public class DatabaseHandler {
 	 * @return returns OK on success.
 	 * @throws IOException throws this exception if something went wrong with the http call.
 	 * @throws IllegalStateException throws this exception if the username doesn't exist in the database.
-	 * @throws IllegalAccessException throws this exception if the authorization schema is wrong.
+	 * @throws UnauthorizedException throws this exception if the authorization schema is wrong.
+	 * @throws BadRequestException throws this exception if the request wasn't understood by the server.
 	 */
+	@SuppressWarnings("Duplicates")
 	public String editUser(String username, String password, String first_name, String last_name, String email, String JWT)
-			throws IOException, IllegalStateException, IllegalAccessException {
+			throws IOException, IllegalStateException, UnauthorizedException, BadRequestException {
 		OkHttpClient httpClient = new OkHttpClient();
 
 		MediaType JSON = MediaType.parse("application/json; charset=utf-8");
@@ -243,16 +250,17 @@ public class DatabaseHandler {
 
 		Response response = httpClient.newCall(request).execute();
 
+		//TODO change this as well
 		if (response.code() == 500) {
 			throw new IllegalStateException("Username doesn't exist in the database!");
 		}
 
 		if (response.code() == 401) {
-			throw new IllegalAccessException("Wrong authorization schema!");
+			throw new UnauthorizedException("Wrong authorization schema!");
 		}
 
 		if (response.code() == 400) {
-			throw new IllegalAccessException("Bad request!");
+			throw new BadRequestException("Bad request!");
 		}
 
 		String result;

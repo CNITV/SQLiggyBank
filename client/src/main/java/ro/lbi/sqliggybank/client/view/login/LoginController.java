@@ -17,12 +17,14 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import ro.lbi.sqliggybank.client.backend.account.Account;
 import ro.lbi.sqliggybank.client.backend.database.DatabaseHandler;
+import ro.lbi.sqliggybank.client.backend.exceptions.ForbiddenException;
+import ro.lbi.sqliggybank.client.backend.exceptions.NotFoundException;
+import ro.lbi.sqliggybank.client.backend.exceptions.UnauthorizedException;
 import ro.lbi.sqliggybank.client.backend.user.User;
 import ro.lbi.sqliggybank.client.util.Alert;
 import ro.lbi.sqliggybank.client.view.window_manager.WindowManager;
 
 import java.io.IOException;
-import java.net.ConnectException;
 import java.util.concurrent.ExecutionException;
 
 import static ro.lbi.sqliggybank.client.view.App.win_height;
@@ -33,8 +35,7 @@ import static ro.lbi.sqliggybank.client.view.App.win_width;
  * log in using an existing username/password combination or create a new one by registering to the server.
  *
  * @author Alexandru GHERGHESCU (alexghergh)
- * @version 0.1
- * @since 2018-10-23 (v0.1)
+ * @since 2018-11-23
  */
 public class LoginController {
 
@@ -160,25 +161,28 @@ public class LoginController {
 							setButtonsEnabled(true);
 							showAlert("Error", e.getMessage());
 							LOGGER.log(Level.ERROR, "Server error", e);
-						} catch (IllegalAccessException e) {
+						} catch (UnauthorizedException e) {
 							setButtonsEnabled(true);
 							showAlert("Wrong authorization schema", e.getMessage());
 							LOGGER.log(Level.ERROR, "Wrong authorization schema", e);
+						} catch (NotFoundException e) {
+							setButtonsEnabled(true);
+							showAlert("User not found", e.getMessage());
+							LOGGER.log(Level.ERROR, "User not found", e);
 						}
-
-					} catch (ConnectException e) {
+					} catch (IOException e) {
 						setButtonsEnabled(true);
 						showAlert("Failed to connect to server", "Failed to connect to the database!" +
 								" This might be due to the server not currently working! Please try again in a few moments!");
 						LOGGER.log(Level.ERROR, "Server connection error", e);
-					} catch (IOException e) {
-						setButtonsEnabled(true);
-						showAlert("Error", e.getMessage());
-						LOGGER.log(Level.ERROR, "Server error", e);
-					} catch (IllegalAccessException e) {
+					} catch (ForbiddenException e) {
 						setButtonsEnabled(true);
 						showAlert("Failed to login", e.getMessage());
 						LOGGER.log(Level.ERROR, "Failed to login", e);
+					} catch (NotFoundException e) {
+						setButtonsEnabled(true);
+						showAlert("User not found", e.getMessage());
+						LOGGER.log(Level.ERROR, "User not found", e);
 					}
 				} catch (IllegalArgumentException e) {
 					setButtonsEnabled(true);
@@ -203,12 +207,12 @@ public class LoginController {
 	/**
 	 * This method displays an alert pop-up in another thread.
 	 *
-	 * @param title the title of the error alert.
+	 * @param title   the title of the error alert.
 	 * @param message the message of the error alert.
 	 */
 	private void showAlert(String title, String message) {
 		Platform.runLater(() ->
-			Alert.errorAlert(title, message)
+				Alert.errorAlert(title, message)
 		);
 	}
 
