@@ -193,6 +193,12 @@ public class UserResource {
 		ObjectMapper mapper = new ObjectMapper();
 		try {
 			User user = mapper.readValue(body, User.class); // read new user body
+			if (userDAO.userExists(user.getUsername())) {
+				return Response
+						.status(Response.Status.FORBIDDEN)
+						.entity(new GenericResponse(Response.Status.FORBIDDEN.getStatusCode(), "User already exists! Please choose another username!"))
+						.build();
+			}
 			user.setUuid(UUID.randomUUID()); // set random UUID, Hibernate needs it FeelsBadMan
 			String token = createJWT(user.getUsername(), user.getPassword()); // create the JWT before we hash the pass
 			user.setPassword(hasher.hash(user.getPassword())); // hash the password now
@@ -300,7 +306,7 @@ public class UserResource {
 	private Response findAuthenticatedUsername(String username, String authorization) {
 		authorization = authorization.substring(authorization.indexOf(" ") + 1); // remove "Bearer" from Authorization header
 		try {
-			User user = null;
+			User user;
 			try {
 				user = userDAO.findByUsername(username).orElseThrow(() -> new NotFoundException("No such username."));
 			} catch (NoResultException e) {

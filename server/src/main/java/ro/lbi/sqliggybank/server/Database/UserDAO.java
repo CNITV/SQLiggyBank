@@ -51,6 +51,18 @@ public class UserDAO extends AbstractDAO<User> {
 	}
 
 	/**
+	 * Finds user by username in the database and checks whether such user exists.
+	 *
+	 * @param username The username of the user.
+	 * @return True if user exists, false if otherwise.
+	 */
+	public boolean userExists(String username) {
+		Query query = namedQuery("ro.lbi.sqliggybank.server.Core.User.findByUsername");
+		query.setParameter("username", username);
+		return (query.uniqueResult() != null);
+	}
+
+	/**
 	 * Creates a user in the database.
 	 *
 	 * @param user The user to be created.
