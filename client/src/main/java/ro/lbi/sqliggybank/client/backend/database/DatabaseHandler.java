@@ -107,7 +107,7 @@ public class DatabaseHandler {
 		if (response.body() != null) {
 			result = response.body().string();
 		} else {
-			throw new NullPointerException("Reponse body came out null! Try again!");
+			throw new NullPointerException("Response body came out null! Try again!");
 		}
 		response.close();
 
@@ -138,6 +138,11 @@ public class DatabaseHandler {
 
 		Response response = httpClient.newCall(request).execute();
 
+		//TODO modify this to actual code
+		/*if (response.code() == 500) {
+
+		}*/
+
 		if (response.code() == 401) {
 			throw new UnauthorizedException("Invalid authorization header!");
 		}
@@ -167,11 +172,11 @@ public class DatabaseHandler {
 	 * @param email the email of the user.
 	 * @return returns a JWT if everything went right.
 	 * @throws IOException throws this exception if something went wrong with the http call.
-	 * @throws IllegalStateException throws this exception if the user inputted an account that already exists.
+	 * @throws ForbiddenException throws this exception if the username already exists in the database.
 	 */
 	@SuppressWarnings("Duplicates")
 	public String registerUser(String username, String password, String first_name, String last_name, String email)
-			throws IOException, IllegalStateException {
+			throws IOException, ForbiddenException {
 		OkHttpClient httpClient = new OkHttpClient();
 
 		MediaType JSON = MediaType.parse("application/json; charset=utf-8");
@@ -190,12 +195,11 @@ public class DatabaseHandler {
 
 		Response response = httpClient.newCall(request).execute();
 
-		//TODO change this to an actual code
-		if (response.code() == 500) {
+		if (response.code() == 403) {
 			/*
 			Username/email already exists in the database.
 			 */
-			throw new IllegalStateException("Username or email already exists in the database!");
+			throw new ForbiddenException("Username or email already exists in the database!");
 		}
 
 		String result;
@@ -250,7 +254,7 @@ public class DatabaseHandler {
 
 		Response response = httpClient.newCall(request).execute();
 
-		//TODO change this as well
+		//TODO modify this to actual code
 		if (response.code() == 500) {
 			throw new IllegalStateException("Username doesn't exist in the database!");
 		}

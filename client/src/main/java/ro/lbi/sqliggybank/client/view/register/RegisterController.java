@@ -13,6 +13,7 @@ import javafx.scene.layout.Region;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import ro.lbi.sqliggybank.client.backend.database.DatabaseHandler;
+import ro.lbi.sqliggybank.client.backend.exceptions.ForbiddenException;
 import ro.lbi.sqliggybank.client.util.Alert;
 import ro.lbi.sqliggybank.client.view.window_manager.WindowManager;
 
@@ -137,9 +138,17 @@ public class RegisterController {
 							emailTextField.getText()
 					);
 
+					/*
+					If everything went fine, announce the user and redirect him to the login screen.
+					 */
 					if (result != null) {
-						Alert.infoAlert("User registered", "User registration complete! You successfully" +
-								"signed up!");
+						Platform.runLater(() ->
+								{
+									Alert.infoAlert("User registered", "User registration complete! You successfully " +
+											"signed up!");
+									windowManager.loginMenu();
+								}
+						);
 
 						return true;
 					}
@@ -148,7 +157,7 @@ public class RegisterController {
 					showAlert("Failed to connect to server", "Failed to connect to the database!" +
 							" This might be due to the server not currently working! Please try again in a few moments!");
 					LOGGER.log(Level.ERROR, "Server connection error", e);
-				} catch (IllegalStateException e) {
+				} catch (IllegalStateException | ForbiddenException e) {
 					setButtonsEnabled(true);
 					showAlert("Error", e.getMessage());
 					LOGGER.log(Level.ERROR, e.getMessage(), e);
@@ -251,25 +260,5 @@ public class RegisterController {
 		registerThread.setDaemon(true);
 		registerThread.start();
 
-		/*
-		Check if the register thread finished execution.
-		 */
-		if (!registerThread.isAlive()) {
-			Boolean result = false;
-			try {
-				result = registerTask.get();
-			} catch (InterruptedException | ExecutionException e) {
-				e.printStackTrace();
-				Platform.exit();
-			}
-
-			/*
-			Redirect the user to the login menu.
-		     */
-			if (result) {
-				windowManager.loginMenu();
-			}
-		}
 	}
-
 }
