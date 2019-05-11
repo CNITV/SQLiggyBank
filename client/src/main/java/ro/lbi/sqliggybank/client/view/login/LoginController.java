@@ -146,7 +146,7 @@ public class LoginController {
 		                    /*
 		                    Get the user account from the server using the JWT.
 		                     */
-							result = databaseHandler.getUser(account, JWT);
+							result = databaseHandler.getUser(account.getUsername(), JWT);
 
 							Gson gson = new Gson();
 							User user = gson.fromJson(result, User.class);
