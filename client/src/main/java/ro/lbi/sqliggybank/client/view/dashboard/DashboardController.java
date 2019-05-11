@@ -95,6 +95,66 @@ public class DashboardController {
 	@FXML
 	private TreeView<String> groupsTreeView;
 
+	/**
+	 * The group name.
+	 */
+	@FXML
+	private Label groupNameLabel;
+
+	/**
+	 * The label which states who created the group.
+	 */
+	@FXML
+	private Label createdByLabel;
+
+	/**
+	 * This is the group description tooltip.
+	 */
+	@FXML
+	private Tooltip groupDescriptionTooltip;
+
+	/**
+	 * This is a button for creating a new group.
+	 */
+	@FXML
+	private Button createNewGroupButton;
+
+	/**
+	 * This is the list of all the members of a group.
+	 */
+	@FXML
+	private ListView<String> membersList;
+
+	/**
+	 * Create an invite for the group.
+	 */
+	@FXML
+	private Button createGroupInviteButton;
+
+	/**
+	 * Show all the invites to the specified group.
+	 */
+	@FXML
+	private Button showGroupInvitesButton;
+
+	/**
+	 * List of goals for a specific group.
+	 */
+	@FXML
+	private ListView<String> goalsList;
+
+	/**
+	 * Adds a goal to the specified bank.
+	 */
+	@FXML
+	private Button addGoalButton;
+
+	/**
+	 * Removes a goal from the specified bank.
+	 */
+	@FXML
+	private Button removeGoalButton;
+
 	DashboardController(WindowManager windowManager, User user) {
 		this.windowManager = windowManager;
 		this.user = user;
@@ -124,21 +184,41 @@ public class DashboardController {
 		/*
 		Initialize the groups, banks and goals.
 		*/
+
+		///TODO get groups and list them
 		//test groups
-		ImageView rootIcon = new ImageView(
+		ImageView groupIcon = new ImageView(
 				new Image("/ro/lbi/sqliggybank/client/view/dashboard/image/folder.png",
 						20, 20, true, true)
 		);
+		TreeItem<String> rootItem = new TreeItem<>("Groups");
+		TreeItem<String> group1 = new TreeItem<>("Group 1", groupIcon);
 
-		TreeItem<String> rootItem = new TreeItem<>("Group 1", rootIcon);
-		rootItem.setExpanded(true);
-		for (int i = 1; i < 100; i++) {
+		rootItem.getChildren().add(group1);
+
+		for (int i = 1; i < 10; i++) {
 			TreeItem<String> item = new TreeItem<>("Bank " + i);
-			rootItem.getChildren().add(item);
-		}
-		groupsTreeView.setRoot(rootItem);
-		rootItem.setExpanded(false);
 
+			group1.getChildren().add(item);
+		}
+
+		groupsTreeView.getSelectionModel().selectedItemProperty().addListener(
+				(observable, oldValue, newValue) -> {
+					groupNameLabel.setVisible(true);
+					groupNameLabel.setText(newValue.getValue());
+
+					createdByLabel.setVisible(true);
+					createdByLabel.setText("Created by " + user.getUsername());
+
+					groupDescriptionTooltip.setText("this is the group description ahahahaha this is the group description ahahahaha this is the group description ahahahaha this is the group description ahahahaha this is the group description ahahahaha this is the group description ahahahaha");
+
+					for (int i = 0; i < 15; ++i) {
+						membersList.getItems().add("Member " + i);
+					}
+				}
+		);
+		groupsTreeView.setRoot(rootItem);
+		groupsTreeView.setShowRoot(false);
 	}
 
 	/**
@@ -174,7 +254,7 @@ public class DashboardController {
 		Prompt the user if they really want to logout.
 		 */
 		ButtonType yesButton = new ButtonType("Yes");
-		ButtonType noButton = new ButtonType("No", ButtonBar.ButtonData.CANCEL_CLOSE);
+		ButtonType noButton = new ButtonType("No");
 
 		Optional<ButtonType> result = Alert.promptAlert("Logout", "Are you sure you want to logout?", yesButton, noButton);
 
@@ -205,19 +285,20 @@ public class DashboardController {
 	 * @param event the event received from the application.
 	 */
 	@FXML
-	private void keyPressed(ActionEvent event) {
+	private void searchBarPressed(ActionEvent event) {
 		try {
 			/*
 			Search for user in the database.
 		    */
-			// TODO maybe put this in a separate thread so it doesn't block the main application thread
-			String result = databaseHandler.getUser(new Account(searchBar.getText(), "password"), user.getJWT());
+			// TODO put this in a separate thread so it doesn't block the main application thread
+			String result = databaseHandler.getUser(searchBar.getText(), user.getJWT());
 
 			Gson gson = new Gson();
 			User searchedUser = gson.fromJson(result, User.class);
 
 			javafx.scene.control.Alert userInfo = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.INFORMATION);
 			userInfo.setTitle("Information for the user " + searchBar.getText());
+			userInfo.setHeaderText(null);
 			userInfo.setContentText("Username: " + searchedUser.getUsername() + "\n" +
 					"Last name: " + searchedUser.getLast_name() + "\n" +
 					"First name: " + searchedUser.getFirst_name() + "\n" +

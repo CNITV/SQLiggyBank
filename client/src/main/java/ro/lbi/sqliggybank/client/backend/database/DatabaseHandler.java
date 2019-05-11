@@ -77,18 +77,18 @@ public class DatabaseHandler {
 	 * It calls the server on this endpoint:
 	 * GET /api/users/{username}
 	 *
-	 * @param account the account data introduced by the user on the client side.
-	 * @param JWT the JWT needed for the authorization schema (if the JWT is wrong, only public fields are given).
+	 * @param username the username to look for in the database.
+	 * @param JWT the JWT needed for the authorization schema (if the JWT doesn't match the username, only public fields are given).
 	 * @return a JSON containing the user information.
 	 * @throws IOException throws this exception if something went wrong with the http call.
 	 * @throws UnauthorizedException throws this exception if the user has an invalid authorization header.
 	 * @throws NotFoundException throws this exception if the user resource wasn't found in the database.
 	 */
-	public String getUser(Account account, String JWT) throws IOException, UnauthorizedException, NotFoundException {
+	public String getUser(String username, String JWT) throws IOException, UnauthorizedException, NotFoundException {
 		OkHttpClient httpClient = new OkHttpClient();
 
 		Request request = new Request.Builder()
-				.url(serverUrl + "/api/users/" + account.getUsername())
+				.url(serverUrl + "/api/users/" + username)
 				.get()
 				.addHeader("Authorization", "Bearer " + JWT)
 				.build();
