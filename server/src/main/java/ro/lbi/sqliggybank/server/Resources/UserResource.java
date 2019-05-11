@@ -346,9 +346,15 @@ public class UserResource {
 	private Response updateUser(String username, String authorization, String newUser) {
 		authorization = authorization.substring(authorization.indexOf(" ") + 1); // remove "Bearer" from Authorization header
 		try {
-			User user = userDAO.findByUsername(username).orElseThrow(() -> new NotFoundException("No such username."));
 			DecodedJWT jwt = authVerifier.verify(authorization); // verify token
-
+			if (!userDAO.userExists(jwt.getClaim("username").asString())) {
+				return Response
+						.status(Response.Status.BAD_REQUEST)
+						.entity(new GenericResponse(Response.Status.FORBIDDEN.getStatusCode(), "This username does not exist!"))
+						.build();
+			}
+			User user = userDAO.findByUsername(username).orElseThrow(() -> new NotFoundException("No such username."));
+			
 			if (jwt.getClaim("username").asString().equals(username) &&
 					hasher.verifyHash(jwt.getClaim("password").asString(), user.getPassword())) { // are they ok?
 				User tempUser = new ObjectMapper().readValue(newUser, User.class); // create new User object
@@ -424,8 +430,14 @@ public class UserResource {
 	private Response removeUser(String username, String authorization) {
 		authorization = authorization.substring(authorization.indexOf(" ") + 1); // remove "Bearer" from Authorization header
 		try {
+		       	DecodedJWT jwt = authVerifier.verify(authorization); // verify token
+			if (!userDAO.userExists(jwt.getClaim("username").asString())) {
+				return Response
+						.status(Response.Status.BAD_REQUEST)
+						.entity(new GenericResponse(Response.Status.FORBIDDEN.getStatusCode(), "This username does not exist!"))
+						.build();
+			}
 			User user = userDAO.findByUsername(username).orElseThrow(() -> new NotFoundException("No such username."));
-			DecodedJWT jwt = authVerifier.verify(authorization); // verify token
 			if (jwt.getClaim("username").asString().equals(username) &&
 					hasher.verifyHash(jwt.getClaim("password").asString(), user.getPassword())) { // if user is correct...
 				userDAO.delete(user); // delete that bad boi
