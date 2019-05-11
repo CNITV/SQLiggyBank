@@ -1,0 +1,97 @@
+# SQLiggyBank-Server Example Configuration
+
+# These are critical variables for SQLiggyBank-Server. You will need to configure these, otherwise the server will not
+# run.
+
+jwtsecret: [INSERT JWT SECRET KEY HERE]
+
+
+# ro.lbi.sqliggybank.server.Database settings.
+database:
+
+  # the name of your JDBC driver
+  driverClass: org.postgresql.Driver
+
+  # the username
+  user: [INSERT POSTGRES DATABASE ADMIN USERNAME HERE]
+
+  # the password
+  password: [INSERT POSTGRES DATABASE ADMIN PASSWORD HERE]
+
+  # the JDBC URL
+  url: jdbc:postgresql://127.0.0.1:54321;databaseName=sqliggybank
+
+# use the simple server factory if you only want to run on a single port
+#server:
+#  type: simple
+#  connector:
+#    type: http
+#    port: 8080
+
+server:
+  #  softNofileLimit: 1000
+  #  hardNofileLimit: 1000
+  applicationConnectors:
+  - type: http
+    port: 80
+  - type: https
+    port: 443
+    keyStorePath: example.keystore
+    keyStorePassword: example
+  #this requires the alpn-boot library on the JVM's boot classpath
+  #- type: h2
+  #  port: 8445
+  #  keyStorePath: example.keystore
+  #  keyStorePassword: example
+  adminConnectors:
+  - type: http
+    port: 81
+  - type: https
+    port: 444
+    keyStorePath: example.keystore
+    keyStorePassword: example
+
+# Logging settings.
+logging:
+
+  # The default level of all loggers. Can be OFF, ERROR, WARN, INFO, DEBUG, TRACE, or ALL.
+  level: INFO
+
+  # Logger-specific levels.
+  loggers:
+
+    # Sets the level for 'com.example.app' to DEBUG.
+    SQLiggyBankServer: DEBUG
+
+    # Redirects SQL logs to a separate file
+    org.hibernate.SQL:
+      level: DEBUG
+
+  # Logback's Time Based Rolling Policy - archivedLogFilenamePattern: /tmp/application-%d{yyyy-MM-dd}.log.gz
+  # Logback's Size and Time Based Rolling Policy -  archivedLogFilenamePattern: /tmp/application-%d{yyyy-MM-dd}-%i.log.gz
+  # Logback's Fixed Window Rolling Policy -  archivedLogFilenamePattern: /tmp/application-%i.log.gz
+
+  appenders:
+  - type: console
+  - type: file
+    threshold: INFO
+    logFormat: "%-6level [%d{HH:mm:ss.SSS}] [%t] %logger{5} - %X{code} %msg %n"
+    currentLogFilename: /tmp/SQLiggyBank-Server.log
+    archivedLogFilenamePattern: /tmp/SQLiggyBank-Server-%d{yyyy-MM-dd}-%i.log.gz
+    archivedFileCount: 7
+    timeZone: UTC
+    maxFileSize: 10MB
+
+# the key needs to match the configuration key of the renderer (ViewRenderer::getConfigurationKey)
+viewRendererConfiguration:
+  freemarker:
+    strict_syntax: yes
+    whitespace_stripping: yes
+
+metrics:
+  reporters:
+  - type: graphite
+    host: localhost
+    port: 8080
+    prefix: sqliggybank
+    frequency: 1m
