@@ -8,9 +8,7 @@ import io.dropwizard.hibernate.HibernateBundle;
 import io.dropwizard.migrations.MigrationsBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
-import ro.lbi.sqliggybank.server.Core.Group;
-import ro.lbi.sqliggybank.server.Core.GroupEntry;
-import ro.lbi.sqliggybank.server.Core.User;
+import ro.lbi.sqliggybank.server.Core.*;
 import ro.lbi.sqliggybank.server.Database.*;
 import ro.lbi.sqliggybank.server.Resources.*;
 
@@ -27,7 +25,7 @@ public class ServerApplication extends Application<ServerConfiguration> {
 	 * The Hibernate bundle for the server. The database is configured here as well.
 	 */
 	private final HibernateBundle<ServerConfiguration> hibernateBundle =
-			new HibernateBundle<ServerConfiguration>(User.class, Group.class, GroupEntry.class) {
+			new HibernateBundle<ServerConfiguration>(User.class, Group.class, GroupEntry.class, PiggyBank.class, Deposit.class, Withdrawal.class, Goal.class) {
 				@Override
 				public DataSourceFactory getDataSourceFactory(ServerConfiguration configuration) {
 					return configuration.getDataSourceFactory();
