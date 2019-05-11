@@ -153,8 +153,14 @@ public class LoginController {
 							user.setJWT(JWT);
 
 							/*
-							Return the user.
+							Everything went fine, redirect user to dashboard.
 							 */
+							Platform.runLater(() ->
+									{
+										windowManager.dashboardMenu(user);
+										Alert.infoAlert("Welcome", "Welcome back, " + user.getUsername() + "!");
+									}
+							);
 							return user;
 
 						} catch (IOException e) {
@@ -265,28 +271,6 @@ public class LoginController {
 		loginThread.setDaemon(true);
 		loginThread.start();
 
-		/*
-		Check if the login thread finished execution.
-		 */
-		if (!loginThread.isAlive()) {
-			/*
-			Get the user created in the login thread.
-		     */
-			User user = null;
-			try {
-				user = loginTask.get();
-			} catch (InterruptedException | ExecutionException e) {
-				e.printStackTrace();
-				Platform.exit();
-			}
-
-			/*
-			Redirect the user to their dashboard.
-		     */
-			if (user != null) {
-				windowManager.dashboardMenu(user);
-			}
-		}
 	}
 
 	/**

@@ -14,7 +14,7 @@ import java.util.Optional;
  * @see javafx.scene.control.Alert
  *
  * @author Alexandru GHERGHESCU (alexghergh)
- * @since 2018-11-23 (v0.1)
+ * @since 2018-11-23
  */
 public class Alert {
 
