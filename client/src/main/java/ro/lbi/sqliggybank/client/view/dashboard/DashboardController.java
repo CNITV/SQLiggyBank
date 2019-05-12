@@ -20,7 +20,6 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import ro.lbi.sqliggybank.client.backend.account.Account;
 import ro.lbi.sqliggybank.client.backend.database.DatabaseHandler;
 import ro.lbi.sqliggybank.client.backend.exceptions.NotFoundException;
 import ro.lbi.sqliggybank.client.backend.exceptions.UnauthorizedException;
@@ -343,51 +342,141 @@ public class DashboardController {
 	 */
 	@FXML
 	private void groupSettingsButtonPressed(ActionEvent event) {
+		/*
+		Open group settings pop-up window.
+		 */
+		try {
+			Stage settings = new Stage();
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("/ro/lbi/sqliggybank/client/view/dashboard/groupSettings.fxml"));
+			loader.setControllerFactory(
+					c -> new GroupSettingsController(windowManager, user)
+			);
 
+			Parent root = loader.load();
+
+			settings.setScene(new Scene(root, 600 , 400));
+			settings.setTitle("Group settings");
+			settings.initModality(Modality.WINDOW_MODAL);
+			settings.initOwner(((Node)event.getSource()).getScene().getWindow());
+			settings.setResizable(false);
+			settings.show();
+
+		} catch (IOException exception) {
+            /*
+            This happens whenever the FXML loader can't load the specified file for whatever reason.
+             */
+			LOGGER.log(Level.ERROR, "The FXML loader couldn't load the FXML file." , exception);
+			Alert.errorAlert("FXML error", "The FXML loader couldn't load the FXML file.");
+			Platform.exit();
+		} catch (IllegalStateException exception) {
+            /*
+            This happens whenever the FXML file isn't found at the specified path or the file name is wrong.
+             */
+			LOGGER.log(Level.ERROR, "The FXML loader couldn't find the file at the specified path.", exception);
+			Alert.errorAlert("FXML error", "The FXML loader couldn't find the file at the specified path.");
+			Platform.exit();
+		}
 	}
 
+	/**
+	 * This method fires when the user wants to join a group.
+	 *
+	 * @param event the event received from the application.
+	 */
 	@FXML
 	private void joinGroupButtonPressed(ActionEvent event) {
+		TextInputDialog dialog = new TextInputDialog("Invite ID");
+		dialog.setTitle("Group Invite");
+		dialog.setHeaderText(null);
+		dialog.setContentText("Please enter the group invite ID:");
 
+		Optional<String> result = dialog.showAndWait();
+		result.ifPresent(invite -> {
+			{
+				databaseHandler.joinGroup();
+			}
+		});
 	}
 
+	/**
+	 * This method fires when the user wants to create a group.
+	 *
+	 * @param event the event received from the application.
+	 */
 	@FXML
 	private void newGroupButtonPressed(ActionEvent event) {
-
+		databaseHandler.createGroup();
 	}
 
+	/**
+	 * This method opens a dialog for the transactions.
+	 *
+	 * @param event the event received from the application.
+	 */
 	@FXML
 	private void transactionsButtonPressed(ActionEvent event) {
-
+		/*
+		Go to transactions pop-up window.
+		 */
 	}
 
+	/**
+	 * This method fires when the user wants to generate a 24-hour group invite link.
+	 *
+	 * @param event the event received from the application.
+	 */
 	@FXML
 	private void createGroupInviteButtonPressed(ActionEvent event) {
-
+		databaseHandler.generateGroupInvite();
 	}
 
+	/**
+	 * This method fires when the user wants to see the currently active group invite links.
+	 *
+	 * @param event the event received from the application.
+	 */
 	@FXML
 	private void showGroupInvitesButtonPressed(ActionEvent event) {
-
+		databaseHandler.getGroupInviteList();
 	}
 
+	/**
+	 * This method fires when the user wants to create a bank for the group.
+	 *
+	 * @param event the event received from the application.
+	 */
 	@FXML
 	private void addBankButtonPressed(ActionEvent event) {
-
+		databaseHandler.createBank();
 	}
 
+	/**
+	 * This method fires when the user wants to remove a bank from the group.
+	 *
+	 * @param event the event received from the application.
+	 */
 	@FXML
 	private void removeBankButtonPressed(ActionEvent event) {
-
+		databaseHandler.removeBank();
 	}
 
+	/**
+	 * This method fires when the user wants to add a goal for a bank.
+	 *
+	 * @param event the event received from the application.
+	 */
 	@FXML
 	private void addGoalButtonPressed(ActionEvent event) {
-
+		databaseHandler.addGoal();
 	}
 
+	/**
+	 * This method fires when the user wants to delete a goal from a bank.
+	 *
+	 * @param event the event received from the application.
+	 */
 	@FXML
 	private void removeGoalButtonPressed(ActionEvent event) {
-
+		databaseHandler.removeGoal();
 	}
 }
