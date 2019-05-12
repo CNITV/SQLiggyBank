@@ -5,6 +5,8 @@ import javax.persistence.*;
 import java.util.Objects;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.*;
+
 /**
  * User is a class that represents a user of SQLiggyBank. It contains a username, password and personal identifiable
  * information that might be needed for a user.
@@ -124,6 +126,7 @@ public class User {
 	 *
 	 * @return The password of the user.
 	 */
+	@JsonIgnore
 	public String getPassword() {
 		return password;
 	}
