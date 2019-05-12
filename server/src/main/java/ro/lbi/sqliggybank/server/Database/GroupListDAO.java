@@ -37,6 +37,26 @@ public class GroupListDAO extends AbstractDAO<GroupEntry> {
 		return !query.getResultList().isEmpty();
 	}
 
+	/**
+	 * Finds all the users that are members of a group.
+	 *
+	 * @param group the Group to find the members from.
+	 * @return List of all the Users in a group.
+	 */
+	@SuppressWarnings("unchecked")
+	public List<User> membersOfGroup(Group group) {
+		Query query = namedQuery("ro.lbi.sqliggybank.server.Core.GroupEntry.membersOfGroup");
+		query.setParameter("groupUuid", group.getUuid());
+		return query.getResultList();
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Group> groupsOfUser(User user) {
+		Query query = namedQuery("ro.lbi.sqliggybank.server.Core.GroupEntry.groupsOfUser");
+		query.setParameter("userUuid", user.getUuid());
+		return query.getResultList();
+	}
+
 	@SuppressWarnings("unchecked")
 	public List<GroupEntry> findByGroup(Group group) {
 		Query query = namedQuery("ro.lbi.sqliggybank.server.Core.GroupEntry.isUserPartOfGroup");
