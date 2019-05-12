@@ -129,9 +129,9 @@ public class UserSettingsController {
 				databaseHandler.editUser(user.getUsername(),
 						usernameBox.getText().isEmpty() ? user.getUsername() : usernameBox.getText(),
 						passwordBox.getText(),
-						firstNameBox.getText().isEmpty() ? user.getFirst_name() : firstNameBox.getText(),
-						lastNameBox.getText().isEmpty() ? user.getLast_name() : lastNameBox.getText(),
-						emailBox.getText().isEmpty() ? user.getEmail() : emailBox.getText(),
+						firstNameBox.getText().isEmpty() ? (user.getFirst_name() == null ? "" : user.getFirst_name()) : firstNameBox.getText(),
+						lastNameBox.getText().isEmpty() ? (user.getLast_name() == null ? "" :user.getLast_name()) : lastNameBox.getText(),
+						emailBox.getText().isEmpty() ? (user.getEmail() == null ? "" : user.getEmail()) : emailBox.getText(),
 						user.getJWT()
 				);
 
