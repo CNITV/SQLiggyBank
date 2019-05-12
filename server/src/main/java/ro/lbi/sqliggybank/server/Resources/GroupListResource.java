@@ -113,8 +113,8 @@ public class GroupListResource {
 		authorization = authorization.substring(authorization.indexOf(" ") + 1); // remove "Bearer" from Authorization header
 		try {
 			DecodedJWT jwt = authVerifier.verify(authorization); // verify token
-			User user = userDAO.findByUsername(jwt.getClaim("username").asString()).orElseThrow(() -> { throw new NotFoundException("User not found!");});
-			Group group = groupDAO.findByName(groupName).orElseThrow(() -> { throw new NotFoundException("Group not found!");});
+			User user = userDAO.findByUsername(jwt.getClaim("username").asString()).orElseThrow(() -> new NotFoundException("User not found!"));
+			Group group = groupDAO.findByName(groupName).orElseThrow(() -> new NotFoundException("Group not found!"));
 			if (groupListDAO.isUserPartOfGroup(user.getUsername(), group.getName())) { // is user part of group? If yes...
 				List<User> list = groupListDAO.membersOfGroup(group);		
 				return Response.ok(list).build();
@@ -141,7 +141,7 @@ public class GroupListResource {
 		authorization = authorization.substring(authorization.indexOf(" ") + 1); // remove "Bearer" from Authorization header
 		try {
 			DecodedJWT jwt = authVerifier.verify(authorization); // verify token
-			User user = userDAO.findByUsername(jwt.getClaim("username").asString()).orElseThrow(() -> { throw new NotFoundException("User not found!");});
+			User user = userDAO.findByUsername(jwt.getClaim("username").asString()).orElseThrow(() -> new NotFoundException("User not found!"));
 			if (jwt.getClaim("username").asString().equals(user.getUsername()) && jwt.getClaim("password").asString().equals(user.getPassword())) { // is user logged in? If yes...
 				List<Group> list = groupListDAO.groupsOfUser(user);		
 				return Response.ok(list).build();
