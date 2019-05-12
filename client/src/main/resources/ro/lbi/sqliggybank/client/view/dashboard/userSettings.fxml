@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="ro.lbi.sqliggybank.client.view.dashboard.UserSettingsController">
+    <Label layoutX="32.0" layoutY="23.0" prefHeight="53.0" prefWidth="253.0" text="Modify user settings">
+        <font>
+            <Font name="Arial Bold" size="24.0"/>
+        </font>
+    </Label>
+    <HBox layoutX="52.0" layoutY="68.0" prefHeight="279.0" prefWidth="497.0">
+        <VBox prefHeight="225.0" prefWidth="242.0" spacing="5.0">
+            <Label alignment="CENTER" prefHeight="50.0" prefWidth="242.0" text="Username:">
+                <font>
+                    <Font name="Arial" size="15.0"/>
+                </font>
+            </Label>
+            <Label alignment="CENTER" prefHeight="50.0" prefWidth="242.0" text="Password:">
+                <font>
+                    <Font name="Arial" size="15.0"/>
+                </font>
+            </Label>
+            <Label alignment="CENTER" prefHeight="50.0" prefWidth="307.0" text="First name:">
+                <font>
+                    <Font name="Arial" size="15.0"/>
+                </font>
+            </Label>
+            <Label alignment="CENTER" prefHeight="50.0" prefWidth="332.0" text="Last name:">
+                <font>
+                    <Font name="Arial" size="15.0"/>
+                </font>
+            </Label>
+            <Label alignment="CENTER" prefHeight="50.0" prefWidth="291.0" text="E-mail:">
+                <font>
+                    <Font name="Arial" size="15.0"/>
+                </font>
+            </Label>
+        </VBox>
+        <VBox prefHeight="253.0" prefWidth="261.0" spacing="5.0">
+            <TextField fx:id="usernameBox" prefHeight="50.0"/>
+            <PasswordField fx:id="passwordBox" prefHeight="50.0"/>
+            <TextField fx:id="firstNameBox" prefHeight="50.0"/>
+            <TextField fx:id="lastNameBox" prefHeight="50.0"/>
+            <TextField fx:id="emailBox" prefHeight="50.0"/>
+        </VBox>
+    </HBox>
+    <Button layoutX="395.0" layoutY="347.0" mnemonicParsing="false" onAction="#okButtonPressed" prefHeight="31.0"
+            prefWidth="60.0" text="OK"/>
+    <Button layoutX="455.0" layoutY="23.0" mnemonicParsing="false" onAction="#deleteUserPressed" prefHeight="31.0"
+            prefWidth="110.0" text="Delete user!!"/>
+</AnchorPane>

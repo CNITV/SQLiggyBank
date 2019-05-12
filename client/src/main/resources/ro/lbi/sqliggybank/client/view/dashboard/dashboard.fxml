@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
@@ -8,235 +7,223 @@
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ro.lbi.sqliggybank.client.view.dashboard.DashboardController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0"
+            prefWidth="1280.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="ro.lbi.sqliggybank.client.view.dashboard.DashboardController">
     <right>
         <SplitPane prefHeight="720.0" prefWidth="300.0" BorderPane.alignment="CENTER">
-           <items>
-               <ScrollPane fitToHeight="true" fitToWidth="true">
-                  <content>
-                      <AnchorPane>
-                         <children>
-                             <TreeView fx:id="groupsTreeView" layoutX="80.0" layoutY="97.0" prefHeight="720.0" prefWidth="298.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                         </children>
-                      </AnchorPane>
-                  </content>
-               </ScrollPane>
-           </items>
+            <ScrollPane fitToHeight="true" fitToWidth="true">
+                <AnchorPane>
+                    <TreeView fx:id="groupsTreeView" layoutX="80.0" layoutY="97.0" prefHeight="720.0"
+                              prefWidth="298.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                              AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
+                </AnchorPane>
+            </ScrollPane>
         </SplitPane>
     </right>
     <center>
         <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
-           <children>
-               <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0">
-                  <children>
-                      <Circle fx:id="profilePicture" fill="DODGERBLUE" radius="57.0" stroke="BLACK" strokeType="INSIDE">
-                          <HBox.margin>
-                              <Insets left="10.0" top="10.0" />
-                          </HBox.margin>
-                      </Circle>
-                      <VBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="340.0">
-                         <children>
-                             <Label fx:id="usernameLabel" prefHeight="38.0" prefWidth="340.0" text="Name">
-                                 <font>
-                                     <Font name="Arial" size="31.0" />
-                                 </font>
-                             </Label>
-                             <Label fx:id="nameLabel" prefWidth="240.0" text="Label">
-                                 <font>
-                                     <Font name="Arial" size="17.0" />
-                                 </font>
-                                 <VBox.margin>
-                                     <Insets top="10.0" />
-                                 </VBox.margin>
-                             </Label>
-                         </children>
-                          <HBox.margin>
-                              <Insets left="15.0" />
-                          </HBox.margin>
-                      </VBox>
-                      <HBox prefHeight="100.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
-                      <TextField fx:id="searchBar" onAction="#searchBarPressed" promptText="search user">
-                          <HBox.margin>
-                              <Insets right="10.0" />
-                          </HBox.margin>
-                     <font>
-                        <Font name="Arial" size="15.0" />
-                     </font>
-                      </TextField>
-                      <Button mnemonicParsing="false" onAction="#settingsButtonPressed">
-                          <graphic>
-                              <ImageView fitHeight="25.0" fitWidth="29.0" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                     <Image url="@image/settings.png" />
-                                 </image>
-                              </ImageView>
-                          </graphic>
-                          <HBox.margin>
-                              <Insets right="10.0" />
-                          </HBox.margin>
-                          <padding>
-                              <Insets top="1.0" />
-                          </padding>
-                      </Button>
-                      <Button alignment="CENTER" mnemonicParsing="false" onAction="#logoutButtonPressed" prefHeight="26.0" prefWidth="98.0" text="Logout">
-                          <HBox.margin>
-                              <Insets right="20.0" />
-                          </HBox.margin>
-                     <font>
-                        <Font name="Arial" size="15.0" />
-                     </font>
-                      </Button>
-                  </children>
-               </HBox>
-            <VBox prefHeight="8.0" prefWidth="980.0" />
+            <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0">
+                <Circle fx:id="profilePicture" fill="DODGERBLUE" radius="57.0" stroke="BLACK" strokeType="INSIDE">
+                    <HBox.margin>
+                        <Insets left="10.0" top="10.0"/>
+                    </HBox.margin>
+                </Circle>
+                <VBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="340.0">
+                    <Label fx:id="usernameLabel" prefHeight="38.0" prefWidth="340.0" text="Name">
+                        <font>
+                            <Font name="Arial" size="31.0"/>
+                        </font>
+                    </Label>
+                    <Label fx:id="nameLabel" prefWidth="240.0" text="Label">
+                        <font>
+                            <Font name="Arial" size="17.0"/>
+                        </font>
+                        <VBox.margin>
+                            <Insets top="10.0"/>
+                        </VBox.margin>
+                    </Label>
+                    <HBox.margin>
+                        <Insets left="15.0"/>
+                    </HBox.margin>
+                </VBox>
+                <HBox prefHeight="100.0" prefWidth="200.0" HBox.hgrow="ALWAYS"/>
+                <TextField fx:id="searchBar" onAction="#searchBarPressed" promptText="search user">
+                    <HBox.margin>
+                        <Insets right="10.0"/>
+                    </HBox.margin>
+                    <font>
+                        <Font name="Arial" size="15.0"/>
+                    </font>
+                </TextField>
+                <Button mnemonicParsing="false" onAction="#userSettingsButtonPressed">
+                    <graphic>
+                        <ImageView fitHeight="25.0" fitWidth="29.0" pickOnBounds="true" preserveRatio="true">
+                            <Image url="@image/settings.png"/>
+                        </ImageView>
+                    </graphic>
+                    <HBox.margin>
+                        <Insets right="10.0"/>
+                    </HBox.margin>
+                    <padding>
+                        <Insets top="1.0"/>
+                    </padding>
+                </Button>
+                <Button alignment="CENTER" mnemonicParsing="false" onAction="#logoutButtonPressed" prefHeight="26.0"
+                        prefWidth="98.0" text="Logout">
+                    <HBox.margin>
+                        <Insets right="20.0"/>
+                    </HBox.margin>
+                    <font>
+                        <Font name="Arial" size="15.0"/>
+                    </font>
+                </Button>
+            </HBox>
+            <VBox prefHeight="8.0" prefWidth="980.0"/>
             <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="10.0" prefWidth="980.0">
-              <items>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0" />
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0" />
-              </items>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0"/>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0"/>
             </SplitPane>
             <GridPane hgap="10.0" prefHeight="497.0" prefWidth="980.0" vgap="20.0" VBox.vgrow="ALWAYS">
-              <columnConstraints>
-                <ColumnConstraints hgrow="ALWAYS" maxWidth="474.0" minWidth="0.0" prefWidth="0.0" />
-                  <ColumnConstraints hgrow="ALWAYS" maxWidth="960.0" minWidth="10.0" prefWidth="960.0" />
-                <ColumnConstraints hgrow="ALWAYS" maxWidth="178.0" minWidth="0.0" prefWidth="0.0" />
-              </columnConstraints>
-              <rowConstraints>
-                <RowConstraints maxHeight="147.0" minHeight="0.0" prefHeight="0.0" vgrow="ALWAYS" />
-                <RowConstraints maxHeight="538.0" minHeight="10.0" prefHeight="538.0" vgrow="ALWAYS" />
-                <RowConstraints maxHeight="55.0" minHeight="0.0" prefHeight="0.0" vgrow="ALWAYS" />
-              </rowConstraints>
-               <children>
-                  <Pane fx:id="groupPane" prefHeight="511.0" prefWidth="878.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                     <children>
-                        <HBox prefHeight="56.0" prefWidth="391.0">
-                           <children>
-                              <Button mnemonicParsing="false" onAction="#settingsButtonPressed">
-                                 <graphic>
-                                    <ImageView fitHeight="25.0" fitWidth="29.0" pickOnBounds="true" preserveRatio="true">
-                                       <image>
-                                          <Image url="@image/settings.png" />
-                                       </image>
-                                    </ImageView>
-                                 </graphic>
-                                 <padding>
-                                    <Insets top="1.0" />
-                                 </padding>
-                              </Button>
-                              <Label fx:id="groupNameLabel" alignment="CENTER_RIGHT" prefHeight="75.0" prefWidth="249.0" text="Group Name" textAlignment="CENTER" wrapText="true">
-                                 <font>
-                                    <Font name="Arial Black" size="20.0" />
-                                 </font>
-                                 <tooltip>
-                                    <Tooltip fx:id="groupDescriptionTooltip" prefWidth="300.0" wrapText="true">
-                                       <font>
-                                          <Font name="Arial" size="15.0" />
-                                       </font>
-                                    </Tooltip>
-                                 </tooltip>
-                              </Label>
-                              <Label fx:id="createdByLabel" alignment="BOTTOM_LEFT" prefHeight="75.0" prefWidth="255.0" text="Created by">
-                                 <font>
-                                    <Font name="Arial" size="16.0" />
-                                 </font>
-                              </Label>
-                           </children>
-                        </HBox>
-                        <Separator layoutX="-5.0" layoutY="77.0" prefHeight="27.0" prefWidth="968.0" />
-                        <Label alignment="CENTER" layoutX="71.0" layoutY="101.0" prefHeight="60.0" prefWidth="151.0" text="Members">
-                           <font>
-                              <Font name="Arial" size="29.0" />
-                           </font>
-                        </Label>
-                        <ListView fx:id="membersList" editable="true" layoutX="46.0" layoutY="160.0" prefHeight="238.0" prefWidth="200.0" />
-                        <VBox layoutX="56.0" layoutY="416.0" prefHeight="70.0" prefWidth="180.0" spacing="10.0">
-                           <children>
-                              <Button fx:id="createGroupInviteButton" mnemonicParsing="false" prefHeight="31.0" prefWidth="193.0" text="Create group invite">
-                                 <font>
-                                    <Font name="Arial" size="15.0" />
-                                 </font>
-                              </Button>
-                              <Button fx:id="showGroupInvitesButton" mnemonicParsing="false" prefHeight="31.0" prefWidth="195.0" text="Show group invites">
-                                 <font>
-                                    <Font name="Arial" size="15.0" />
-                                 </font>
-                              </Button>
-                           </children>
-                        </VBox>
-                        <Button fx:id="createNewGroupButton" layoutX="709.0" layoutY="14.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="155.0" text="Create new group">
-                           <font>
-                              <Font name="Arial" size="15.0" />
-                           </font>
+                <columnConstraints>
+                    <ColumnConstraints hgrow="ALWAYS" maxWidth="474.0" minWidth="0.0" prefWidth="0.0"/>
+                    <ColumnConstraints hgrow="ALWAYS" maxWidth="960.0" minWidth="10.0" prefWidth="960.0"/>
+                    <ColumnConstraints hgrow="ALWAYS" maxWidth="178.0" minWidth="0.0" prefWidth="0.0"/>
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints maxHeight="147.0" minHeight="0.0" prefHeight="0.0" vgrow="ALWAYS"/>
+                    <RowConstraints maxHeight="538.0" minHeight="10.0" prefHeight="538.0" vgrow="ALWAYS"/>
+                    <RowConstraints maxHeight="55.0" minHeight="0.0" prefHeight="0.0" vgrow="ALWAYS"/>
+                </rowConstraints>
+                <Pane prefHeight="511.0" prefWidth="878.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                    <HBox prefHeight="56.0" prefWidth="391.0">
+                        <Button mnemonicParsing="false" onAction="#groupSettingsButtonPressed">
+                            <graphic>
+                                <ImageView fitHeight="25.0" fitWidth="29.0" pickOnBounds="true" preserveRatio="true">
+                                    <Image url="@image/settings.png"/>
+                                </ImageView>
+                            </graphic>
+                            <padding>
+                                <Insets top="1.0"/>
+                            </padding>
                         </Button>
-                        <Label alignment="CENTER" layoutX="711.0" layoutY="101.0" prefHeight="60.0" prefWidth="151.0" text="Goals">
-                           <font>
-                              <Font name="Arial" size="29.0" />
-                           </font>
+                        <Label fx:id="groupNameLabel" alignment="CENTER_RIGHT" prefHeight="75.0" prefWidth="249.0"
+                               text="Group Name" textAlignment="CENTER" wrapText="true">
+                            <font>
+                                <Font name="Arial Black" size="20.0"/>
+                            </font>
+                            <tooltip>
+                                <Tooltip fx:id="groupDescriptionTooltip" prefWidth="300.0" wrapText="true">
+                                    <font>
+                                        <Font name="Arial" size="15.0"/>
+                                    </font>
+                                </Tooltip>
+                            </tooltip>
                         </Label>
-                        <ListView fx:id="goalsList" layoutX="687.0" layoutY="160.0" prefHeight="238.0" prefWidth="200.0" />
-                        <VBox layoutX="697.0" layoutY="416.0" prefHeight="70.0" prefWidth="180.0" spacing="10.0">
-                           <children>
-                              <Button fx:id="addGoalButton" mnemonicParsing="false" prefHeight="30.0" prefWidth="180.0" text="Add goal">
-                                 <font>
-                                    <Font name="Arial" size="15.0" />
-                                 </font>
-                              </Button>
-                              <Button fx:id="removeGoalButton" mnemonicParsing="false" prefHeight="30.0" prefWidth="180.0" text="Remove goal">
-                                 <font>
-                                    <Font name="Arial" size="15.0" />
-                                 </font>
-                              </Button>
-                           </children>
-                        </VBox>
-                        <Label alignment="CENTER" layoutX="391.0" layoutY="101.0" prefHeight="60.0" prefWidth="151.0" text="Banks">
-                           <font>
-                              <Font name="Arial" size="29.0" />
-                           </font>
+                        <Label fx:id="createdByLabel" alignment="BOTTOM_LEFT" prefHeight="75.0" prefWidth="255.0"
+                               text="created by">
+                            <font>
+                                <Font name="Arial" size="16.0"/>
+                            </font>
                         </Label>
-                        <ListView layoutX="381.0" layoutY="160.0" prefHeight="238.0" prefWidth="200.0" />
-                        <VBox layoutX="389.0" layoutY="416.0" prefHeight="70.0" prefWidth="180.0" spacing="10.0">
-                           <children>
-                              <Button mnemonicParsing="false" prefHeight="31.0" prefWidth="192.0" text="Add bank">
-                                 <font>
-                                    <Font name="Arial" size="15.0" />
-                                 </font>
-                              </Button>
-                              <Button mnemonicParsing="false" prefHeight="31.0" prefWidth="189.0" text="Remove bank">
-                                 <font>
-                                    <Font name="Arial" size="15.0" />
-                                 </font>
-                              </Button>
-                           </children>
-                        </VBox>
-                        <Button layoutX="532.0" layoutY="13.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="155.0" text="Join a group">
-                           <font>
-                              <Font name="Arial" size="15.0" />
-                           </font>
+                    </HBox>
+                    <Separator layoutX="-5.0" layoutY="77.0" prefHeight="27.0" prefWidth="968.0"/>
+                    <Label alignment="CENTER" layoutX="71.0" layoutY="101.0" prefHeight="60.0" prefWidth="151.0"
+                           text="Members">
+                        <font>
+                            <Font name="Arial" size="29.0"/>
+                        </font>
+                    </Label>
+                    <ListView fx:id="membersList" editable="true" layoutX="46.0" layoutY="160.0" prefHeight="238.0"
+                              prefWidth="200.0"/>
+                    <VBox layoutX="56.0" layoutY="416.0" prefHeight="70.0" prefWidth="180.0" spacing="10.0">
+                        <Button mnemonicParsing="false" onAction="#createGroupInviteButtonPressed" prefHeight="31.0"
+                                prefWidth="193.0" text="Create group invite">
+                            <font>
+                                <Font name="Arial" size="15.0"/>
+                            </font>
                         </Button>
-                        <Button layoutX="542.0" layoutY="119.0" mnemonicParsing="false">
-                           <padding>
-                              <Insets top="-1.0" />
-                           </padding>
-                           <graphic>
-                              <ImageView fitHeight="25.0" fitWidth="29.0" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@image/plus.png" />
-                                 </image>
-                              </ImageView>
-                           </graphic>
-                           <tooltip>
-                              <Tooltip text="Go to transactions">
-                                 <font>
-                                    <Font name="Arial" size="15.0" />
-                                 </font>
-                              </Tooltip>
-                           </tooltip>
+                        <Button mnemonicParsing="false" onAction="#showGroupInvitesButtonPressed" prefHeight="31.0"
+                                prefWidth="195.0" text="Show group invites">
+                            <font>
+                                <Font name="Arial" size="15.0"/>
+                            </font>
                         </Button>
-                     </children>
-                  </Pane>
-               </children>
+                    </VBox>
+                    <Button layoutX="709.0" layoutY="14.0" mnemonicParsing="false" onAction="#newGroupButtonPressed"
+                            prefHeight="31.0" prefWidth="155.0" text="Create new group">
+                        <font>
+                            <Font name="Arial" size="15.0"/>
+                        </font>
+                    </Button>
+                    <Label alignment="CENTER" layoutX="711.0" layoutY="101.0" prefHeight="60.0" prefWidth="151.0"
+                           text="Goals">
+                        <font>
+                            <Font name="Arial" size="29.0"/>
+                        </font>
+                    </Label>
+                    <ListView fx:id="goalsList" layoutX="687.0" layoutY="160.0" prefHeight="238.0" prefWidth="200.0"/>
+                    <VBox layoutX="697.0" layoutY="416.0" prefHeight="70.0" prefWidth="180.0" spacing="10.0">
+                        <Button mnemonicParsing="false" onAction="#addGoalButtonPressed" prefHeight="30.0"
+                                prefWidth="180.0" text="Add goal">
+                            <font>
+                                <Font name="Arial" size="15.0"/>
+                            </font>
+                        </Button>
+                        <Button mnemonicParsing="false" onAction="#removeGoalButtonPressed" prefHeight="30.0"
+                                prefWidth="180.0" text="Remove goal">
+                            <font>
+                                <Font name="Arial" size="15.0"/>
+                            </font>
+                        </Button>
+                    </VBox>
+                    <Label alignment="CENTER" layoutX="391.0" layoutY="101.0" prefHeight="60.0" prefWidth="151.0"
+                           text="Banks">
+                        <font>
+                            <Font name="Arial" size="29.0"/>
+                        </font>
+                    </Label>
+                    <ListView fx:id="banksList" layoutX="381.0" layoutY="160.0" prefHeight="238.0" prefWidth="200.0"/>
+                    <VBox layoutX="389.0" layoutY="416.0" prefHeight="70.0" prefWidth="180.0" spacing="10.0">
+                        <Button mnemonicParsing="false" onAction="#addBankButtonPressed" prefHeight="31.0"
+                                prefWidth="192.0" text="Add bank">
+                            <font>
+                                <Font name="Arial" size="15.0"/>
+                            </font>
+                        </Button>
+                        <Button mnemonicParsing="false" onAction="#removeBankButtonPressed" prefHeight="31.0"
+                                prefWidth="189.0" text="Remove bank">
+                            <font>
+                                <Font name="Arial" size="15.0"/>
+                            </font>
+                        </Button>
+                    </VBox>
+                    <Button layoutX="532.0" layoutY="13.0" mnemonicParsing="false" onAction="#joinGroupButtonPressed"
+                            prefHeight="31.0" prefWidth="155.0" text="Join a group">
+                        <font>
+                            <Font name="Arial" size="15.0"/>
+                        </font>
+                    </Button>
+                    <Button layoutX="542.0" layoutY="119.0" mnemonicParsing="false"
+                            onAction="#transactionsButtonPressed">
+                        <padding>
+                            <Insets top="-1.0"/>
+                        </padding>
+                        <graphic>
+                            <ImageView fitHeight="25.0" fitWidth="29.0" pickOnBounds="true" preserveRatio="true">
+                                <Image url="@image/plus.png"/>
+                            </ImageView>
+                        </graphic>
+                        <tooltip>
+                            <Tooltip text="Go to transactions">
+                                <font>
+                                    <Font name="Arial" size="15.0"/>
+                                </font>
+                            </Tooltip>
+                        </tooltip>
+                    </Button>
+                </Pane>
             </GridPane>
-           </children>
         </VBox>
     </center>
 </BorderPane>

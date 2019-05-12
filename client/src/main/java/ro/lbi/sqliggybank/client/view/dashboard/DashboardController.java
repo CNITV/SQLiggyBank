@@ -4,8 +4,11 @@ import com.google.gson.Gson;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -13,6 +16,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
 
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import ro.lbi.sqliggybank.client.backend.account.Account;
@@ -108,57 +113,47 @@ public class DashboardController {
 	private Label createdByLabel;
 
 	/**
-	 * This is the group description tooltip.
+	 * The group description tooltip.
 	 */
 	@FXML
 	private Tooltip groupDescriptionTooltip;
 
 	/**
-	 * This is a button for creating a new group.
-	 */
-	@FXML
-	private Button createNewGroupButton;
-
-	/**
-	 * This is the list of all the members of a group.
+	 * List of all the members of a group.
 	 */
 	@FXML
 	private ListView<String> membersList;
 
 	/**
-	 * Create an invite for the group.
+	 * List of all the banks of a group.
 	 */
 	@FXML
-	private Button createGroupInviteButton;
+	private ListView<String> banksList;
 
 	/**
-	 * Show all the invites to the specified group.
-	 */
-	@FXML
-	private Button showGroupInvitesButton;
-
-	/**
-	 * List of goals for a specific group.
+	 * List of goals for a specific bank of a group.
 	 */
 	@FXML
 	private ListView<String> goalsList;
-
-	/**
-	 * Adds a goal to the specified bank.
-	 */
-	@FXML
-	private Button addGoalButton;
-
-	/**
-	 * Removes a goal from the specified bank.
-	 */
-	@FXML
-	private Button removeGoalButton;
 
 	DashboardController(WindowManager windowManager, User user) {
 		this.windowManager = windowManager;
 		this.user = user;
 		databaseHandler = new DatabaseHandler();
+	}
+
+	/**
+	 * This method is the default initialize method for an FXML controller class.
+	 * <p>
+	 * It is called <u>right after</u> the constructor finished execution and the @FXML annotated fields
+	 * are populated.
+	 *
+	 * <p>
+	 * This method then initializes any attributes needed in the GUI.
+	 */
+	@FXML
+	private void initialize() {
+		initController();
 	}
 
 	/**
@@ -185,7 +180,7 @@ public class DashboardController {
 		Initialize the groups, banks and goals.
 		*/
 
-		///TODO get groups and list them
+		///TODO get groups,banks and goals and list them
 		//test groups
 		ImageView groupIcon = new ImageView(
 				new Image("/ro/lbi/sqliggybank/client/view/dashboard/image/folder.png",
@@ -219,64 +214,6 @@ public class DashboardController {
 		);
 		groupsTreeView.setRoot(rootItem);
 		groupsTreeView.setShowRoot(false);
-	}
-
-	/**
-	 * This method is the default initialize method for an FXML controller class.
-	 * <p>
-	 * It is called <u>right after</u> the constructor finished execution and the @FXML annotated fields
-	 * are populated.
-	 *
-	 * <p>
-	 * This method then initializes any attributes needed in the GUI.
-	 */
-	@FXML
-	private void initialize() {
-		initController();
-	}
-
-	/**
-	 * This method fires whenever the logout button is pressed by the user.
-	 *
-	 * @param event the action event received from the application.
-	 */
-	@FXML
-	@SuppressWarnings("OptionalGetWithoutIsPresent")
-	private void logoutButtonPressed(ActionEvent event) {
-
-		/*
-        Persist the current window settings throughout the application.
-         */
-		win_width = (int) ((Node) event.getSource()).getScene().getWidth();
-		win_height = (int) ((Node) event.getSource()).getScene().getHeight();
-
-		/*
-		Prompt the user if they really want to logout.
-		 */
-		ButtonType yesButton = new ButtonType("Yes");
-		ButtonType noButton = new ButtonType("No");
-
-		Optional<ButtonType> result = Alert.promptAlert("Logout", "Are you sure you want to logout?", yesButton, noButton);
-
-		if (result.get() == yesButton) {
-			/*
-			Check that everything is ok and logout user, then go back to login menu.
-			 */
-			windowManager.loginMenu();
-		}
-
-	}
-
-	/**
-	 * This method opens a settings dialog.
-	 *
-	 * @param event the event received from the application.
-	 */
-	@FXML
-	private void settingsButtonPressed(ActionEvent event) {
-		/*
-		Open settings pop-up window.
-		 */
 	}
 
 	/**
@@ -322,5 +259,135 @@ public class DashboardController {
 			);
 			LOGGER.log(Level.ERROR, "User not found", e);
 		}
+	}
+
+	/**
+	 * This method opens a settings dialog for the user.
+	 *
+	 * @param event the event received from the application.
+	 */
+	@FXML
+	private void userSettingsButtonPressed(ActionEvent event) {
+		/*
+		Open settings pop-up window.
+		 */
+		try {
+			Stage settings = new Stage();
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("/ro/lbi/sqliggybank/client/view/dashboard/userSettings.fxml"));
+			loader.setControllerFactory(
+					c -> new UserSettingsController(windowManager, user)
+			);
+
+			Parent root = loader.load();
+
+			settings.setScene(new Scene(root, 600 , 400));
+			settings.setTitle("User settings");
+			settings.initModality(Modality.WINDOW_MODAL);
+			settings.initOwner(((Node)event.getSource()).getScene().getWindow());
+			settings.setResizable(false);
+			settings.show();
+
+		} catch (IOException exception) {
+            /*
+            This happens whenever the FXML loader can't load the specified file for whatever reason.
+             */
+			LOGGER.log(Level.ERROR, "The FXML loader couldn't load the FXML file." , exception);
+			Alert.errorAlert("FXML error", "The FXML loader couldn't load the FXML file.");
+			Platform.exit();
+		} catch (IllegalStateException exception) {
+            /*
+            This happens whenever the FXML file isn't found at the specified path or the file name is wrong.
+             */
+			LOGGER.log(Level.ERROR, "The FXML loader couldn't find the file at the specified path.", exception);
+			Alert.errorAlert("FXML error", "The FXML loader couldn't find the file at the specified path.");
+			Platform.exit();
+		}
+	}
+
+	/**
+	 * This method fires whenever the logout button is pressed.
+	 *
+	 * @param event the action event received from the application.
+	 */
+	@FXML
+	@SuppressWarnings("OptionalGetWithoutIsPresent")
+	private void logoutButtonPressed(ActionEvent event) {
+
+		/*
+        Persist the current window settings throughout the application.
+         */
+		win_width = (int) ((Node) event.getSource()).getScene().getWidth();
+		win_height = (int) ((Node) event.getSource()).getScene().getHeight();
+
+		/*
+		Prompt the user if they really want to logout.
+		 */
+		ButtonType yesButton = new ButtonType("Yes");
+		ButtonType noButton = new ButtonType("No");
+
+		Optional<ButtonType> result = Alert.promptAlert("Logout", "Are you sure you want to logout?", yesButton, noButton);
+
+		if (result.get() == yesButton) {
+			/*
+			Check that everything is ok and logout user, then go back to login menu.
+			 */
+			windowManager.loginMenu();
+		}
+
+	}
+
+	/**
+	 * This method fires whenever the group settings button is pressed.
+	 *
+	 * @param event the action event received from the application.
+	 */
+	@FXML
+	private void groupSettingsButtonPressed(ActionEvent event) {
+
+	}
+
+	@FXML
+	private void joinGroupButtonPressed(ActionEvent event) {
+
+	}
+
+	@FXML
+	private void newGroupButtonPressed(ActionEvent event) {
+
+	}
+
+	@FXML
+	private void transactionsButtonPressed(ActionEvent event) {
+
+	}
+
+	@FXML
+	private void createGroupInviteButtonPressed(ActionEvent event) {
+
+	}
+
+	@FXML
+	private void showGroupInvitesButtonPressed(ActionEvent event) {
+
+	}
+
+	@FXML
+	private void addBankButtonPressed(ActionEvent event) {
+
+	}
+
+	@FXML
+	private void removeBankButtonPressed(ActionEvent event) {
+
+	}
+
+	@FXML
+	private void addGoalButtonPressed(ActionEvent event) {
+
+	}
+
+	@FXML
+	private void removeGoalButtonPressed(ActionEvent event) {
+
 	}
 }

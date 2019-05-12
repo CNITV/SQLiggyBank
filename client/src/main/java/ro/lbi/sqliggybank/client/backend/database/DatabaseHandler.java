@@ -220,21 +220,23 @@ public class DatabaseHandler {
 	 * It calls the method on this endpoint:
 	 * PATCH /api/users/{username}
 	 *
+	 * @param oldUsername the old username (needed for the API request).
 	 * @param username the changed username of the user.
 	 * @param password the changed password of the user.
 	 * @param first_name the changed first name of the user.
 	 * @param last_name the changed last name of the user.
 	 * @param email the changed email of the user.
 	 * @param JWT the JWT needed for the authorization schema (a logged in user can only change his account).
-	 * @return returns OK on success.
+	 * @return returns a JSON containing the new JWT token on success.
 	 * @throws IOException throws this exception if something went wrong with the http call.
 	 * @throws IllegalStateException throws this exception if the username doesn't exist in the database.
+	 * @throws ForbiddenException throws this exception if the requested username or password is empty.
 	 * @throws UnauthorizedException throws this exception if the authorization schema is wrong.
 	 * @throws BadRequestException throws this exception if the request wasn't understood by the server.
 	 */
 	@SuppressWarnings("Duplicates")
-	public String editUser(String username, String password, String first_name, String last_name, String email, String JWT)
-			throws IOException, IllegalStateException, UnauthorizedException, BadRequestException {
+	public String editUser(String oldUsername, String username, String password, String first_name, String last_name, String email, String JWT)
+			throws IOException, IllegalStateException, ForbiddenException, UnauthorizedException, BadRequestException {
 		OkHttpClient httpClient = new OkHttpClient();
 
 		MediaType JSON = MediaType.parse("application/json; charset=utf-8");
@@ -247,7 +249,7 @@ public class DatabaseHandler {
 				"}");
 
 		Request request = new Request.Builder()
-				.url(serverUrl + "/api/users/" + username)
+				.url(serverUrl + "/api/users/" + oldUsername)
 				.patch(body)
 				.addHeader("Authorization", "Bearer " + JWT)
 				.build();
@@ -256,7 +258,11 @@ public class DatabaseHandler {
 
 		//TODO modify this to actual code
 		if (response.code() == 500) {
-			throw new IllegalStateException("Username doesn't exist in the database!");
+			throw new IllegalStateException("Username already exists in the database!");
+		}
+
+		if (response.code() == 403) {
+			throw new ForbiddenException("You can't have an empty username or password!");
 		}
 
 		if (response.code() == 401) {
