@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.layout.*?>
+
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="ro.lbi.sqliggybank.client.view.dashboard.GroupSettingsController">
+    <Label layoutX="31.0" layoutY="26.0" prefHeight="53.0" prefWidth="253.0" text="Modify group settings">
+        <font>
+            <Font name="Arial Bold" size="24.0"/>
+        </font>
+    </Label>
+    <Button layoutX="406.0" layoutY="345.0" mnemonicParsing="false" onAction="#okButtonPressed" prefHeight="31.0"
+            prefWidth="60.0" text="OK"/>
+    <Label alignment="CENTER" layoutX="112.0" layoutY="91.0" prefHeight="50.0" prefWidth="150.0" text="Group name:">
+        <font>
+            <Font name="Arial" size="24.0"/>
+        </font>
+    </Label>
+    <TextField fx:id="groupNameBox" layoutX="300.0" layoutY="101.0" prefHeight="25.0"/>
+    <TextArea fx:id="descriptionArea" layoutX="74.0" layoutY="161.0" prefHeight="167.0" prefWidth="452.0"
+              promptText="Description"/>
+    <Button layoutX="458.0" layoutY="26.0" mnemonicParsing="false" onAction="#deleteGroupPressed"
+            text="Delete group!!"/>
+</AnchorPane>
