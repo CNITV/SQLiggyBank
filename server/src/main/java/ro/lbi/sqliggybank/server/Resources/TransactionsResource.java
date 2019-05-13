@@ -131,6 +131,7 @@ public class TransactionsResource {
 				Deposit tempDeposit = mapper.readValue(body, Deposit.class);
 				tempDeposit.setBank(tempBank);
 				tempDeposit.setPayee(payee);
+				tempDeposit.setUuid(UUID.randomUUID());
 				depositDAO.create(tempDeposit);
 				return Response.ok(new GenericResponse(Response.Status.OK.getStatusCode(), "Created transaction!")).build();
 			} else { // not owner of group, eject client
@@ -154,7 +155,9 @@ public class TransactionsResource {
 			try {
 				PiggyBank tempBank = piggyBankDAO.findByName(bankName).orElseThrow(() -> new NotFoundException("Piggy bank not found!"));
 				Withdrawal withdrawal = new ObjectMapper().readValue(body, Withdrawal.class);
+				withdrawal.setUuid(UUID.randomUUID());
 				withdrawal.setBank(tempBank);
+				withdrawalDAO.create(withdrawal);
 				return Response.ok(new GenericResponse(Response.Status.OK.getStatusCode(), "Created transaction!")).build();
 			} catch (JsonParseException | JsonMappingException e1) {
 				return Response
@@ -166,7 +169,7 @@ public class TransactionsResource {
 						.status(Response.Status.INTERNAL_SERVER_ERROR)
 						.entity(new InternalErrorResponse(e1.getMessage()))
 						.build();
-			} catch (NotFoundException e) {
+			} catch (NotFoundException e1) {
 				if (e.getMessage().split(" ")[0].equals("Group")) {
 					return Response
 							.status(Response.Status.NOT_FOUND)

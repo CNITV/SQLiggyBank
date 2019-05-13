@@ -25,6 +25,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.util.UUID;
 
 @Path("/api/banks/")
 @Produces(MediaType.APPLICATION_JSON)
@@ -153,6 +154,7 @@ public class BanksResource {
 				PiggyBank tempBank = new ObjectMapper().readValue(body, PiggyBank.class);
 				Group group = groupDAO.findByName(groupName).orElseThrow(() -> new NotFoundException("Group not found!"));
 				tempBank.setGroup(group);
+				tempBank.setUuid(UUID.randomUUID());
 				piggyBankDAO.create(tempBank);
 				return Response.ok(new GenericResponse(Response.Status.OK.getStatusCode(), "Created piggy bank!")).build();
 			} else { // not owner of group, eject client

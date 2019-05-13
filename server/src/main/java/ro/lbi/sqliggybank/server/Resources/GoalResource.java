@@ -24,6 +24,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.util.UUID;
 
 @Path("/api/goals/")
 @Produces(MediaType.APPLICATION_JSON)
@@ -164,6 +165,7 @@ public class GoalResource {
 				Group group = groupDAO.findByName(groupName).orElseThrow(() -> new NotFoundException("Group not found!"));
 				PiggyBank bank = piggyBankDAO.findByNameAndGroup(group, bankName).orElseThrow(() -> new NotFoundException("Piggy bank not found!"));
 				goal.setBank(bank);
+				goal.setUuid(UUID.randomUUID());
 				goalDAO.create(goal);
 				return Response.ok(new GenericResponse(Response.Status.OK.getStatusCode(), "Created goal!")).build();
 			} else { // not owner of group, eject client
