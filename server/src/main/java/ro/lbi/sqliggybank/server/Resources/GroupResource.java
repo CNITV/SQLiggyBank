@@ -152,7 +152,7 @@ public class GroupResource {
 		}
 	}
 
-	@POST
+	@GET
 	@UnitOfWork
 	@Path("{groupName}/invites/new")
 	public Response createInvite(@HeaderParam("Authorization") String authorization, @PathParam("groupName") String groupName) {
@@ -201,7 +201,7 @@ public class GroupResource {
 		}
 	}
 
-	@POST
+	@GET
 	@UnitOfWork
 	@Path("{groupName}/invite/{inviteID}")
 	public Response groupInvite(@HeaderParam("Authorization") String authorization, @PathParam("groupName") String groupName, @PathParam("inviteID") String inviteUUID) {
