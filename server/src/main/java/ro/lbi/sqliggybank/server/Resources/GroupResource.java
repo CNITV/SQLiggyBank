@@ -297,8 +297,9 @@ public class GroupResource {
 	private Response editGroup(String authorization, String groupName, String newGroup) {
 		authorization = authorization.substring(authorization.indexOf(" ") + 1); // remove "Bearer" from Authorization header
 		try {
-			Group group = groupDAO.findByName(groupName).orElseThrow(() -> new NotFoundException("No such group."));
 			DecodedJWT jwt = authVerifier.verify(authorization); // verify token
+			Group group = groupDAO.findByName(groupName).orElseThrow(() -> new NotFoundException("No such group."));
+			User user = userDAO.findByUsername(jwt.getClaim("username").asString()).orElseThrow(() -> new NotFoundException("User not found!"));
 			if (groupDAO.isUserOwnerOfGroup(jwt.getClaim("username").asString(), groupName)) { // are they ok?
 				Group tempGroup = new ObjectMapper().readValue(newGroup, Group.class); // create new Group object
 				// Apparently, Hibernate doesn't like you modifying the objects it remembers in memory, even if they
@@ -308,7 +309,7 @@ public class GroupResource {
 				// I'm just happy I don't have to make my own actual SQL queries :)
 				group.setName(tempGroup.getName());
 				group.setDescription(tempGroup.getDescription());
-				group.setOwner(tempGroup.getOwner());
+				group.setOwner(user);
 				// update group
 				groupDAO.update(group);
 				return Response
