@@ -25,7 +25,7 @@ import java.util.UUID;
 						query = "SELECT b FROM PiggyBank b WHERE b.group = :passed_group"
 				),
 				@NamedQuery(
-						name = "ro.lbi.sqliggybank.Core.PiggyBank.findByGroupAndName",
+						name = "ro.lbi.sqliggybank.server.Core.PiggyBank.findByGroupAndName",
 						query = "SELECT b FROM PiggyBank b WHERE b.group = :passed_group AND b.name = :name"
 				)
 		}
