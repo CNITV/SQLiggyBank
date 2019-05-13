@@ -1,11 +1,13 @@
 package ro.lbi.sqliggybank.server.Database;
 
 import io.dropwizard.hibernate.AbstractDAO;
+import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import ro.lbi.sqliggybank.server.Core.Goal;
 import ro.lbi.sqliggybank.server.Core.PiggyBank;
 
+import javax.persistence.NoResultException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -51,11 +53,15 @@ public class GoalDAO extends AbstractDAO<Goal> {
 	 * @return An Optional of any found goal.
 	 */
 	public Optional<Goal> findByNameAndBank(PiggyBank bank, String goalName) {
-		Query query = namedQuery("ro.lbi.sqliggybank.server.Core.Goal.findByBankAndName");
-		query.setParameter("bank", bank);
-		query.setParameter("passed_goal", goalName);
-		Goal goal = (Goal) query.getSingleResult();
-		return Optional.of(goal);
+		try {
+			Query query = namedQuery("ro.lbi.sqliggybank.server.Core.Goal.findByBankAndName");
+			query.setParameter("bank", bank);
+			query.setParameter("passed_goal", goalName);
+			Goal goal = (Goal) query.getSingleResult();
+			return Optional.of(goal);
+		} catch (NoResultException e) {
+			return Optional.empty();
+		}
 	}
 
 	/**

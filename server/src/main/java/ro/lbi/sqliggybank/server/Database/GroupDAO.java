@@ -1,10 +1,12 @@
 package ro.lbi.sqliggybank.server.Database;
 
 import io.dropwizard.hibernate.AbstractDAO;
+import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import ro.lbi.sqliggybank.server.Core.Group;
 
+import javax.persistence.NoResultException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -36,10 +38,14 @@ public class GroupDAO extends AbstractDAO<Group> {
 	 * @return Optional of any found group.
 	 */
 	public Optional<Group> findByName(String name) {
-		Query query = namedQuery("ro.lbi.sqliggybank.server.Core.Group.findByName");
-		query.setParameter("name", name);
-		Group group = (Group) query.getSingleResult();
-		return Optional.of(group);
+		try {
+			Query query = namedQuery("ro.lbi.sqliggybank.server.Core.Group.findByName");
+			query.setParameter("name", name);
+			Group group = (Group) query.getSingleResult();
+			return Optional.of(group);
+		} catch (NoResultException e) {
+			return Optional.empty();
+		}
 	}
 
 	public boolean isUserOwnerOfGroup(String username, String groupName) {

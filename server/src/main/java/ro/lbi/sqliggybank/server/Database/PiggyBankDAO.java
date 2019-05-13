@@ -1,11 +1,13 @@
 package ro.lbi.sqliggybank.server.Database;
 
 import io.dropwizard.hibernate.AbstractDAO;
+import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import ro.lbi.sqliggybank.server.Core.Group;
 import ro.lbi.sqliggybank.server.Core.PiggyBank;
 
+import javax.persistence.NoResultException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -37,18 +39,26 @@ public class PiggyBankDAO extends AbstractDAO<PiggyBank> {
 	 * @return Optional of any found piggy bank.
 	 */
 	public Optional<PiggyBank> findByName(String name) {
-		Query query = namedQuery("ro.lbi.sqliggybank.server.Core.PiggyBank.findByName");
-		query.setParameter("name", name);
-		PiggyBank piggyBank = (PiggyBank) query.getSingleResult();
-		return Optional.of(piggyBank);
+		try {
+			Query query = namedQuery("ro.lbi.sqliggybank.server.Core.PiggyBank.findByName");
+			query.setParameter("name", name);
+			PiggyBank piggyBank = (PiggyBank) query.getSingleResult();
+			return Optional.of(piggyBank);
+		} catch (NoResultException e) {
+			return Optional.empty();
+		}
 	}
 
 	public Optional<PiggyBank> findByNameAndGroup(Group group, String name) {
-		Query query = namedQuery("ro.lbi.sqliggybank.server.Core.PiggyBank.findByGroupAndName");
-		query.setParameter("name", name);
-		query.setParameter("passed_group", group);
-		PiggyBank piggyBank = (PiggyBank) query.getSingleResult();
-		return Optional.of(piggyBank);
+		try {
+			Query query = namedQuery("ro.lbi.sqliggybank.server.Core.PiggyBank.findByGroupAndName");
+			query.setParameter("name", name);
+			query.setParameter("passed_group", group);
+			PiggyBank piggyBank = (PiggyBank) query.getSingleResult();
+			return Optional.of(piggyBank);
+		} catch (NoResultException e) {
+			return Optional.empty();
+		}
 	}
 
 	public List findAllBanksInGroup(Group group) {

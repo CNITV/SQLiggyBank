@@ -1,10 +1,13 @@
 package ro.lbi.sqliggybank.server.Database;
 
 import io.dropwizard.hibernate.AbstractDAO;
+import javassist.NotFoundException;
+import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import ro.lbi.sqliggybank.server.Core.User;
 
+import javax.persistence.NoResultException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -44,10 +47,14 @@ public class UserDAO extends AbstractDAO<User> {
 	 * @return Optional of any found user.
 	 */
 	public Optional<User> findByUsername(String username) {
-		Query query = namedQuery("ro.lbi.sqliggybank.server.Core.User.findByUsername");
-		query.setParameter("username", username);
-		User user = (User) query.getSingleResult();
-		return Optional.of(user);
+		try {
+			Query query = namedQuery("ro.lbi.sqliggybank.server.Core.User.findByUsername");
+			query.setParameter("username", username);
+			User user = (User) query.getSingleResult();
+			return Optional.of(user);
+		} catch (NoResultException e) {
+			return Optional.empty();
+		}
 	}
 
 	/**

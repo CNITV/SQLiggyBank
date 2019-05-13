@@ -200,8 +200,8 @@ public class UserResource {
 						.build();
 			}
 			user.setUuid(UUID.randomUUID()); // set random UUID, Hibernate needs it FeelsBadMan
-			String token = createJWT(user.getUsername(), user.getPassword()); // create the JWT before we hash the pass
 			user.setPassword(hasher.hash(user.getPassword())); // hash the password now
+			String token = createJWT(user.getUsername(), user.getPassword()); // create the JWT after we hash the pass
 			userDAO.create(user); // create user
 			return Response // return token
 					.ok(new JWTResponse(Response.Status.OK.getStatusCode(), "Registration complete!", token))
@@ -249,7 +249,7 @@ public class UserResource {
 						.entity(new GenericResponse(Response.Status.FORBIDDEN.getStatusCode(), "Invalid username and password combination!"))
 						.build();
 			}
-			String token = createJWT(account.getUsername(), account.getPassword());
+			String token = createJWT(user.getUsername(), user.getPassword());
 			return Response // return token
 					.ok(new JWTResponse(Response.Status.OK.getStatusCode(), "Login complete!", token))
 					.build();
@@ -331,6 +331,11 @@ public class UserResource {
 			return Response
 					.status(Response.Status.UNAUTHORIZED)
 					.entity(new GenericResponse(Response.Status.UNAUTHORIZED.getStatusCode(), "Invalid authentication scheme!"))
+					.build();
+		} catch (NotFoundException e) {
+			return Response
+					.status(Response.Status.NOT_FOUND)
+					.entity(new NotFoundResponse(username + " cannot be found! Please try again!"))
 					.build();
 		}
 	}
@@ -416,6 +421,11 @@ public class UserResource {
 					.serverError()
 					.entity(new InternalErrorResponse("Could not access database!"))
 					.build();
+		} catch (NotFoundException e) {
+			return Response
+					.status(Response.Status.NOT_FOUND)
+					.entity(new NotFoundResponse(username + " cannot be found! Please try again!"))
+					.build();
 		}
 	}
 
@@ -460,6 +470,11 @@ public class UserResource {
 			return Response
 					.status(Response.Status.UNAUTHORIZED)
 					.entity(new GenericResponse(Response.Status.UNAUTHORIZED.getStatusCode(), "Invalid authentication scheme!"))
+					.build();
+		} catch (NotFoundException e) {
+			return Response
+					.status(Response.Status.NOT_FOUND)
+					.entity(new NotFoundResponse(username + " cannot be found! Please try again!"))
 					.build();
 		}
 	}

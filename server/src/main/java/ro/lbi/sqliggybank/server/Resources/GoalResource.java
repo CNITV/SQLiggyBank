@@ -17,7 +17,9 @@ import ro.lbi.sqliggybank.server.Core.PiggyBank;
 import ro.lbi.sqliggybank.server.Database.*;
 import ro.lbi.sqliggybank.server.Responses.GenericResponse;
 import ro.lbi.sqliggybank.server.Responses.InternalErrorResponse;
+import ro.lbi.sqliggybank.server.Responses.NotFoundResponse;
 
+import javax.persistence.NoResultException;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -127,10 +129,27 @@ public class GoalResource {
 					.status(Response.Status.UNAUTHORIZED)
 					.entity(new GenericResponse(Response.Status.UNAUTHORIZED.getStatusCode(), "Invalid authentication scheme!"))
 					.build();
+		} catch (NotFoundException e) {
+			if (e.getMessage().split(" ")[0].equals("Group")) {
+				return Response
+						.status(Response.Status.NOT_FOUND)
+						.entity(new NotFoundResponse("The group \"" + groupName + "\" could not be found!"))
+						.build();
+			} else if (e.getMessage().split(" ")[0].equals("Piggy")){
+				return Response
+						.status(Response.Status.NOT_FOUND)
+						.entity(new NotFoundResponse("The piggy bank \"" + bankName + "\" could not be found!"))
+						.build();
+			} else {
+				return Response
+						.status(Response.Status.NOT_FOUND)
+						.entity(new NotFoundResponse("The goal \"" + goalName + "\" could not be found!"))
+						.build();
+			}
 		}
 	}
 
-	private Goal queryGoal(String bankName, String groupName, String goalName) {
+	private Goal queryGoal(String bankName, String groupName, String goalName) throws NoResultException {
 		Group group = groupDAO.findByName(groupName).orElseThrow(() -> new NotFoundException("Group not found!"));
 		PiggyBank bank = piggyBankDAO.findByNameAndGroup(group, bankName).orElseThrow(() -> new NotFoundException("Piggy bank not found!"));
 		return goalDAO.findByNameAndBank(bank, goalName).orElseThrow(() -> new NotFoundException("Goal not found!"));
@@ -173,6 +192,18 @@ public class GoalResource {
 					.status(Response.Status.INTERNAL_SERVER_ERROR)
 					.entity(new InternalErrorResponse(e.getMessage()))
 					.build();
+		} catch (NotFoundException e) {
+			if (e.getMessage().split(" ")[0].equals("Group")) {
+				return Response
+						.status(Response.Status.NOT_FOUND)
+						.entity(new NotFoundResponse("The group \"" + groupName + "\" could not be found!"))
+						.build();
+			} else {
+				return Response
+						.status(Response.Status.NOT_FOUND)
+						.entity(new NotFoundResponse("The piggy bank \"" + bankName + "\" could not be found!"))
+						.build();
+			}
 		}
 	}
 
@@ -221,6 +252,23 @@ public class GoalResource {
 					.status(Response.Status.INTERNAL_SERVER_ERROR)
 					.entity(new InternalErrorResponse(e.getMessage()))
 					.build();
+		} catch (NotFoundException e) {
+			if (e.getMessage().split(" ")[0].equals("Group")) {
+				return Response
+						.status(Response.Status.NOT_FOUND)
+						.entity(new NotFoundResponse("The group \"" + groupName + "\" could not be found!"))
+						.build();
+			} else if (e.getMessage().split(" ")[0].equals("Piggy")){
+				return Response
+						.status(Response.Status.NOT_FOUND)
+						.entity(new NotFoundResponse("The piggy bank \"" + bankName + "\" could not be found!"))
+						.build();
+			} else {
+				return Response
+						.status(Response.Status.NOT_FOUND)
+						.entity(new NotFoundResponse("The goal \"" + goalName + "\" could not be found!"))
+						.build();
+			}
 		}
 	}
 
@@ -248,6 +296,23 @@ public class GoalResource {
 					.status(Response.Status.UNAUTHORIZED)
 					.entity(new GenericResponse(Response.Status.UNAUTHORIZED.getStatusCode(), "Invalid authentication scheme!"))
 					.build();
+		} catch (NotFoundException e) {
+			if (e.getMessage().split(" ")[0].equals("Group")) {
+				return Response
+						.status(Response.Status.NOT_FOUND)
+						.entity(new NotFoundResponse("The group \"" + groupName + "\" could not be found!"))
+						.build();
+			} else if (e.getMessage().split(" ")[0].equals("Piggy")){
+				return Response
+						.status(Response.Status.NOT_FOUND)
+						.entity(new NotFoundResponse("The piggy bank \"" + bankName + "\" could not be found!"))
+						.build();
+			} else {
+				return Response
+						.status(Response.Status.NOT_FOUND)
+						.entity(new NotFoundResponse("The goal \"" + goalName + "\" could not be found!"))
+						.build();
+			}
 		}
 	}
 }

@@ -18,10 +18,7 @@ import ro.lbi.sqliggybank.server.Core.User;
 import ro.lbi.sqliggybank.server.Database.GroupDAO;
 import ro.lbi.sqliggybank.server.Database.GroupListDAO;
 import ro.lbi.sqliggybank.server.Database.UserDAO;
-import ro.lbi.sqliggybank.server.Responses.GenericResponse;
-import ro.lbi.sqliggybank.server.Responses.InternalErrorResponse;
-import ro.lbi.sqliggybank.server.Responses.JWTResponse;
-import ro.lbi.sqliggybank.server.Responses.JoinedGroupResponse;
+import ro.lbi.sqliggybank.server.Responses.*;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -95,6 +92,11 @@ public class GroupResource {
 					.status(Response.Status.UNAUTHORIZED)
 					.entity(new GenericResponse(Response.Status.UNAUTHORIZED.getStatusCode(), "Invalid authentication scheme!"))
 					.build();
+		} catch (NotFoundException e) {
+			return Response
+					.status(Response.Status.NOT_FOUND)
+					.entity(new NotFoundResponse(groupName + "could not be found! Try again!"))
+					.build();
 		}
 	}
 
@@ -142,6 +144,11 @@ public class GroupResource {
 					.status(Response.Status.UNAUTHORIZED)
 					.entity(new GenericResponse(Response.Status.UNAUTHORIZED.getStatusCode(), "Invalid authentication scheme!"))
 					.build();
+		} catch (NotFoundException e) {
+			return Response
+					.status(Response.Status.NOT_FOUND)
+					.entity(new NotFoundResponse(groupName + "could not be found! Try again!"))
+					.build();
 		}
 	}
 
@@ -185,6 +192,11 @@ public class GroupResource {
 			return Response
 					.status(Response.Status.UNAUTHORIZED)
 					.entity(new GenericResponse(Response.Status.UNAUTHORIZED.getStatusCode(), "Invalid authentication scheme!"))
+					.build();
+		} catch (NotFoundException e) {
+			return Response
+					.status(Response.Status.NOT_FOUND)
+					.entity(new NotFoundResponse(groupName + "could not be found! Try again!"))
 					.build();
 		}
 	}
@@ -277,6 +289,11 @@ public class GroupResource {
 					.status(Response.Status.UNAUTHORIZED)
 					.entity(new GenericResponse(Response.Status.UNAUTHORIZED.getStatusCode(), "Invalid authentication scheme!"))
 					.build();
+		} catch (NotFoundException e) {
+			return Response
+					.status(Response.Status.NOT_FOUND)
+					.entity(new NotFoundResponse(groupName + "could not be found! Try again!"))
+					.build();
 		}
 	}
 
@@ -343,6 +360,11 @@ public class GroupResource {
 					.serverError()
 					.entity(new InternalErrorResponse("Could not access database!"))
 					.build();
+		} catch (NotFoundException e) {
+			return Response
+					.status(Response.Status.NOT_FOUND)
+					.entity(new NotFoundResponse(groupName + "could not be found! Try again!"))
+					.build();
 		}
 	}
 
@@ -386,6 +408,11 @@ public class GroupResource {
 			return Response
 					.status(Response.Status.UNAUTHORIZED)
 					.entity(new GenericResponse(Response.Status.UNAUTHORIZED.getStatusCode(), "Invalid authentication scheme!"))
+					.build();
+		} catch (NotFoundException e) {
+			return Response
+					.status(Response.Status.NOT_FOUND)
+					.entity(new NotFoundResponse(groupName + "could not be found! Try again!"))
 					.build();
 		}
 	}

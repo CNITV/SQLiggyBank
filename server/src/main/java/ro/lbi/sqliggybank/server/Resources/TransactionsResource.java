@@ -18,7 +18,9 @@ import ro.lbi.sqliggybank.server.Core.Withdrawal;
 import ro.lbi.sqliggybank.server.Database.*;
 import ro.lbi.sqliggybank.server.Responses.GenericResponse;
 import ro.lbi.sqliggybank.server.Responses.InternalErrorResponse;
+import ro.lbi.sqliggybank.server.Responses.NotFoundResponse;
 
+import javax.persistence.NoResultException;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -108,6 +110,11 @@ public class TransactionsResource {
 					.status(Response.Status.UNAUTHORIZED)
 					.entity(new GenericResponse(Response.Status.UNAUTHORIZED.getStatusCode(), "Invalid authentication scheme!"))
 					.build();
+		} catch (NoResultException e) {
+			return Response
+					.status(Response.Status.NOT_FOUND)
+					.entity(new NotFoundResponse("The transaction with UUID " + transactionID + " cannot be found!"))
+					.build();
 		}
 	}
 
@@ -159,6 +166,18 @@ public class TransactionsResource {
 						.status(Response.Status.INTERNAL_SERVER_ERROR)
 						.entity(new InternalErrorResponse(e1.getMessage()))
 						.build();
+			} catch (NotFoundException e) {
+				if (e.getMessage().split(" ")[0].equals("Group")) {
+					return Response
+							.status(Response.Status.NOT_FOUND)
+							.entity(new NotFoundResponse("The group \"" + groupName + "\" could not be found!"))
+							.build();
+				} else {
+					return Response
+							.status(Response.Status.NOT_FOUND)
+							.entity(new NotFoundResponse("The piggy bank \"" + bankName + "\" could not be found!"))
+							.build();
+				}
 			}
 
 		} catch (IOException e) {
@@ -166,6 +185,18 @@ public class TransactionsResource {
 					.status(Response.Status.INTERNAL_SERVER_ERROR)
 					.entity(new InternalErrorResponse(e.getMessage()))
 					.build();
+		} catch (NotFoundException e) {
+			if (e.getMessage().split(" ")[0].equals("Group")) {
+				return Response
+						.status(Response.Status.NOT_FOUND)
+						.entity(new NotFoundResponse("The group \"" + groupName + "\" could not be found!"))
+						.build();
+			} else {
+				return Response
+						.status(Response.Status.NOT_FOUND)
+						.entity(new NotFoundResponse("The piggy bank \"" + bankName + "\" could not be found!"))
+						.build();
+			}
 		}
 	}
 }
