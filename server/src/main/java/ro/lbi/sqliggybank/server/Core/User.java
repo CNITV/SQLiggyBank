@@ -189,6 +189,7 @@ public class User {
 	 *
 	 * @param password The new password for the existing user.
 	 */
+	@JsonProperty
 	public void setPassword(String password) {
 		this.password = password;
 	}
