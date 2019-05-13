@@ -7,7 +7,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import org.apache.log4j.Logger;
 import ro.lbi.sqliggybank.client.backend.database.DatabaseHandler;
-import ro.lbi.sqliggybank.client.backend.user.User;
+import ro.lbi.sqliggybank.client.backend.User;
 import ro.lbi.sqliggybank.client.util.Alert;
 import ro.lbi.sqliggybank.client.view.window_manager.WindowManager;
 
@@ -44,7 +44,7 @@ public class GroupSettingsController {
 	/**
 	 * The currently logged in user.
 	 *
-	 * @see ro.lbi.sqliggybank.client.backend.user.User
+	 * @see User
 	 */
 	private User user;
 
@@ -97,7 +97,7 @@ public class GroupSettingsController {
 			/*
 			Check that everything is ok and edit group information.
 			 */
-			databaseHandler.editGroup();
+			//databaseHandler.editGroup();
 		}
 	}
 
@@ -119,7 +119,7 @@ public class GroupSettingsController {
 			/*
 			Delete group.
 			 */
-			databaseHandler.deleteGroup();
+			//databaseHandler.deleteGroup();
 		}
 	}
 

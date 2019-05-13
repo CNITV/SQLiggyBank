@@ -2,7 +2,7 @@ package ro.lbi.sqliggybank.client.view.dashboard;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import ro.lbi.sqliggybank.client.backend.user.User;
+import ro.lbi.sqliggybank.client.backend.User;
 import ro.lbi.sqliggybank.client.view.window_manager.WindowManager;
 
 import java.io.IOException;

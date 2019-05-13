@@ -1,4 +1,4 @@
-package ro.lbi.sqliggybank.client.backend.user;
+package ro.lbi.sqliggybank.client.backend;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -52,16 +52,5 @@ public class User {
 	 * The e-mail of the user.
 	 */
 	private String email;
-
-	@Override
-	public String toString() {
-		return "UUID: " + uuid + "\n" +
-				"Username: " + username + "\n" +
-				"Password: " + password + "\n" +
-				"First name: " + first_name + "\n" +
-				"Last name: " + last_name + "\n" +
-				"Email: " + email + "\n" +
-				"JWT: " + JWT + "\n";
-	}
 }
 

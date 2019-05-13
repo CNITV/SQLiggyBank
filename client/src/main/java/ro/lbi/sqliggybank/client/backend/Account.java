@@ -1,4 +1,4 @@
-package ro.lbi.sqliggybank.client.backend.account;
+package ro.lbi.sqliggybank.client.backend;
 
 import lombok.Getter;
 

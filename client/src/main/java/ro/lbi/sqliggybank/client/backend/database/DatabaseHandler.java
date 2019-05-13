@@ -1,12 +1,12 @@
 package ro.lbi.sqliggybank.client.backend.database;
 
 import okhttp3.*;
-import ro.lbi.sqliggybank.client.backend.account.Account;
+import ro.lbi.sqliggybank.client.backend.Account;
 import ro.lbi.sqliggybank.client.backend.exceptions.BadRequestException;
 import ro.lbi.sqliggybank.client.backend.exceptions.ForbiddenException;
 import ro.lbi.sqliggybank.client.backend.exceptions.NotFoundException;
 import ro.lbi.sqliggybank.client.backend.exceptions.UnauthorizedException;
-import ro.lbi.sqliggybank.client.backend.user.User;
+import ro.lbi.sqliggybank.client.backend.User;
 
 import java.io.IOException;
 
@@ -283,4 +283,186 @@ public class DatabaseHandler {
 
 		return result;
 	}
+
+	/**
+	 * This method is used to get information about a group.
+	 *
+	 * <p>
+	 * The group information is, however, only available to users who are currently in the group.
+	 *
+	 * @param groupName the group name whose information the user wants.
+	 * @param JWT the JWT needed for authorization to view the group.
+	 * @return a JSON containing group information.
+	 * @throws IOException throws this exception if there was a connection error.
+	 * @throws ForbiddenException throws this exception if the user is not authorized to view the group (isn't part of it).
+	 */
+	public String getGroup(String groupName, String JWT) throws IOException, ForbiddenException {
+		OkHttpClient httpClient = new OkHttpClient();
+
+		Request request = new Request.Builder()
+				.url(serverUrl + "/api/groups/" + groupName)
+				.get()
+				.addHeader("Authorization", "Bearer " + JWT)
+				.build();
+
+		Response response = httpClient.newCall(request).execute();
+
+		if (response.code() == 403) {
+			throw new ForbiddenException("You are not authorized to view this group!");
+		}
+
+		String result;
+		if (response.body() != null) {
+			result = response.body().string();
+		} else {
+			throw new NullPointerException("Response body came out null! Try again!");
+		}
+		response.close();
+
+		return result;
+	}
+
+	/**
+	 * This method is used to generate a group invite link for a group. Only the owner of the group can generate a link.
+	 *
+	 * @param groupName generate a group invite for this group.
+	 * @param JWT the JWT needed for the authorization to generate a link.
+	 * @return a JSON containing a new invite link.
+	 * @throws IOException throws this exception if there was a connection error.
+	 * @throws ForbiddenException throws this exception if the user isn't authorized to perform this action.
+	 */
+	public String generateGroupInvite(String groupName, String JWT) throws IOException, ForbiddenException {
+		OkHttpClient httpClient = new OkHttpClient();
+
+		Request request = new Request.Builder()
+				.url(serverUrl + "/api/groups/" + groupName + "/invites/new")
+				.get()
+				.addHeader("Authorization", "Bearer " + JWT)
+				.build();
+
+		Response response = httpClient.newCall(request).execute();
+
+		if (response.code() == 403) {
+			throw new ForbiddenException("You are not the owner of the group.");
+		}
+
+		String result;
+		if (response.body() != null) {
+			result = response.body().string();
+		} else {
+			throw new NullPointerException("Response body came out null! Try again!");
+		}
+		response.close();
+
+		return result;
+	}
+
+	/**
+	 * This method is used to get the invite links of a group. They can only be seen by the owner of the group.
+	 *
+	 * @param groupName the group name whose links' information the user wants.
+	 * @param JWT the JWT needed for authorization to view the group links.
+	 * @return a JSON containing all the invite links.
+	 * @throws IOException throws this exception if there was a connection error.
+	 * @throws ForbiddenException throws this exception if the user is not authorized to view the group invites (isn't part of it).
+	 */
+	public String getGroupInviteList(String groupName, String JWT) throws IOException, ForbiddenException {
+		OkHttpClient httpClient = new OkHttpClient();
+
+		Request request = new Request.Builder()
+				.url(serverUrl + "/api/groups/" + groupName + "/invites")
+				.get()
+				.addHeader("Authorization", "Bearer " + JWT)
+				.build();
+
+		Response response = httpClient.newCall(request).execute();
+
+		if (response.code() == 403) {
+			throw new ForbiddenException("You are not authorized to view the group links!");
+		}
+
+		String result;
+		if (response.body() != null) {
+			result = response.body().string();
+		} else {
+			throw new NullPointerException("Response body came out null! Try again!");
+		}
+		response.close();
+
+		return result;
+	}
+
+	/**
+	 * This method adds a user to a specified group through an invite link.
+	 *
+	 * @param groupName the group where the user wants to join.
+	 * @param inviteID the invite ID of the group provided by the owner of the group.
+	 * @param JWT the JWT of the user who wants to join the group.
+	 * @return OK on success.
+	 * @throws IOException throws this exception if there was a connection error.
+	 * @throws ForbiddenException throws this exception if the user is already part of the group.
+	 */
+	public String joinGroup(String groupName, String inviteID, String JWT) throws IOException, ForbiddenException {
+		OkHttpClient httpClient = new OkHttpClient();
+
+		Request request = new Request.Builder()
+				.url(serverUrl + "/api/groups/" + groupName + "/invite/" + inviteID)
+				.get()
+				.addHeader("Authorization", "Bearer " + JWT)
+				.build();
+
+		Response response = httpClient.newCall(request).execute();
+
+		if (response.code() == 403) {
+			throw new ForbiddenException("You are already part of the group!");
+		}
+
+		String result;
+		if (response.body() != null) {
+			result = response.body().string();
+		} else {
+			throw new NullPointerException("Response body came out null! Try again!");
+		}
+		response.close();
+
+		return result;
+	}
+
+	/**
+	 * This method is used to create a new group.
+	 *
+	 * @param groupName the new group name.
+	 * @param description the new group description.
+	 * @param JWT the JWT of the user who wants to create a group.
+	 * @return OK on success.
+	 * @throws IOException throws this exception if there was a connection error.
+	 */
+	public String createGroup(String groupName, String description, String JWT) throws IOException  {
+		OkHttpClient httpClient = new OkHttpClient();
+
+		MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+		RequestBody body = RequestBody.create(JSON, "{\n" +
+				"\t\"name\":\"" + groupName + "\",\n" +
+				"\t\"description\":\"" + (description.equals("") ? "null" : "\"" + description + "\"") + "\"\n" +
+				"}");
+
+		Request request = new Request.Builder()
+				.url(serverUrl + "/api/groups/new")
+				.post(body)
+				.addHeader("Authorization", "Bearer " + JWT)
+				.build();
+
+		Response response = httpClient.newCall(request).execute();
+
+		String result;
+		if (response.body() != null) {
+			result = response.body().string();
+		} else {
+			throw new NullPointerException("Response body came out null! Try again!");
+		}
+		response.close();
+
+		return result;
+	}
+
 }

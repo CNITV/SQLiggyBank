@@ -5,7 +5,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import ro.lbi.sqliggybank.client.backend.user.User;
+import ro.lbi.sqliggybank.client.backend.User;
 import ro.lbi.sqliggybank.client.util.Alert;
 import ro.lbi.sqliggybank.client.view.dashboard.DashboardView;
 import ro.lbi.sqliggybank.client.view.login.LoginView;
@@ -132,7 +132,7 @@ public class WindowManagerImpl implements WindowManager {
      *
      * @see ro.lbi.sqliggybank.client.view.window_manager.WindowManager#dashboardMenu(User)
      * @see ro.lbi.sqliggybank.client.view.dashboard.DashboardView
-     * @see ro.lbi.sqliggybank.client.backend.user.User
+     * @see User
      */
     @Override
     public void dashboardMenu(User user) {

@@ -12,7 +12,7 @@ import ro.lbi.sqliggybank.client.backend.database.DatabaseHandler;
 import ro.lbi.sqliggybank.client.backend.exceptions.BadRequestException;
 import ro.lbi.sqliggybank.client.backend.exceptions.ForbiddenException;
 import ro.lbi.sqliggybank.client.backend.exceptions.UnauthorizedException;
-import ro.lbi.sqliggybank.client.backend.user.User;
+import ro.lbi.sqliggybank.client.backend.User;
 import ro.lbi.sqliggybank.client.util.Alert;
 import ro.lbi.sqliggybank.client.view.window_manager.WindowManager;
 
@@ -50,7 +50,7 @@ public class UserSettingsController {
 	/**
 	 * The currently logged in user.
 	 *
-	 * @see ro.lbi.sqliggybank.client.backend.user.User
+	 * @see User
 	 */
 	private User user;
 
@@ -173,7 +173,7 @@ public class UserSettingsController {
 		ButtonType noButton = new ButtonType("No");
 
 		Optional<ButtonType> result = Alert.promptAlert("WARNING!!", "Are you sure you want to permanently " +
-				"delete your account?\n This action cannot be reversed!!!!", yesButton, noButton);
+				"delete your account?\nThis action cannot be reversed!!!!", yesButton, noButton);
 
 		if (result.get() == yesButton) {
 			/*

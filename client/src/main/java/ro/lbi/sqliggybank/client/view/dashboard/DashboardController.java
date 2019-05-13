@@ -20,10 +20,13 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import ro.lbi.sqliggybank.client.backend.Invite;
 import ro.lbi.sqliggybank.client.backend.database.DatabaseHandler;
+import ro.lbi.sqliggybank.client.backend.exceptions.ForbiddenException;
 import ro.lbi.sqliggybank.client.backend.exceptions.NotFoundException;
 import ro.lbi.sqliggybank.client.backend.exceptions.UnauthorizedException;
-import ro.lbi.sqliggybank.client.backend.user.User;
+import ro.lbi.sqliggybank.client.backend.Group;
+import ro.lbi.sqliggybank.client.backend.User;
 import ro.lbi.sqliggybank.client.util.Alert;
 import ro.lbi.sqliggybank.client.view.window_manager.WindowManager;
 
@@ -65,9 +68,14 @@ public class DashboardController {
 	/**
 	 * The currently logged in user.
 	 *
-	 * @see ro.lbi.sqliggybank.client.backend.user.User
+	 * @see User
 	 */
 	private User user;
+
+	/**
+	 * The current highlighted group.
+	 */
+	private Group group;
 
 	/**
 	 * The label that contains the username.
@@ -138,7 +146,8 @@ public class DashboardController {
 	DashboardController(WindowManager windowManager, User user) {
 		this.windowManager = windowManager;
 		this.user = user;
-		databaseHandler = new DatabaseHandler();
+		this.group = null;
+		this.databaseHandler = new DatabaseHandler();
 	}
 
 	/**
@@ -186,7 +195,7 @@ public class DashboardController {
 						20, 20, true, true)
 		);
 		TreeItem<String> rootItem = new TreeItem<>("Groups");
-		TreeItem<String> group1 = new TreeItem<>("Group 1", groupIcon);
+		TreeItem<String> group1 = new TreeItem<>("Group testGroup", groupIcon);
 
 		rootItem.getChildren().add(group1);
 
@@ -198,16 +207,35 @@ public class DashboardController {
 
 		groupsTreeView.getSelectionModel().selectedItemProperty().addListener(
 				(observable, oldValue, newValue) -> {
-					groupNameLabel.setVisible(true);
-					groupNameLabel.setText(newValue.getValue());
+					if (newValue.getValue().split(" ")[0].equals("Group")) {
+						try {
+							String result;
+							result = databaseHandler.getGroup(newValue.getValue().split(" ")[1], user.getJWT());
 
-					createdByLabel.setVisible(true);
-					createdByLabel.setText("Created by " + user.getUsername());
+							Gson gson = new Gson();
+							group = gson.fromJson(result, Group.class);
 
-					groupDescriptionTooltip.setText("this is the group description ahahahaha this is the group description ahahahaha this is the group description ahahahaha this is the group description ahahahaha this is the group description ahahahaha this is the group description ahahahaha");
+							System.out.println(group);
 
-					for (int i = 0; i < 15; ++i) {
-						membersList.getItems().add("Member " + i);
+							groupNameLabel.setText(group.getName());
+							groupNameLabel.setVisible(true);
+
+							createdByLabel.setText("created by " + group.getOwner().getUsername());
+							createdByLabel.setVisible(true);
+
+							groupDescriptionTooltip.setText(group.getDescription());
+
+							/*for (int i = 0; i < 15; ++i) {
+								membersList.getItems().add("Member " + i);
+							}*/
+						} catch (IOException e) {
+							LOGGER.log(Level.ERROR, "Connection error", e);
+							Alert.errorAlert("Connection error", "Database is not available at the moment, try again" +
+									" in a few moments.");
+						} catch (ForbiddenException e) {
+							LOGGER.log(Level.ERROR, "Authorization error", e);
+							Alert.errorAlert("Authorization error", "You are not authorized to view this group.");
+						}
 					}
 				}
 		);
@@ -279,10 +307,10 @@ public class DashboardController {
 
 			Parent root = loader.load();
 
-			settings.setScene(new Scene(root, 600 , 400));
+			settings.setScene(new Scene(root, 600, 400));
 			settings.setTitle("User settings");
 			settings.initModality(Modality.WINDOW_MODAL);
-			settings.initOwner(((Node)event.getSource()).getScene().getWindow());
+			settings.initOwner(((Node) event.getSource()).getScene().getWindow());
 			settings.setResizable(false);
 			settings.show();
 
@@ -290,7 +318,7 @@ public class DashboardController {
             /*
             This happens whenever the FXML loader can't load the specified file for whatever reason.
              */
-			LOGGER.log(Level.ERROR, "The FXML loader couldn't load the FXML file." , exception);
+			LOGGER.log(Level.ERROR, "The FXML loader couldn't load the FXML file.", exception);
 			Alert.errorAlert("FXML error", "The FXML loader couldn't load the FXML file.");
 			Platform.exit();
 		} catch (IllegalStateException exception) {
@@ -332,7 +360,6 @@ public class DashboardController {
 			 */
 			windowManager.loginMenu();
 		}
-
 	}
 
 	/**
@@ -354,10 +381,10 @@ public class DashboardController {
 
 			Parent root = loader.load();
 
-			settings.setScene(new Scene(root, 600 , 400));
+			settings.setScene(new Scene(root, 600, 400));
 			settings.setTitle("Group settings");
 			settings.initModality(Modality.WINDOW_MODAL);
-			settings.initOwner(((Node)event.getSource()).getScene().getWindow());
+			settings.initOwner(((Node) event.getSource()).getScene().getWindow());
 			settings.setResizable(false);
 			settings.show();
 
@@ -365,7 +392,7 @@ public class DashboardController {
             /*
             This happens whenever the FXML loader can't load the specified file for whatever reason.
              */
-			LOGGER.log(Level.ERROR, "The FXML loader couldn't load the FXML file." , exception);
+			LOGGER.log(Level.ERROR, "The FXML loader couldn't load the FXML file.", exception);
 			Alert.errorAlert("FXML error", "The FXML loader couldn't load the FXML file.");
 			Platform.exit();
 		} catch (IllegalStateException exception) {
@@ -393,7 +420,17 @@ public class DashboardController {
 		Optional<String> result = dialog.showAndWait();
 		result.ifPresent(invite -> {
 			{
-				databaseHandler.joinGroup();
+				try {
+					databaseHandler.joinGroup(group.getName(), invite, user.getJWT());
+				} catch (NullPointerException e) {
+					Alert.errorAlert("Error", "You didn't select a group!");
+				} catch (IOException e) {
+					LOGGER.log(Level.ERROR, "Connection error", e);
+					Alert.errorAlert("Connection error", "The database can't be accessed at the moment.");
+				} catch (ForbiddenException e) {
+					LOGGER.log(Level.ERROR, "Error", e);
+					Alert.errorAlert("Error", "You are already part of the group!!");
+				}
 			}
 		});
 	}
@@ -405,7 +442,14 @@ public class DashboardController {
 	 */
 	@FXML
 	private void newGroupButtonPressed(ActionEvent event) {
-		databaseHandler.createGroup();
+		/*try {
+			databaseHandler.createGroup(name, description, user.getJWT());
+		} catch (NullPointerException e) {
+			Alert.errorAlert("Error", "You didn't select a group!");
+		} catch (IOException e) {
+			LOGGER.log(Level.ERROR, "Connection error", e);
+			Alert.errorAlert("Connection error", "The database can't be accessed at the moment.");
+		}*/
 	}
 
 	/**
@@ -427,7 +471,20 @@ public class DashboardController {
 	 */
 	@FXML
 	private void createGroupInviteButtonPressed(ActionEvent event) {
-		databaseHandler.generateGroupInvite();
+		try {
+			databaseHandler.generateGroupInvite(group.getName(), user.getJWT());
+			Alert.infoAlert("Success", "You successfully generated a group invite!!\n" +
+					"Go to group invites to see it.");
+		} catch (NullPointerException e) {
+			Alert.errorAlert("Error", "You didn't select a group!");
+		} catch (IOException e) {
+			LOGGER.log(Level.ERROR, "Connection error", e);
+			Alert.errorAlert("Connection error", "The database can't be accessed at the moment.");
+		} catch (ForbiddenException e) {
+			LOGGER.log(Level.ERROR, "Authorization error", e);
+			Alert.errorAlert("Authorization error", "You are not the owner of the group so you cannot " +
+					"perform such an action!");
+		}
 	}
 
 	/**
@@ -437,7 +494,30 @@ public class DashboardController {
 	 */
 	@FXML
 	private void showGroupInvitesButtonPressed(ActionEvent event) {
-		databaseHandler.getGroupInviteList();
+		try {
+			String result = databaseHandler.getGroupInviteList(group.getName(), user.getJWT());
+
+			Gson gson = new Gson();
+			Invite[] invites = gson.fromJson(result, Invite[].class);
+
+			String inviteString = "";
+			for (Invite invite : invites) {
+				inviteString = inviteString.concat(invite.getUuid().toString()).concat("\n");
+			}
+
+			Alert.infoAlert("Invites", "These are the available invites:\n" +
+					inviteString);
+
+		} catch (NullPointerException e) {
+			Alert.errorAlert("Error", "You didn't select a group!");
+		} catch (IOException e) {
+			LOGGER.log(Level.ERROR, "Connection error", e);
+			Alert.errorAlert("Connection error", "The database can't be accessed at the moment.");
+		} catch (ForbiddenException e) {
+			LOGGER.log(Level.ERROR, "Authorization error", e);
+			Alert.errorAlert("Authorization error", "You are not the owner of the group so you cannot " +
+					"perform such an action!");
+		}
 	}
 
 	/**
@@ -447,7 +527,7 @@ public class DashboardController {
 	 */
 	@FXML
 	private void addBankButtonPressed(ActionEvent event) {
-		databaseHandler.createBank();
+		//databaseHandler.createBank();
 	}
 
 	/**
@@ -457,7 +537,7 @@ public class DashboardController {
 	 */
 	@FXML
 	private void removeBankButtonPressed(ActionEvent event) {
-		databaseHandler.removeBank();
+		//databaseHandler.removeBank();
 	}
 
 	/**
@@ -467,7 +547,7 @@ public class DashboardController {
 	 */
 	@FXML
 	private void addGoalButtonPressed(ActionEvent event) {
-		databaseHandler.addGoal();
+		//databaseHandler.addGoal();
 	}
 
 	/**
@@ -477,6 +557,6 @@ public class DashboardController {
 	 */
 	@FXML
 	private void removeGoalButtonPressed(ActionEvent event) {
-		databaseHandler.removeGoal();
+		//databaseHandler.removeGoal();
 	}
 }
