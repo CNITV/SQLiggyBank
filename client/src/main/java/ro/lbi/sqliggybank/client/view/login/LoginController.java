@@ -15,17 +15,16 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import ro.lbi.sqliggybank.client.backend.account.Account;
+import ro.lbi.sqliggybank.client.backend.Account;
 import ro.lbi.sqliggybank.client.backend.database.DatabaseHandler;
 import ro.lbi.sqliggybank.client.backend.exceptions.ForbiddenException;
 import ro.lbi.sqliggybank.client.backend.exceptions.NotFoundException;
 import ro.lbi.sqliggybank.client.backend.exceptions.UnauthorizedException;
-import ro.lbi.sqliggybank.client.backend.user.User;
+import ro.lbi.sqliggybank.client.backend.User;
 import ro.lbi.sqliggybank.client.util.Alert;
 import ro.lbi.sqliggybank.client.view.window_manager.WindowManager;
 
 import java.io.IOException;
-import java.util.concurrent.ExecutionException;
 
 import static ro.lbi.sqliggybank.client.view.App.win_height;
 import static ro.lbi.sqliggybank.client.view.App.win_width;
