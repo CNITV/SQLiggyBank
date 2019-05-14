@@ -16,10 +16,12 @@ import ro.lbi.sqliggybank.server.Database.GroupListDAO;
 import ro.lbi.sqliggybank.server.Responses.GenericResponse;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
 
 @Path("/api/lists/")
+@Produces(MediaType.APPLICATION_JSON)
 public class GroupListResource {
 
 	private final GroupDAO groupDAO;
