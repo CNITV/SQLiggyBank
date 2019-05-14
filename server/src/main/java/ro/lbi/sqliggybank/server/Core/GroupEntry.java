@@ -29,11 +29,11 @@ import java.util.Objects;
 				),
 				@NamedQuery(
 						name = "ro.lbi.sqliggybank.server.Core.GroupEntry.membersOfGroup",
-						query = "SELECT l.user FROM GroupEntry l, Group g WHERE l.group.uuid = :groupUuid"
+						query = "SELECT DISTINCT l.user FROM GroupEntry l, Group g WHERE l.group.uuid = :groupUuid"
 				),
 				@NamedQuery(
 						name = "ro.lbi.sqliggybank.server.Core.GroupEntry.groupsOfUser",
-						query = "SELECT l.group FROM GroupEntry l, User u WHERE l.user.uuid = :userUuid"
+						query = "SELECT DISTINCT l.group FROM GroupEntry l, User u WHERE l.user.uuid = :userUuid"
 				)
 		})
 public class GroupEntry {
