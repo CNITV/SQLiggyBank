@@ -1,5 +1,7 @@
 package ro.lbi.sqliggybank.server.Core;
 
+import org.eclipse.jetty.util.annotation.Name;
+
 import javax.persistence.*;
 import java.util.Objects;
 import java.util.UUID;
@@ -27,7 +29,7 @@ import java.util.UUID;
 				@NamedQuery(
 						name = "ro.lbi.sqliggybank.server.Core.PiggyBank.findByGroupAndName",
 						query = "SELECT b FROM PiggyBank b WHERE b.group = :passed_group AND b.name = :name"
-				)
+				),
 		}
 )
 public class PiggyBank {

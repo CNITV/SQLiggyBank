@@ -25,6 +25,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 @Path("/api/banks/")
@@ -61,6 +62,20 @@ public class BanksResource {
 			return Response
 					.status(Response.Status.FORBIDDEN)
 					.entity(new GenericResponse(Response.Status.FORBIDDEN.getStatusCode(), "You must be logged in to view piggy bank information!"))
+					.build();
+		}
+	}
+
+	@GET
+	@UnitOfWork
+	@Path("{groupName}/list")
+	public Response listPiggyBanks(@HeaderParam("Authorization") String authorization, @PathParam("groupName") String groupName) {
+		if (authorization != null) { // are they a user? Let's see if they pass the test.
+			return getPiggyBankList(groupName, authorization);
+		} else {
+			return Response
+					.status(Response.Status.FORBIDDEN)
+					.entity(new GenericResponse(Response.Status.FORBIDDEN.getStatusCode(), "You must be logged in to list piggy banks!"))
 					.build();
 		}
 	}
@@ -104,6 +119,38 @@ public class BanksResource {
 					.status(Response.Status.FORBIDDEN)
 					.entity(new GenericResponse(Response.Status.FORBIDDEN.getStatusCode(), "You must be logged in to delete a piggy bank!"))
 					.build();
+		}
+	}
+
+	private Response getPiggyBankList(String groupName, String authorization) {
+		authorization = authorization.substring(authorization.indexOf(" ") + 1); // remove "Bearer" from Authorization header
+		try {
+			DecodedJWT jwt = authVerifier.verify(authorization); // verify token
+			if (groupListDAO.isUserPartOfGroup(jwt.getClaim("username").asString(), groupName)) { // user part of group, give bank information
+				Group group = groupDAO.findByName(groupName).orElseThrow(() -> new NotFoundException("Group not found!"));
+				List<PiggyBank> list = piggyBankDAO.findByGroup(group);
+				return Response.ok(list).build();
+			} else { // not part of group, eject client
+				return Response
+						.status(Response.Status.FORBIDDEN)
+						.entity(new GenericResponse(Response.Status.FORBIDDEN.getStatusCode(), "You are not part of this group!"))
+						.build();
+			}
+		} catch (TokenExpiredException e) {
+			return Response
+					.status(Response.Status.UNAUTHORIZED)
+					.entity(new GenericResponse(Response.Status.UNAUTHORIZED.getStatusCode(), "Token expired! Log in again!"))
+					.build();
+		} catch (JWTVerificationException e) { // invalid token, eject client
+			return Response
+					.status(Response.Status.UNAUTHORIZED)
+					.entity(new GenericResponse(Response.Status.UNAUTHORIZED.getStatusCode(), "Invalid authentication scheme!"))
+					.build();
+		} catch (NotFoundException e) {
+				return Response
+						.status(Response.Status.NOT_FOUND)
+						.entity(new NotFoundResponse("The group \"" + groupName + "\" could not be found!"))
+						.build();
 		}
 	}
 

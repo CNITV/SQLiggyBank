@@ -49,6 +49,13 @@ public class PiggyBankDAO extends AbstractDAO<PiggyBank> {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
+	public List<PiggyBank> findByGroup(Group group) {
+			Query query = namedQuery("ro.lbi.sqliggybank.server.Core.PiggyBank.findByGroup");
+			query.setParameter("passed_group", group);
+			return query.getResultList();
+	}
+
 	public Optional<PiggyBank> findByNameAndGroup(Group group, String name) {
 		try {
 			Query query = namedQuery("ro.lbi.sqliggybank.server.Core.PiggyBank.findByGroupAndName");
