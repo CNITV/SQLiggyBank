@@ -2,7 +2,6 @@ package ro.lbi.sqliggybank.client.backend;
 
 import lombok.Getter;
 
-import java.util.Date;
 import java.util.UUID;
 
 /**
@@ -30,7 +29,7 @@ public class Invite {
 	/**
 	 * The description of the group.
 	 */
-	private Date dateCreated;
+	private long dateCreated;
 
 	@Override
 	public String toString() {

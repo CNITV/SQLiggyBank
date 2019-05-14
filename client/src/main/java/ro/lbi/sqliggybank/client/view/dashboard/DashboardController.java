@@ -1,6 +1,7 @@
 package ro.lbi.sqliggybank.client.view.dashboard;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -20,6 +21,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import ro.lbi.sqliggybank.client.backend.Bank;
 import ro.lbi.sqliggybank.client.backend.Invite;
 import ro.lbi.sqliggybank.client.backend.database.DatabaseHandler;
 import ro.lbi.sqliggybank.client.backend.exceptions.ForbiddenException;
@@ -73,9 +75,29 @@ public class DashboardController {
 	private User user;
 
 	/**
+	 * The current members of the highlighted group.
+	 */
+	private User[] members;
+
+	/**
 	 * The current highlighted group.
 	 */
 	private Group group;
+
+	/**
+	 * All the groups of a user.
+	 */
+	private Group[] groups;
+
+	/**
+	 * The current highlighted bank.
+	 */
+	private Bank bank;
+
+	/**
+	 * All the banks of a group.
+	 */
+	private Bank[] banks;
 
 	/**
 	 * The label that contains the username.
@@ -147,6 +169,7 @@ public class DashboardController {
 		this.windowManager = windowManager;
 		this.user = user;
 		this.group = null;
+		this.bank = null;
 		this.databaseHandler = new DatabaseHandler();
 	}
 
@@ -188,54 +211,110 @@ public class DashboardController {
 		Initialize the groups, banks and goals.
 		*/
 
-		///TODO get groups,banks and goals and list them
-		//test groups
+		banksList.setOnMouseClicked((event) ->
+				{
+					//databaseHandler.getBank();
+				}
+		);
+
 		ImageView groupIcon = new ImageView(
 				new Image("/ro/lbi/sqliggybank/client/view/dashboard/image/folder.png",
 						20, 20, true, true)
 		);
 		TreeItem<String> rootItem = new TreeItem<>("Groups");
-		TreeItem<String> group1 = new TreeItem<>("Group testGroup", groupIcon);
+		try {
+			String result = databaseHandler.getGroupsOfUser(user.getUsername(), user.getJWT());
 
-		rootItem.getChildren().add(group1);
+			Gson gson = new Gson();
+			groups = gson.fromJson(result, Group[].class);
 
-		for (int i = 1; i < 10; i++) {
-			TreeItem<String> item = new TreeItem<>("Bank " + i);
+			for (Group group : groups) {
+				rootItem.getChildren().add(new TreeItem<>(group.getName(), new ImageView(
+						new Image("/ro/lbi/sqliggybank/client/view/dashboard/image/folder.png",
+								20, 20, true, true)
+				)));
+			}
 
-			group1.getChildren().add(item);
+		} catch (IOException e) {
+			LOGGER.log(Level.ERROR, "Connection error", e);
+			Alert.errorAlert("Connection error", "Database is not available at the moment, try again" +
+					" in a few moments.");
+			Platform.exit();
 		}
 
 		groupsTreeView.getSelectionModel().selectedItemProperty().addListener(
 				(observable, oldValue, newValue) -> {
-					if (newValue.getValue().split(" ")[0].equals("Group")) {
+					try {
+						String result;
+						result = databaseHandler.getGroup(newValue.getValue(), user.getJWT());
+
+						Gson gson = new Gson();
+						group = gson.fromJson(result, Group.class);
+
+						groupNameLabel.setText(group.getName());
+						groupNameLabel.setVisible(true);
+
+						createdByLabel.setText("created by " + group.getOwner().getUsername());
+						createdByLabel.setVisible(true);
+
+						groupDescriptionTooltip.setText(group.getDescription());
+
+						membersList.getItems().clear();
 						try {
-							String result;
-							result = databaseHandler.getGroup(newValue.getValue().split(" ")[1], user.getJWT());
+							result = databaseHandler.getMembersOfGroup(group.getName(), user.getJWT());
 
-							Gson gson = new Gson();
-							group = gson.fromJson(result, Group.class);
+							gson = new Gson();
+							members = gson.fromJson(result, User[].class);
 
-							System.out.println(group);
+							for (User member : members) {
+								membersList.getItems().add(member.getUsername());
+							}
 
-							groupNameLabel.setText(group.getName());
-							groupNameLabel.setVisible(true);
-
-							createdByLabel.setText("created by " + group.getOwner().getUsername());
-							createdByLabel.setVisible(true);
-
-							groupDescriptionTooltip.setText(group.getDescription());
-
-							/*for (int i = 0; i < 15; ++i) {
-								membersList.getItems().add("Member " + i);
-							}*/
 						} catch (IOException e) {
 							LOGGER.log(Level.ERROR, "Connection error", e);
 							Alert.errorAlert("Connection error", "Database is not available at the moment, try again" +
 									" in a few moments.");
-						} catch (ForbiddenException e) {
-							LOGGER.log(Level.ERROR, "Authorization error", e);
-							Alert.errorAlert("Authorization error", "You are not authorized to view this group.");
 						}
+
+						banksList.getItems().clear();
+						try {
+							result = databaseHandler.getBanksOfGroup(group.getName(), user.getJWT());
+
+							gson = new Gson();
+							banks = gson.fromJson(result, Bank[].class);
+
+							for (Bank bank : banks) {
+								banksList.getItems().add(bank.getName());
+							}
+							banksList.setOnMouseClicked((event) ->
+									{
+										try {
+											String res = databaseHandler.getBank(group.getName(),
+													banksList.getSelectionModel().getSelectedItem(), user.getJWT());
+
+											Gson gson1 = new Gson();
+											bank = gson1.fromJson(res, Bank.class);
+										} catch (IOException e) {
+											LOGGER.log(Level.ERROR, "Connection error", e);
+											Alert.errorAlert("Connection error", "Database is not available at the moment, try again" +
+													" in a few moments.");
+										}
+
+									}
+							);
+						} catch (IOException e) {
+							LOGGER.log(Level.ERROR, "Connection error", e);
+							Alert.errorAlert("Connection error", "Database is not available at the moment, try again" +
+									" in a few moments.");
+						}
+
+					} catch (IOException e) {
+						LOGGER.log(Level.ERROR, "Connection error", e);
+						Alert.errorAlert("Connection error", "Database is not available at the moment, try again" +
+								" in a few moments.");
+					} catch (ForbiddenException e) {
+						LOGGER.log(Level.ERROR, "Authorization error", e);
+						Alert.errorAlert("Authorization error", "You are not authorized to view this group.");
 					}
 				}
 		);
@@ -412,27 +491,43 @@ public class DashboardController {
 	 */
 	@FXML
 	private void joinGroupButtonPressed(ActionEvent event) {
+		String groupName = null;
+
+		TextInputDialog dialog1 = new TextInputDialog("Group Name");
+		dialog1.setTitle("Group Invite");
+		dialog1.setHeaderText(null);
+		dialog1.setContentText("Please enter the group name you want to join:");
+
+		Optional<String> result1 = dialog1.showAndWait();
+		if (result1.isPresent()) {
+			groupName = result1.get();
+		} else {
+			Alert.errorAlert("Error", "Group name cannot be empty!");
+			return;
+		}
+
 		TextInputDialog dialog = new TextInputDialog("Invite ID");
 		dialog.setTitle("Group Invite");
 		dialog.setHeaderText(null);
 		dialog.setContentText("Please enter the group invite ID:");
 
 		Optional<String> result = dialog.showAndWait();
-		result.ifPresent(invite -> {
-			{
-				try {
-					databaseHandler.joinGroup(group.getName(), invite, user.getJWT());
-				} catch (NullPointerException e) {
-					Alert.errorAlert("Error", "You didn't select a group!");
-				} catch (IOException e) {
-					LOGGER.log(Level.ERROR, "Connection error", e);
-					Alert.errorAlert("Connection error", "The database can't be accessed at the moment.");
-				} catch (ForbiddenException e) {
-					LOGGER.log(Level.ERROR, "Error", e);
-					Alert.errorAlert("Error", "You are already part of the group!!");
-				}
+		if (result.isPresent()) {
+			String invite = result.get();
+			try {
+				databaseHandler.joinGroup(groupName, invite, user.getJWT());
+			} catch (NullPointerException e) {
+				Alert.errorAlert("Error", "You didn't select a group!");
+			} catch (IOException e) {
+				LOGGER.log(Level.ERROR, "Connection error", e);
+				Alert.errorAlert("Connection error", "The database can't be accessed at the moment.");
+			} catch (ForbiddenException e) {
+				LOGGER.log(Level.ERROR, "Error", e);
+				Alert.errorAlert("Error", "You are already part of the group or the invitation is wrong!!");
 			}
-		});
+		} else {
+			Alert.errorAlert("Error", "Group invite ID cannot be empty!");
+		}
 	}
 
 	/**
@@ -442,14 +537,44 @@ public class DashboardController {
 	 */
 	@FXML
 	private void newGroupButtonPressed(ActionEvent event) {
-		/*try {
-			databaseHandler.createGroup(name, description, user.getJWT());
+		String name = null;
+		String description = null;
+
+		TextInputDialog dialog1 = new TextInputDialog("Group name");
+		dialog1.setTitle("Create Group");
+		dialog1.setHeaderText(null);
+		dialog1.setContentText("Please enter the name of the group:");
+
+		Optional<String> result1 = dialog1.showAndWait();
+		if (result1.isPresent()) {
+			name = result1.get();
+		} else {
+			Alert.errorAlert("Error", "Group name can't be empty!");
+			return;
+		}
+
+		TextInputDialog dialog2 = new TextInputDialog("Group Description");
+		dialog2.setTitle("Create Group");
+		dialog2.setHeaderText(null);
+		dialog2.setContentText("Please enter the description of the group:");
+
+		Optional<String> result2 = dialog2.showAndWait();
+		description = (result2.isPresent() ? result2.get() : "");
+
+		try {
+			String result = databaseHandler.createGroup(name, description, user.getJWT());
+			if (result.equals("200")) {
+				Alert.infoAlert("Success", "Successfully created a group!");
+				Alert.infoAlert("Login", "Please login again so your changes take place.");
+				windowManager.loginMenu();
+			}
+			System.out.println(result);
 		} catch (NullPointerException e) {
 			Alert.errorAlert("Error", "You didn't select a group!");
 		} catch (IOException e) {
 			LOGGER.log(Level.ERROR, "Connection error", e);
 			Alert.errorAlert("Connection error", "The database can't be accessed at the moment.");
-		}*/
+		}
 	}
 
 	/**
@@ -462,6 +587,43 @@ public class DashboardController {
 		/*
 		Go to transactions pop-up window.
 		 */
+		try {
+			Stage settings = new Stage();
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("/ro/lbi/sqliggybank/client/view/dashboard/transactions.fxml"));
+			if (group == null || bank == null) {
+				throw new NullPointerException();
+			}
+			loader.setControllerFactory(
+					c -> new TransactionsController(windowManager, user, group, bank)
+			);
+
+			Parent root = loader.load();
+
+			settings.setScene(new Scene(root, 600, 400));
+			settings.setTitle("Transactions");
+			settings.initModality(Modality.WINDOW_MODAL);
+			settings.initOwner(((Node) event.getSource()).getScene().getWindow());
+			settings.setResizable(false);
+			settings.show();
+
+		} catch (IOException exception) {
+            /*
+            This happens whenever the FXML loader can't load the specified file for whatever reason.
+             */
+			LOGGER.log(Level.ERROR, "The FXML loader couldn't load the FXML file.", exception);
+			Alert.errorAlert("FXML error", "The FXML loader couldn't load the FXML file.");
+			Platform.exit();
+		} catch (IllegalStateException exception) {
+            /*
+            This happens whenever the FXML file isn't found at the specified path or the file name is wrong.
+             */
+			LOGGER.log(Level.ERROR, "The FXML loader couldn't find the file at the specified path.", exception);
+			Alert.errorAlert("FXML error", "The FXML loader couldn't find the file at the specified path.");
+			Platform.exit();
+		} catch (NullPointerException e) {
+			LOGGER.log(Level.ERROR, "The FXML loader couldn't find the file at the specified path.", e);
+			Alert.errorAlert("Error", "You didn't select a group!!");
+		}
 	}
 
 	/**
@@ -527,7 +689,44 @@ public class DashboardController {
 	 */
 	@FXML
 	private void addBankButtonPressed(ActionEvent event) {
-		//databaseHandler.createBank();
+		String bankName = null;
+		String bankDescription = null;
+
+		TextInputDialog dialog1 = new TextInputDialog("Bank name");
+		dialog1.setTitle("Create Bank");
+		dialog1.setHeaderText(null);
+		dialog1.setContentText("Please enter the name of the bank:");
+
+		Optional<String> result1 = dialog1.showAndWait();
+		if (result1.isPresent()) {
+			bankName = result1.get();
+		} else {
+			Alert.errorAlert("Error", "Bank name can't be empty!");
+			return;
+		}
+
+		TextInputDialog dialog2 = new TextInputDialog("Bank Description");
+		dialog2.setTitle("Create Bank");
+		dialog2.setHeaderText(null);
+		dialog2.setContentText("Please enter the description of the bank:");
+
+		Optional<String> result2 = dialog2.showAndWait();
+		bankDescription = (result2.isPresent() ? result2.get() : "");
+		try {
+			String result = databaseHandler.createBank(group.getName(), user.getJWT(), bankName, bankDescription);
+			if (result.equals("200")) {
+				Alert.infoAlert("Success", "Successfully created a bank!");
+				Alert.infoAlert("Login", "Please login again so your changes take place.");
+				windowManager.loginMenu();
+			}
+		} catch (IOException e) {
+			LOGGER.log(Level.ERROR, "Connection error", e);
+			Alert.errorAlert("Connection error", "The database can't be accessed at the moment.");
+		} catch (ForbiddenException e) {
+			LOGGER.log(Level.ERROR, "Authorization error", e);
+			Alert.errorAlert("Authorization error", "You are not the owner of the group so you cannot " +
+					"perform such an action!");
+		}
 	}
 
 	/**
@@ -537,7 +736,21 @@ public class DashboardController {
 	 */
 	@FXML
 	private void removeBankButtonPressed(ActionEvent event) {
-		//databaseHandler.removeBank();
+		try {
+			String result = databaseHandler.deleteBank(group.getName(), bank.getName(), user.getJWT());
+			if (result.equals("200")) {
+				Alert.infoAlert("Success", "Successfully created a bank!");
+				Alert.infoAlert("Login", "Please login again so your changes take place.");
+				windowManager.loginMenu();
+			}
+		} catch (IOException e) {
+			LOGGER.log(Level.ERROR, "Connection error", e);
+			Alert.errorAlert("Connection error", "The database can't be accessed at the moment.");
+		} catch (ForbiddenException e) {
+			LOGGER.log(Level.ERROR, "Authorization error", e);
+			Alert.errorAlert("Authorization error", "You are not the owner of the group so you cannot " +
+					"perform such an action!");
+		}
 	}
 
 	/**
