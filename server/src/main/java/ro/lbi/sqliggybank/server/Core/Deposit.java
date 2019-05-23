@@ -17,6 +17,10 @@ import java.util.UUID;
 						name = "ro.lbi.sqliggybank.server.Core.Deposit.findByID",
 						query = "SELECT d FROM Deposit d WHERE d.uuid = :uuid"
 				),
+				@NamedQuery(
+						name = "ro.lbi.sqliggybank.server.Core.Deposit.findByGroupAndBank",
+						query = "SELECT d FROM Deposit d WHERE d.bank.name = :bank AND d.bank.group.name = :group"
+				)
 		}
 )
 public class Deposit {

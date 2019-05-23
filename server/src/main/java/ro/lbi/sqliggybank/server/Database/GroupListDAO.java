@@ -66,7 +66,7 @@ public class GroupListDAO extends AbstractDAO<GroupEntry> {
 	 *
 	 * @param groupEntry The group list to be created.
 	 */
-	public void create(GroupEntry groupEntry) {
+	private void create(GroupEntry groupEntry) {
 		persist(groupEntry);
 	}
 

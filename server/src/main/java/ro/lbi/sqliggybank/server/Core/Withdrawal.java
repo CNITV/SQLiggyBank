@@ -18,6 +18,10 @@ import java.util.UUID;
 						name = "ro.lbi.sqliggybank.server.Core.Withdrawal.findByID",
 						query = "SELECT w FROM Withdrawal w WHERE w.uuid = :uuid"
 				),
+				@NamedQuery(
+						name = "ro.lbi.sqliggybank.server.Core.Withdrawal.findByGroupAndBank",
+						query = "SELECT w FROM Withdrawal w WHERE w.bank.name = :bank AND w.bank.group.name = :group"
+				)
 		}
 )
 public class Withdrawal {

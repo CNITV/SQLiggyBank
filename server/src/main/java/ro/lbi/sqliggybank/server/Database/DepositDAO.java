@@ -29,6 +29,14 @@ public class DepositDAO extends AbstractDAO<Deposit> {
 		return Optional.ofNullable(get(id));
 	}
 
+	@SuppressWarnings("unchecked")
+	public List<Deposit> findByGroupAndBank(String group, String bank) {
+		Query query = namedQuery("ro.lbi.sqliggybank.server.Core.Deposit.findByGroupAndBank");
+		query.setParameter("group", group);
+		query.setParameter("bank", bank);
+		return query.getResultList();
+	}
+
 	/**
 	 * Checks the presence of a deposit in a database. Used to differentiate transactions.
 	 *

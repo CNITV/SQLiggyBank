@@ -29,6 +29,14 @@ public class WithdrawalDAO extends AbstractDAO<Withdrawal> {
 		return Optional.ofNullable(get(id));
 	}
 
+	@SuppressWarnings("unchecked")
+	public List<Withdrawal> findByGroupAndBank(String group, String bank) {
+		Query query = namedQuery("ro.lbi.sqliggybank.server.Core.Withdrawal.findByGroupAndBank");
+		query.setParameter("group", group);
+		query.setParameter("bank", bank);
+		return query.getResultList();
+	}
+
 	/**
 	 * Checks the presence of a withdrawal in a database. Used to differentiate transactions.
 	 *
