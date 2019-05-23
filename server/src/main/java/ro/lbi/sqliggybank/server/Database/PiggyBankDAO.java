@@ -1,7 +1,6 @@
 package ro.lbi.sqliggybank.server.Database;
 
 import io.dropwizard.hibernate.AbstractDAO;
-import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import ro.lbi.sqliggybank.server.Core.Group;

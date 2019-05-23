@@ -36,8 +36,6 @@ public class TransactionsResource {
 	private final DepositDAO depositDAO;
 	private final WithdrawalDAO withdrawalDAO;
 	private final PiggyBankDAO piggyBankDAO;
-	private final byte[] JWTSecret;
-	private final Algorithm authAlgorithm;
 	private final JWTVerifier authVerifier;
 
 	public TransactionsResource(GroupDAO groupDAO, GroupListDAO groupListDAO, UserDAO userDAO, DepositDAO depositDAO, WithdrawalDAO withdrawalDAO, PiggyBankDAO piggyBankDAO, byte[] JWTSecret) {
@@ -47,9 +45,8 @@ public class TransactionsResource {
 		this.depositDAO = depositDAO;
 		this.withdrawalDAO = withdrawalDAO;
 		this.piggyBankDAO = piggyBankDAO;
-		this.JWTSecret = JWTSecret;
-		this.authAlgorithm = Algorithm.HMAC256(this.JWTSecret);
-		this.authVerifier = JWT.require(this.authAlgorithm)
+		Algorithm authAlgorithm = Algorithm.HMAC256(JWTSecret);
+		this.authVerifier = JWT.require(authAlgorithm)
 				.withIssuer("SQLiggyBank")
 				.build();
 	}

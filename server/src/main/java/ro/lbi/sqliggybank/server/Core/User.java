@@ -1,6 +1,5 @@
 package ro.lbi.sqliggybank.server.Core;
 
-import javax.inject.Named;
 import javax.persistence.*;
 import java.util.Objects;
 import java.util.UUID;

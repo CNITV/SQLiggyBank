@@ -27,17 +27,14 @@ public class GroupListResource {
 	private final GroupDAO groupDAO;
 	private final UserDAO userDAO;
 	private final GroupListDAO groupListDAO;
-	private final byte[] JWTSecret;
-	private final Algorithm authAlgorithm;
 	private final JWTVerifier authVerifier;
 
 	public GroupListResource(GroupDAO groupDAO, UserDAO userDAO, GroupListDAO groupListDAO, byte[] JWTSecret) {
 		this.groupDAO = groupDAO;
 		this.userDAO = userDAO;
 		this.groupListDAO = groupListDAO;
-		this.JWTSecret = JWTSecret;
-		this.authAlgorithm = Algorithm.HMAC256(this.JWTSecret);
-		this.authVerifier = JWT.require(this.authAlgorithm)
+		Algorithm authAlgorithm = Algorithm.HMAC256(JWTSecret);
+		this.authVerifier = JWT.require(authAlgorithm)
 				.withIssuer("SQLiggyBank")
 				.build();
 	}

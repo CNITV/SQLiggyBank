@@ -17,7 +17,6 @@ import ro.lbi.sqliggybank.server.Core.PiggyBank;
 import ro.lbi.sqliggybank.server.Database.*;
 import ro.lbi.sqliggybank.server.Responses.GenericResponse;
 import ro.lbi.sqliggybank.server.Responses.InternalErrorResponse;
-import ro.lbi.sqliggybank.server.Responses.NotFoundResponse;
 
 import javax.persistence.NoResultException;
 import javax.ws.rs.*;
@@ -32,21 +31,16 @@ public class GoalResource {
 	private final GroupDAO groupDAO;
 	private final GroupListDAO groupListDAO;
 	private final PiggyBankDAO piggyBankDAO;
-	private final UserDAO userDAO;
 	private final GoalDAO goalDAO;
-	private final byte[] JWTSecret;
-	private final Algorithm authAlgorithm;
 	private final JWTVerifier authVerifier;
 
 	public GoalResource(GroupDAO groupDAO, GroupListDAO groupListDAO, UserDAO userDAO, PiggyBankDAO piggyBankDAO, GoalDAO goalDAO, byte[] JWTSecret) {
 		this.groupDAO = groupDAO;
 		this.groupListDAO = groupListDAO;
-		this.userDAO = userDAO;
 		this.piggyBankDAO = piggyBankDAO;
 		this.goalDAO = goalDAO;
-		this.JWTSecret = JWTSecret;
-		this.authAlgorithm = Algorithm.HMAC256(this.JWTSecret);
-		this.authVerifier = JWT.require(this.authAlgorithm)
+		Algorithm authAlgorithm = Algorithm.HMAC256(JWTSecret);
+		this.authVerifier = JWT.require(authAlgorithm)
 				.withIssuer("SQLiggyBank")
 				.build();
 	}

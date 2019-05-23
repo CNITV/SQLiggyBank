@@ -13,11 +13,8 @@ import java.util.UUID;
 
 public class GroupListDAO extends AbstractDAO<GroupEntry> {
 
-	private UserDAO userDAO;
-
 	public GroupListDAO(SessionFactory factory, UserDAO userDAO) {
 		super(factory);
-		this.userDAO = userDAO;
 	}
 
 	/**

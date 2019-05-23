@@ -1,7 +1,5 @@
 package ro.lbi.sqliggybank.server.Core;
 
-import org.eclipse.jetty.util.annotation.Name;
-
 import javax.persistence.*;
 import java.util.Objects;
 import java.util.UUID;

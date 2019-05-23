@@ -2,8 +2,6 @@ package ro.lbi.sqliggybank.server.Tools;
 
 import org.mindrot.jbcrypt.BCrypt;
 
-import java.util.function.Function;
-
 /**
  * BCryptHasher is a class used to hash passwords into the datbaase using the BCrypt algorithm.
  * <p>

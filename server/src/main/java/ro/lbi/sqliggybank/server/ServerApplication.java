@@ -97,7 +97,7 @@ public class ServerApplication extends Application<ServerConfiguration> {
 		environment.jersey().register(new UserResource(userDAO, secret));
 		environment.jersey().register(new GroupResource(groupDAO, groupListDAO, userDAO, secret));
 		environment.jersey().register(new GroupListResource(groupDAO, userDAO, groupListDAO, secret));
-		environment.jersey().register(new BanksResource(groupDAO, groupListDAO, userDAO, piggyBankDAO, secret));
+		environment.jersey().register(new BanksResource(groupDAO, groupListDAO, piggyBankDAO, secret));
 		environment.jersey().register(new TransactionsResource(groupDAO, groupListDAO, userDAO, depositDAO, withdrawalDAO, piggyBankDAO, secret));
 		environment.jersey().register(new GoalResource(groupDAO, groupListDAO, userDAO, piggyBankDAO, goalDAO, secret));
 	}
