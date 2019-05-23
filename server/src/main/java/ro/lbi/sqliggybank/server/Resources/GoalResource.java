@@ -131,22 +131,7 @@ public class GoalResource {
 					.entity(new GenericResponse(Response.Status.UNAUTHORIZED.getStatusCode(), "Invalid authentication scheme!"))
 					.build();
 		} catch (NotFoundException e) {
-			if (e.getMessage().split(" ")[0].equals("Group")) {
-				return Response
-						.status(Response.Status.NOT_FOUND)
-						.entity(new NotFoundResponse("The group \"" + groupName + "\" could not be found!"))
-						.build();
-			} else if (e.getMessage().split(" ")[0].equals("Piggy")){
-				return Response
-						.status(Response.Status.NOT_FOUND)
-						.entity(new NotFoundResponse("The piggy bank \"" + bankName + "\" could not be found!"))
-						.build();
-			} else {
-				return Response
-						.status(Response.Status.NOT_FOUND)
-						.entity(new NotFoundResponse("The goal \"" + goalName + "\" could not be found!"))
-						.build();
-			}
+			return EndpointExceptionHandler.parseGoalNotFound(groupName, bankName, goalName, e);
 		}
 	}
 
@@ -195,17 +180,7 @@ public class GoalResource {
 					.entity(new InternalErrorResponse(e.getMessage()))
 					.build();
 		} catch (NotFoundException e) {
-			if (e.getMessage().split(" ")[0].equals("Group")) {
-				return Response
-						.status(Response.Status.NOT_FOUND)
-						.entity(new NotFoundResponse("The group \"" + groupName + "\" could not be found!"))
-						.build();
-			} else {
-				return Response
-						.status(Response.Status.NOT_FOUND)
-						.entity(new NotFoundResponse("The piggy bank \"" + bankName + "\" could not be found!"))
-						.build();
-			}
+			return EndpointExceptionHandler.parseBankNotFound(groupName, bankName, e);
 		}
 	}
 
@@ -255,22 +230,7 @@ public class GoalResource {
 					.entity(new InternalErrorResponse(e.getMessage()))
 					.build();
 		} catch (NotFoundException e) {
-			if (e.getMessage().split(" ")[0].equals("Group")) {
-				return Response
-						.status(Response.Status.NOT_FOUND)
-						.entity(new NotFoundResponse("The group \"" + groupName + "\" could not be found!"))
-						.build();
-			} else if (e.getMessage().split(" ")[0].equals("Piggy")){
-				return Response
-						.status(Response.Status.NOT_FOUND)
-						.entity(new NotFoundResponse("The piggy bank \"" + bankName + "\" could not be found!"))
-						.build();
-			} else {
-				return Response
-						.status(Response.Status.NOT_FOUND)
-						.entity(new NotFoundResponse("The goal \"" + goalName + "\" could not be found!"))
-						.build();
-			}
+			return EndpointExceptionHandler.parseGoalNotFound(groupName, bankName, goalName, e);
 		}
 	}
 
@@ -299,22 +259,7 @@ public class GoalResource {
 					.entity(new GenericResponse(Response.Status.UNAUTHORIZED.getStatusCode(), "Invalid authentication scheme!"))
 					.build();
 		} catch (NotFoundException e) {
-			if (e.getMessage().split(" ")[0].equals("Group")) {
-				return Response
-						.status(Response.Status.NOT_FOUND)
-						.entity(new NotFoundResponse("The group \"" + groupName + "\" could not be found!"))
-						.build();
-			} else if (e.getMessage().split(" ")[0].equals("Piggy")){
-				return Response
-						.status(Response.Status.NOT_FOUND)
-						.entity(new NotFoundResponse("The piggy bank \"" + bankName + "\" could not be found!"))
-						.build();
-			} else {
-				return Response
-						.status(Response.Status.NOT_FOUND)
-						.entity(new NotFoundResponse("The goal \"" + goalName + "\" could not be found!"))
-						.build();
-			}
+			return EndpointExceptionHandler.parseGoalNotFound(groupName, bankName, goalName, e);
 		}
 	}
 }
