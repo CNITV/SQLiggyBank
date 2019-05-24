@@ -3,7 +3,7 @@ package ro.lbi.sqliggybank.server.Tools;
 import org.mindrot.jbcrypt.BCrypt;
 
 /**
- * BCryptHasher is a class used to hash passwords into the datbaase using the BCrypt algorithm.
+ * BCryptHasher is a class used to hash passwords into the database using the BCrypt algorithm.
  * <p>
  * The BCrypt algorithm randomly generated a new salt for each password it hashes and allows for easy hashing and
  * verification of new passwords. This will be used to encrypt all passwords.
