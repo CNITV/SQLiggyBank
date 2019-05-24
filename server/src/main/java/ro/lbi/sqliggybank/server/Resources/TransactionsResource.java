@@ -36,8 +36,6 @@ public class TransactionsResource {
 	private final DepositDAO depositDAO;
 	private final WithdrawalDAO withdrawalDAO;
 	private final PiggyBankDAO piggyBankDAO;
-	private final byte[] JWTSecret;
-	private final Algorithm authAlgorithm;
 	private final JWTVerifier authVerifier;
 
 	public TransactionsResource(GroupDAO groupDAO, GroupListDAO groupListDAO, UserDAO userDAO, DepositDAO depositDAO, WithdrawalDAO withdrawalDAO, PiggyBankDAO piggyBankDAO, byte[] JWTSecret) {
@@ -47,9 +45,8 @@ public class TransactionsResource {
 		this.depositDAO = depositDAO;
 		this.withdrawalDAO = withdrawalDAO;
 		this.piggyBankDAO = piggyBankDAO;
-		this.JWTSecret = JWTSecret;
-		this.authAlgorithm = Algorithm.HMAC256(this.JWTSecret);
-		this.authVerifier = JWT.require(this.authAlgorithm)
+		Algorithm authAlgorithm = Algorithm.HMAC256(JWTSecret);
+		this.authVerifier = JWT.require(authAlgorithm)
 				.withIssuer("SQLiggyBank")
 				.build();
 	}
@@ -170,17 +167,7 @@ public class TransactionsResource {
 						.entity(new InternalErrorResponse(e1.getMessage()))
 						.build();
 			} catch (NotFoundException e1) {
-				if (e.getMessage().split(" ")[0].equals("Group")) {
-					return Response
-							.status(Response.Status.NOT_FOUND)
-							.entity(new NotFoundResponse("The group \"" + groupName + "\" could not be found!"))
-							.build();
-				} else {
-					return Response
-							.status(Response.Status.NOT_FOUND)
-							.entity(new NotFoundResponse("The piggy bank \"" + bankName + "\" could not be found!"))
-							.build();
-				}
+				return EndpointExceptionHandler.parseBankNotFound(groupName, bankName, e1);
 			}
 
 		} catch (IOException e) {
@@ -189,17 +176,7 @@ public class TransactionsResource {
 					.entity(new InternalErrorResponse(e.getMessage()))
 					.build();
 		} catch (NotFoundException e) {
-			if (e.getMessage().split(" ")[0].equals("Group")) {
-				return Response
-						.status(Response.Status.NOT_FOUND)
-						.entity(new NotFoundResponse("The group \"" + groupName + "\" could not be found!"))
-						.build();
-			} else {
-				return Response
-						.status(Response.Status.NOT_FOUND)
-						.entity(new NotFoundResponse("The piggy bank \"" + bankName + "\" could not be found!"))
-						.build();
-			}
+			return EndpointExceptionHandler.parseBankNotFound(groupName, bankName, e);
 		}
 	}
 }

@@ -17,7 +17,6 @@ import ro.lbi.sqliggybank.server.Core.PiggyBank;
 import ro.lbi.sqliggybank.server.Database.*;
 import ro.lbi.sqliggybank.server.Responses.GenericResponse;
 import ro.lbi.sqliggybank.server.Responses.InternalErrorResponse;
-import ro.lbi.sqliggybank.server.Responses.NotFoundResponse;
 
 import javax.persistence.NoResultException;
 import javax.ws.rs.*;
@@ -32,21 +31,16 @@ public class GoalResource {
 	private final GroupDAO groupDAO;
 	private final GroupListDAO groupListDAO;
 	private final PiggyBankDAO piggyBankDAO;
-	private final UserDAO userDAO;
 	private final GoalDAO goalDAO;
-	private final byte[] JWTSecret;
-	private final Algorithm authAlgorithm;
 	private final JWTVerifier authVerifier;
 
-	public GoalResource(GroupDAO groupDAO, GroupListDAO groupListDAO, UserDAO userDAO, PiggyBankDAO piggyBankDAO, GoalDAO goalDAO, byte[] JWTSecret) {
+	public GoalResource(GroupDAO groupDAO, GroupListDAO groupListDAO, PiggyBankDAO piggyBankDAO, GoalDAO goalDAO, byte[] JWTSecret) {
 		this.groupDAO = groupDAO;
 		this.groupListDAO = groupListDAO;
-		this.userDAO = userDAO;
 		this.piggyBankDAO = piggyBankDAO;
 		this.goalDAO = goalDAO;
-		this.JWTSecret = JWTSecret;
-		this.authAlgorithm = Algorithm.HMAC256(this.JWTSecret);
-		this.authVerifier = JWT.require(this.authAlgorithm)
+		Algorithm authAlgorithm = Algorithm.HMAC256(JWTSecret);
+		this.authVerifier = JWT.require(authAlgorithm)
 				.withIssuer("SQLiggyBank")
 				.build();
 	}
@@ -131,22 +125,7 @@ public class GoalResource {
 					.entity(new GenericResponse(Response.Status.UNAUTHORIZED.getStatusCode(), "Invalid authentication scheme!"))
 					.build();
 		} catch (NotFoundException e) {
-			if (e.getMessage().split(" ")[0].equals("Group")) {
-				return Response
-						.status(Response.Status.NOT_FOUND)
-						.entity(new NotFoundResponse("The group \"" + groupName + "\" could not be found!"))
-						.build();
-			} else if (e.getMessage().split(" ")[0].equals("Piggy")){
-				return Response
-						.status(Response.Status.NOT_FOUND)
-						.entity(new NotFoundResponse("The piggy bank \"" + bankName + "\" could not be found!"))
-						.build();
-			} else {
-				return Response
-						.status(Response.Status.NOT_FOUND)
-						.entity(new NotFoundResponse("The goal \"" + goalName + "\" could not be found!"))
-						.build();
-			}
+			return EndpointExceptionHandler.parseGoalNotFound(groupName, bankName, goalName, e);
 		}
 	}
 
@@ -195,17 +174,7 @@ public class GoalResource {
 					.entity(new InternalErrorResponse(e.getMessage()))
 					.build();
 		} catch (NotFoundException e) {
-			if (e.getMessage().split(" ")[0].equals("Group")) {
-				return Response
-						.status(Response.Status.NOT_FOUND)
-						.entity(new NotFoundResponse("The group \"" + groupName + "\" could not be found!"))
-						.build();
-			} else {
-				return Response
-						.status(Response.Status.NOT_FOUND)
-						.entity(new NotFoundResponse("The piggy bank \"" + bankName + "\" could not be found!"))
-						.build();
-			}
+			return EndpointExceptionHandler.parseBankNotFound(groupName, bankName, e);
 		}
 	}
 
@@ -255,22 +224,7 @@ public class GoalResource {
 					.entity(new InternalErrorResponse(e.getMessage()))
 					.build();
 		} catch (NotFoundException e) {
-			if (e.getMessage().split(" ")[0].equals("Group")) {
-				return Response
-						.status(Response.Status.NOT_FOUND)
-						.entity(new NotFoundResponse("The group \"" + groupName + "\" could not be found!"))
-						.build();
-			} else if (e.getMessage().split(" ")[0].equals("Piggy")){
-				return Response
-						.status(Response.Status.NOT_FOUND)
-						.entity(new NotFoundResponse("The piggy bank \"" + bankName + "\" could not be found!"))
-						.build();
-			} else {
-				return Response
-						.status(Response.Status.NOT_FOUND)
-						.entity(new NotFoundResponse("The goal \"" + goalName + "\" could not be found!"))
-						.build();
-			}
+			return EndpointExceptionHandler.parseGoalNotFound(groupName, bankName, goalName, e);
 		}
 	}
 
@@ -299,22 +253,7 @@ public class GoalResource {
 					.entity(new GenericResponse(Response.Status.UNAUTHORIZED.getStatusCode(), "Invalid authentication scheme!"))
 					.build();
 		} catch (NotFoundException e) {
-			if (e.getMessage().split(" ")[0].equals("Group")) {
-				return Response
-						.status(Response.Status.NOT_FOUND)
-						.entity(new NotFoundResponse("The group \"" + groupName + "\" could not be found!"))
-						.build();
-			} else if (e.getMessage().split(" ")[0].equals("Piggy")){
-				return Response
-						.status(Response.Status.NOT_FOUND)
-						.entity(new NotFoundResponse("The piggy bank \"" + bankName + "\" could not be found!"))
-						.build();
-			} else {
-				return Response
-						.status(Response.Status.NOT_FOUND)
-						.entity(new NotFoundResponse("The goal \"" + goalName + "\" could not be found!"))
-						.build();
-			}
+			return EndpointExceptionHandler.parseGoalNotFound(groupName, bankName, goalName, e);
 		}
 	}
 }

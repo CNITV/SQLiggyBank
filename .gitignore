@@ -116,3 +116,5 @@ buildNumber.properties
 
 # Configuration files for server
 server/config.yml
+# Example SSL certificate for local testing
+example.keystore

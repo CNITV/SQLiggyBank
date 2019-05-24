@@ -12,7 +12,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.dropwizard.hibernate.UnitOfWork;
 import io.dropwizard.jersey.PATCH;
 import ro.lbi.sqliggybank.server.Core.Group;
-import ro.lbi.sqliggybank.server.Core.GroupEntry;
 import ro.lbi.sqliggybank.server.Core.Invite;
 import ro.lbi.sqliggybank.server.Core.User;
 import ro.lbi.sqliggybank.server.Database.GroupDAO;
@@ -24,13 +23,9 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Path("/api/groups/")
 @Produces(MediaType.APPLICATION_JSON)
@@ -39,8 +34,6 @@ public class GroupResource {
 	private final GroupDAO groupDAO;
 	private final GroupListDAO groupListDAO;
 	private final UserDAO userDAO;
-	private final byte[] JWTSecret;
-	private final Algorithm authAlgorithm;
 	private final JWTVerifier authVerifier;
 	private final ArrayList<Invite> invites = new ArrayList<>();
 
@@ -48,9 +41,8 @@ public class GroupResource {
 		this.groupDAO = groupDAO;
 		this.groupListDAO = groupListDAO;
 		this.userDAO = userDAO;
-		this.JWTSecret = JWTSecret;
-		this.authAlgorithm = Algorithm.HMAC256(this.JWTSecret);
-		this.authVerifier = JWT.require(this.authAlgorithm)
+		Algorithm authAlgorithm = Algorithm.HMAC256(JWTSecret);
+		this.authVerifier = JWT.require(authAlgorithm)
 				.withIssuer("SQLiggyBank")
 				.build();
 	}
