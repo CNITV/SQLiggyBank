@@ -34,7 +34,7 @@ public class GoalResource {
 	private final GoalDAO goalDAO;
 	private final JWTVerifier authVerifier;
 
-	public GoalResource(GroupDAO groupDAO, GroupListDAO groupListDAO, UserDAO userDAO, PiggyBankDAO piggyBankDAO, GoalDAO goalDAO, byte[] JWTSecret) {
+	public GoalResource(GroupDAO groupDAO, GroupListDAO groupListDAO, PiggyBankDAO piggyBankDAO, GoalDAO goalDAO, byte[] JWTSecret) {
 		this.groupDAO = groupDAO;
 		this.groupListDAO = groupListDAO;
 		this.piggyBankDAO = piggyBankDAO;
