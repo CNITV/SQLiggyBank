@@ -49,17 +49,11 @@ import java.util.UUID;
 @Produces(MediaType.APPLICATION_JSON)
 public class UserResource {
 	/**
-	 * userDAO is the DAO for the users table in the database. This is modified by the constructor.
+	 * userDAO is the DAO for the "users" table in the database. This is modified by the constructor.
 	 *
 	 * @see ro.lbi.sqliggybank.server.Database.UserDAO
 	 */
 	private final UserDAO userDAO;
-
-	/**
-	 * JWTSecret is the secret used to construct the algorithms for the JWT's used for authentication.
-	 */
-	@SuppressWarnings("FieldCanBeLocal")
-	private final byte[] JWTSecret;
 
 	/**
 	 * authAlgorithm is the HMAC256 algorithm used to sign JWT's.
@@ -79,13 +73,12 @@ public class UserResource {
 	/**
 	 * The constructor for UserResource. The parameters should be passed solely by the ServerApplication class.
 	 *
-	 * @param userDAO   The DAO to the users table in the database.
-	 * @param JWTSecret The secret to be used for signing JWT's using the HMAC256 algorithm
+	 * @param userDAO   The DAO to the "users" table in the database.
+	 * @param JWTSecret The secret to be used for signing JWT's using the HMAC256 algorithm.
 	 */
 	public UserResource(UserDAO userDAO, byte[] JWTSecret) {
 		this.userDAO = userDAO;
-		this.JWTSecret = JWTSecret;
-		this.authAlgorithm = Algorithm.HMAC256(this.JWTSecret);
+		this.authAlgorithm = Algorithm.HMAC256(JWTSecret);
 		this.authVerifier = JWT.require(this.authAlgorithm)
 				.withIssuer("SQLiggyBank")
 				.build();
