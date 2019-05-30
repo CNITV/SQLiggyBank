@@ -6,6 +6,8 @@ import java.util.Date;
 import java.util.Objects;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.*;
+
 @Entity
 @Table(name = "withdrawals")
 @NamedQueries(
@@ -53,6 +55,7 @@ public class Withdrawal {
 		this.tags = tags;
 	}
 
+	@JsonIgnore
 	public UUID getUuid() {
 		return uuid;
 	}

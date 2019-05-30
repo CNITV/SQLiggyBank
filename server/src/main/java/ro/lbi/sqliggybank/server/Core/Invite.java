@@ -4,6 +4,8 @@ import java.util.Date;
 import java.util.Objects;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.*;
+
 public class Invite {
 	private UUID uuid;
 	private String group;
@@ -15,6 +17,7 @@ public class Invite {
 		this.dateCreated = dateCreated;
 	}
 
+	@JsonIgnore
 	public UUID getUuid() {
 		return uuid;
 	}

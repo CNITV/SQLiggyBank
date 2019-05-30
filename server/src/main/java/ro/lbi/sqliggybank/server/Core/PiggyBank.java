@@ -4,6 +4,8 @@ import javax.persistence.*;
 import java.util.Objects;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.*;
+
 @Entity
 @Table(name = "banks")
 @NamedQueries(
@@ -56,6 +58,7 @@ public class PiggyBank {
 		this.group = group;
 	}
 
+	@JsonIgnore
 	public UUID getUuid() {
 		return uuid;
 	}

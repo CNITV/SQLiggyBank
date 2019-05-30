@@ -4,6 +4,8 @@ import javax.persistence.*;
 import java.util.Objects;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.*;
+
 @Entity
 @Table(name = "groups")
 @NamedQueries(
@@ -57,6 +59,7 @@ public class Group {
 		this.owner = owner;
 	}
 
+	@JsonIgnore
 	public UUID getUuid() {
 		return uuid;
 	}
