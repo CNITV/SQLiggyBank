@@ -317,7 +317,7 @@ public class UserResource {
 			}
 			DecodedJWT jwt = authVerifier.verify(authorization); // verify token
 			if (jwt.getClaim("username").asString().equals(username) &&
-					hasher.verifyHash(jwt.getClaim("password").asString(), user.getPassword())) { // correct token given, give legit user information
+					jwt.getClaim("password").asString().equals(user.getPassword())) { // correct token given, give legit user information
 				return Response.ok(user).build();
 			} else { // wrong password given, send to redacted information
 				return findUsername(username);
@@ -355,7 +355,7 @@ public class UserResource {
 			User user = userDAO.findByUsername(username).orElseThrow(() -> new NotFoundException("No such username."));
 			
 			if (jwt.getClaim("username").asString().equals(username) &&
-					hasher.verifyHash(jwt.getClaim("password").asString(), user.getPassword())) { // are they ok?
+					jwt.getClaim("password").asString().equals(user.getPassword())) { // are they ok?
 				User tempUser = new ObjectMapper().readValue(newUser, User.class); // create new User object
 				if (tempUser.getPassword().trim().equals("") || tempUser.getUsername().trim().equals("")) {
 					return Response
@@ -437,7 +437,7 @@ public class UserResource {
 			DecodedJWT jwt = authVerifier.verify(authorization); // verify token
 			User user = userDAO.findByUsername(username).orElseThrow(() -> new NotFoundException("No such username."));
 			if (jwt.getClaim("username").asString().equals(username) &&
-					hasher.verifyHash(jwt.getClaim("password").asString(), user.getPassword())) { // if user is correct...
+					jwt.getClaim("password").asString().equals(user.getPassword())) { // if user is correct...
 				userDAO.delete(user); // delete that bad boi
 				return Response // return OK
 						.ok(new GenericResponse(Response.Status.OK.getStatusCode(), "Deleted! Sorry to see you go :("))
