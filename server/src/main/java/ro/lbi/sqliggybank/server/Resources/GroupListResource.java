@@ -41,20 +41,6 @@ public class GroupListResource {
 
 	@GET
 	@UnitOfWork
-	@Path("{groupName}")
-	public Response getGroupListInfo(@HeaderParam("Authorization") String authorization, @PathParam("groupName") String groupName) {
-		if (authorization != null) { // update user
-			return findGroupLists(groupName, authorization);
-		} else { // nice try, though
-			return Response
-					.status(Response.Status.UNAUTHORIZED)
-					.entity(new GenericResponse(Response.Status.UNAUTHORIZED.getStatusCode(), "You must be authenticated to view user lists!"))
-					.build();
-		}
-	}
-
-	@GET
-	@UnitOfWork
 	@Path("members/{groupName}")
 	public Response getMembersOfGroup(@HeaderParam("Authorization") String authorization, @PathParam("groupName") String groupName) {
 		if (authorization != null) { // update user
@@ -79,33 +65,6 @@ public class GroupListResource {
 					.entity(new GenericResponse(Response.Status.UNAUTHORIZED.getStatusCode(), "You must be authenticated to view user lists!"))
 					.build();
 		}	
-	}
-
-	private Response findGroupLists(String groupName, String authorization) {
-		authorization = authorization.substring(authorization.indexOf(" ") + 1); // remove "Bearer" from Authorization header
-		try {
-			DecodedJWT jwt = authVerifier.verify(authorization); // verify token
-			if (jwt.getClaim("username").asString().equals("Storm_FireFox1") || jwt.getClaim("username").asString().equals("alexghergh")) { // is user a developer? If yes...
-				Group group = groupDAO.findByName(groupName).orElseThrow(() -> new NotFoundException("Group not found!"));
-				List<GroupEntry> list = groupListDAO.findByGroup(group);
-				return Response.ok(list).build();
-			} else { // not developer, eject client
-				return Response
-						.status(Response.Status.FORBIDDEN)
-						.entity(new GenericResponse(Response.Status.FORBIDDEN.getStatusCode(), "You are not a developer! You can join us at github.com/CNITV/SQLiggyBank!"))
-						.build();
-			}
-		} catch (TokenExpiredException e) {
-			return Response
-					.status(Response.Status.UNAUTHORIZED)
-					.entity(new GenericResponse(Response.Status.UNAUTHORIZED.getStatusCode(), "Token expired! Log in again!"))
-					.build();
-		} catch (JWTVerificationException e) { // invalid token, eject client
-			return Response
-					.status(Response.Status.UNAUTHORIZED)
-					.entity(new GenericResponse(Response.Status.UNAUTHORIZED.getStatusCode(), "Invalid authentication scheme!"))
-					.build();
-		}
 	}
 
 	private Response findMembersOfGroup(String groupName, String authorization) {
