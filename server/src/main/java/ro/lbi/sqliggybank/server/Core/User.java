@@ -107,6 +107,7 @@ public class User {
 	 *
 	 * @return The UUID of the user.
 	 */
+	@JsonIgnore
 	public UUID getUuid() {
 		return uuid;
 	}
