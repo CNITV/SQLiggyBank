@@ -87,7 +87,7 @@ public class GroupResource {
 		} catch (NotFoundException e) {
 			return Response
 					.status(Response.Status.NOT_FOUND)
-					.entity(new NotFoundResponse(groupName + "could not be found! Try again!"))
+					.entity(new NotFoundResponse(groupName + " could not be found! Try again!"))
 					.build();
 		}
 	}

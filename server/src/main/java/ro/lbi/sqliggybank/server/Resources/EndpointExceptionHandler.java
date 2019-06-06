@@ -10,12 +10,12 @@ class EndpointExceptionHandler {
 		if (e.getMessage().split(" ")[0].equals("Group")) {
 			return Response
 					.status(Response.Status.NOT_FOUND)
-					.entity(new NotFoundResponse("The group \"" + groupName + "\" could not be found!"))
+					.entity(new NotFoundResponse("The group " + groupName + " could not be found!"))
 					.build();
 		} else {
 			return Response
 					.status(Response.Status.NOT_FOUND)
-					.entity(new NotFoundResponse("The piggy bank \"" + bankName + "\" could not be found!"))
+					.entity(new NotFoundResponse("The piggy bank " + bankName + " could not be found!"))
 					.build();
 		}
 	}
@@ -24,17 +24,17 @@ class EndpointExceptionHandler {
 		if (e.getMessage().split(" ")[0].equals("Group")) {
 			return Response
 					.status(Response.Status.NOT_FOUND)
-					.entity(new NotFoundResponse("The group \"" + groupName + "\" could not be found!"))
+					.entity(new NotFoundResponse("The group " + groupName + " could not be found!"))
 					.build();
 		} else if (e.getMessage().split(" ")[0].equals("Piggy")) {
 			return Response
 					.status(Response.Status.NOT_FOUND)
-					.entity(new NotFoundResponse("The piggy bank \"" + bankName + "\" could not be found!"))
+					.entity(new NotFoundResponse("The piggy bank " + bankName + " could not be found!"))
 					.build();
 		} else {
 			return Response
 					.status(Response.Status.NOT_FOUND)
-					.entity(new NotFoundResponse("The goal \"" + goalName + "\" could not be found!"))
+					.entity(new NotFoundResponse("The goal " + goalName + " could not be found!"))
 					.build();
 		}
 	}
