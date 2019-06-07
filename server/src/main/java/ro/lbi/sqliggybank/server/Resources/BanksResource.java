@@ -236,7 +236,6 @@ public class BanksResource {
 				//
 				// I'm just happy I don't have to make my own actual SQL queries :)
 				piggyBank.setName(tempBank.getName());
-				piggyBank.setGroup(tempBank.getGroup());
 				piggyBank.setDescription(tempBank.getDescription());
 				piggyBankDAO.update(piggyBank);
 				return Response.ok(new GenericResponse(Response.Status.OK.getStatusCode(), "Update complete!")).build();
