@@ -190,11 +190,18 @@ public class GoalResource {
 				// everything in the original one.
 				//
 				// I'm just happy I don't have to make my own actual SQL queries :)
-				goal.setName(tempGoal.getName());
-				goal.setBank(tempGoal.getBank());
-				goal.setDescription(tempGoal.getDescription());
-				goal.setTarget_amount(tempGoal.getTarget_amount());
-				goal.setDeadline(tempGoal.getDeadline());
+				if (tempGoal.getName() != null) {
+					goal.setName(tempGoal.getName());
+				}
+				if (tempGoal.getDescription() != null) {
+					goal.setDescription(tempGoal.getDescription());
+				}
+				if (tempGoal.getTarget_amount() != null) {
+					goal.setTarget_amount(tempGoal.getTarget_amount());
+				}
+				if (tempGoal.getDeadline() != null) {
+					goal.setDeadline(tempGoal.getDeadline());
+				}
 				goalDAO.update(goal);
 				return Response.ok(new GenericResponse(Response.Status.OK.getStatusCode(), "Update complete!")).build();
 			} else { // not owner of group, eject client
