@@ -23,6 +23,10 @@ import com.fasterxml.jackson.annotation.*;
 						name = "ro.lbi.sqliggybank.server.Core.Goal.findByBank",
 						query = "SELECT g FROM Goal g WHERE g.bank = :bank"
 				),
+				@NamedQuery(
+						name = "ro.lbi.sqliggybank.server.Core.Goal.findByNameAndBank",
+						query = "SELECT g FROM Goal g WHERE g.name = :name AND g.bank = :bank"
+				)
 		}
 )
 public class Goal {

@@ -53,9 +53,9 @@ public class GoalDAO extends AbstractDAO<Goal> {
 	 */
 	public Optional<Goal> findByNameAndBank(PiggyBank bank, String goalName) {
 		try {
-			Query query = namedQuery("ro.lbi.sqliggybank.server.Core.Goal.findByBankAndName");
+			Query query = namedQuery("ro.lbi.sqliggybank.server.Core.Goal.findByNameAndBank");
 			query.setParameter("bank", bank);
-			query.setParameter("passed_goal", goalName);
+			query.setParameter("name", goalName);
 			Goal goal = (Goal) query.getSingleResult();
 			return Optional.of(goal);
 		} catch (NoResultException e) {
