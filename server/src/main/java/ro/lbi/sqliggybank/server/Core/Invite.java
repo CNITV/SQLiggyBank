@@ -17,7 +17,6 @@ public class Invite {
 		this.dateCreated = dateCreated;
 	}
 
-	@JsonIgnore
 	public UUID getUuid() {
 		return uuid;
 	}
