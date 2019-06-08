@@ -143,6 +143,13 @@ public class GoalResource {
 				Goal goal = new ObjectMapper().readValue(body, Goal.class);
 				Group group = groupDAO.findByName(groupName).orElseThrow(() -> new NotFoundException("Group not found!"));
 				PiggyBank bank = piggyBankDAO.findByNameAndGroup(group, bankName).orElseThrow(() -> new NotFoundException("Piggy bank not found!"));
+				Goal possibleGoal = goalDAO.findByNameAndBank(bank, goal.getName()).orElse(null);
+				if (possibleGoal != null) {
+					return Response
+						        .status(Response.Status.FORBIDDEN)
+							.entity(new GenericResponse(Response.Status.FORBIDDEN.getStatusCode(), "Goal already exists, choose another name!"))
+							.build();
+				}
 				goal.setBank(bank);
 				goal.setUuid(UUID.randomUUID());
 				goalDAO.create(goal);
