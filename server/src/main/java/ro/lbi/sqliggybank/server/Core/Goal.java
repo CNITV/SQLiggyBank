@@ -47,7 +47,7 @@ public class Goal {
 	private Date deadline;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "bank_uuid", nullable = false)
+	@JoinColumn(name = "piggy_bank_uuid", nullable = false)
 	private PiggyBank bank;
 
 	public Goal() {
