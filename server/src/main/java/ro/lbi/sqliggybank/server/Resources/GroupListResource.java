@@ -100,6 +100,12 @@ public class GroupListResource {
 		try {
 			DecodedJWT jwt = authVerifier.verify(authorization); // verify token
 			User user = userDAO.findByUsername(userName).orElseThrow(() -> new NotFoundException("User not found!"));
+			if (!jwt.getClaim("username").asString().equals(user.getUsername())) {
+				return Response
+						.status(Response.Status.FORBIDDEN)
+						.entity(new GenericResponse(Response.Status.FORBIDDEN.getStatusCode(), "You are not allowed to view the groups of another user!"))
+						.build();
+			}
 			if (jwt.getClaim("username").asString().equals(user.getUsername()) && jwt.getClaim("password").asString().equals(user.getPassword())) { // is user logged in? If yes...
 				List<Group> list = groupListDAO.groupsOfUser(user);		
 				return Response.ok(list).build();
