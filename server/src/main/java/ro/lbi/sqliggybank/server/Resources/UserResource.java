@@ -200,6 +200,14 @@ public class UserResource {
 						.entity(new GenericResponse(Response.Status.FORBIDDEN.getStatusCode(), "User already exists! Please choose another username!"))
 						.build();
 			}
+			if (user.getEmail() != null) {
+				if (userDAO.checkForExistingEmail(user.getEmail())) {
+					return Response
+							.status(Response.Status.FORBIDDEN)
+							.entity(new GenericResponse(Response.Status.FORBIDDEN.getStatusCode(), "An user with this e-mail address already exists!"))
+							.build();
+				}
+			}
 			user.setUuid(UUID.randomUUID()); // set random UUID, Hibernate needs it FeelsBadMan
 			if (user.getUsername() == null) {
 				return Response
