@@ -234,6 +234,12 @@ public class GroupResource {
 						.entity(new GenericResponse(Response.Status.FORBIDDEN.getStatusCode(), "Group already exists, choose another name!"))
 						.build();
 			}
+			if (tempGroup.getName() == null) {
+				return Response
+						.status(Response.Status.BAD_REQUEST)
+						.entity(new GenericResponse(Response.Status.BAD_REQUEST.getStatusCode(), "Your submitted body is missing the \"name\" field, try again!"))
+						.build();
+			}
 			tempGroup.setUuid(UUID.randomUUID()); // set random UUID, Hibernate needs it FeelsBadMan
 			tempGroup.setOwner(owner);
 			groupDAO.create(tempGroup);
@@ -323,6 +329,12 @@ public class GroupResource {
 				// everything in the original one.
 				//
 				// I'm just happy I don't have to make my own actual SQL queries :)
+				if (tempGroup.getName() == null) {
+					return Response
+							.status(Response.Status.BAD_REQUEST)
+							.entity(new GenericResponse(Response.Status.BAD_REQUEST.getStatusCode(), "Your submitted body is missing the \"name\" field, try again!"))
+							.build();
+				}
 				group.setName(tempGroup.getName());
 				group.setDescription(tempGroup.getDescription());
 				group.setOwner(user);

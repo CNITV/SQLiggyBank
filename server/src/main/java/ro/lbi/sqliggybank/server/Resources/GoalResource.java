@@ -150,6 +150,22 @@ public class GoalResource {
 							.entity(new GenericResponse(Response.Status.FORBIDDEN.getStatusCode(), "Goal already exists, choose another name!"))
 							.build();
 				}
+				if (goal.getName() == null) {
+					return Response
+							.status(Response.Status.BAD_REQUEST)
+							.entity(new GenericResponse(Response.Status.BAD_REQUEST.getStatusCode(), "Your submitted body is missing the \"name\" field, try again!"))
+							.build();
+				} else if (goal.getTarget_amount() == null) {
+					return Response
+							.status(Response.Status.BAD_REQUEST)
+							.entity(new GenericResponse(Response.Status.BAD_REQUEST.getStatusCode(), "Your submitted body is missing the \"target_amount\" field, try again!"))
+							.build();
+				} else if (goal.getDeadline() == null) {
+					return Response
+							.status(Response.Status.BAD_REQUEST)
+							.entity(new GenericResponse(Response.Status.BAD_REQUEST.getStatusCode(), "Your submitted body is missing the \"deadline\" field, try again!"))
+							.build();
+				}
 				goal.setBank(bank);
 				goal.setUuid(UUID.randomUUID());
 				goalDAO.create(goal);

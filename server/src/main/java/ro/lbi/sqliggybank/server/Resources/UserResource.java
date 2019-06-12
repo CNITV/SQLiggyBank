@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.dropwizard.hibernate.UnitOfWork;
 import io.dropwizard.jersey.PATCH;
 import org.hibernate.HibernateException;
+import org.postgresql.util.PSQLException;
 import ro.lbi.sqliggybank.server.Core.Account;
 import ro.lbi.sqliggybank.server.Core.User;
 import ro.lbi.sqliggybank.server.Database.UserDAO;
@@ -200,6 +201,17 @@ public class UserResource {
 						.build();
 			}
 			user.setUuid(UUID.randomUUID()); // set random UUID, Hibernate needs it FeelsBadMan
+			if (user.getUsername() == null) {
+				return Response
+						.status(Response.Status.BAD_REQUEST)
+						.entity(new GenericResponse(Response.Status.BAD_REQUEST.getStatusCode(), "Your submitted body is missing the \"username\" field, try again!"))
+						.build();
+			} else if (user.getPassword() == null) {
+				return Response
+						.status(Response.Status.BAD_REQUEST)
+						.entity(new GenericResponse(Response.Status.BAD_REQUEST.getStatusCode(), "Your submitted body is missing the \"password\" field, try again!"))
+						.build();
+			}
 			user.setPassword(hasher.hash(user.getPassword())); // hash the password now
 			String token = createJWT(user.getUsername(), user.getPassword()); // create the JWT after we hash the pass
 			userDAO.create(user); // create user
@@ -237,7 +249,7 @@ public class UserResource {
 		try {
 			Account account = mapper.readValue(body, Account.class); // read object in Account class
 			User user = userDAO.findByUsername(account.getUsername()).orElseThrow(() -> new NotFoundException("No such username."));
-			if (account.getPassword().equals("") || account.getUsername().equals("")) {
+			if (account.getPassword().equals("") || account.getUsername().equals("") || account.getUsername() == null || account.getPassword() == null) {
 				return Response
 						.status(Response.Status.FORBIDDEN)
 						.entity(new GenericResponse(Response.Status.FORBIDDEN.getStatusCode(), "No empty usernames or passwords allowed!"))
