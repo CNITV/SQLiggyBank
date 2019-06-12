@@ -259,8 +259,8 @@ public class UserResource {
 			User user = userDAO.findByUsername(account.getUsername()).orElseThrow(() -> new NotFoundException("No such username."));
 			if (account.getPassword().equals("") || account.getUsername().equals("") || account.getUsername() == null || account.getPassword() == null) {
 				return Response
-						.status(Response.Status.FORBIDDEN)
-						.entity(new GenericResponse(Response.Status.FORBIDDEN.getStatusCode(), "No empty usernames or passwords allowed!"))
+						.status(Response.Status.BAD_REQUEST)
+						.entity(new GenericResponse(Response.Status.BAD_REQUEST.getStatusCode(), "No empty usernames or passwords allowed!"))
 						.build();
 			}
 			if (!hasher.verifyHash(account.getPassword(), user.getPassword())) { // wrong password, eject client
@@ -379,9 +379,27 @@ public class UserResource {
 				User tempUser = new ObjectMapper().readValue(newUser, User.class); // create new User object
 				if (tempUser.getPassword().trim().equals("") || tempUser.getUsername().trim().equals("")) {
 					return Response
-							.status(Response.Status.FORBIDDEN)
-							.entity(new GenericResponse(Response.Status.FORBIDDEN.getStatusCode(), "No empty usernames or passwords allowed!"))
+							.status(Response.Status.BAD_REQUEST)
+							.entity(new GenericResponse(Response.Status.BAD_REQUEST.getStatusCode(), "No empty usernames or passwords allowed!"))
 							.build();
+				}
+				if (tempUser.getUsername() == null) {
+					return Response
+							.status(Response.Status.BAD_REQUEST)
+							.entity(new GenericResponse(Response.Status.BAD_REQUEST.getStatusCode(), "The submitted body is missing the \"username\" field! Please try again!"))
+							.build();
+				} else if (tempUser.getPassword() == null) {
+					return Response
+							.status(Response.Status.BAD_REQUEST)
+							.entity(new GenericResponse(Response.Status.BAD_REQUEST.getStatusCode(), "The submitted body is missing the \"password\" field! Please try again!"))
+							.build();
+
+				}
+				if (userDAO.userExists(tempUser.getUsername())) {
+					return Response
+						.status(Response.Status.FORBIDDEN)
+						.entity(new GenericResponse(Response.Status.FORBIDDEN.getStatusCode(), "User already exists! Please choose another username!"))
+						.build();
 				}
 				// Apparently, Hibernate doesn't like you modifying the objects it remembers in memory, even if they
 				// are functionally the same. In conclusion, crap code like this shows up, where I have to replace
