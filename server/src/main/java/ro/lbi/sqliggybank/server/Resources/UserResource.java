@@ -401,7 +401,7 @@ public class UserResource {
 				String token = JWT.create()
 						.withIssuer("SQLiggyBank")
 						.withClaim("username", user.getUsername())
-						.withClaim("password", tempUser.getPassword())
+						.withClaim("password", user.getPassword())
 						.withExpiresAt(expiryDate)
 						.sign(authAlgorithm); // create JWT for user
 				return Response // return token
