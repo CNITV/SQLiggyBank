@@ -254,6 +254,13 @@ public class BanksResource {
 							.entity(new GenericResponse(Response.Status.BAD_REQUEST.getStatusCode(), "Your submitted body is missing the \"name\" field, try again!"))
 							.build();
 				}
+				PiggyBank possibleBank = piggyBankDAO.findByNameAndGroup(group, tempBank.getName()).orElse(null);
+				if (possibleBank != null && !possibleBank.getUuid().equals(piggyBank.getUuid())) {
+					return Response
+							.status(Response.Status.FORBIDDEN)
+							.entity(new GenericResponse(Response.Status.BAD_REQUEST.getStatusCode(), "A piggy bank with this name already exists! Please try another name!"))
+							.build();
+				}
 				piggyBank.setName(tempBank.getName());
 				piggyBank.setDescription(tempBank.getDescription());
 				piggyBankDAO.update(piggyBank);

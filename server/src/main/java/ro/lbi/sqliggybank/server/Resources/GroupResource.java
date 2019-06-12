@@ -335,6 +335,13 @@ public class GroupResource {
 							.entity(new GenericResponse(Response.Status.BAD_REQUEST.getStatusCode(), "Your submitted body is missing the \"name\" field, try again!"))
 							.build();
 				}
+				Group possibleGroup = groupDAO.findByName(tempGroup.getName()).orElse(null);
+				if (possibleGroup != null && !possibleGroup.getUuid().equals(group.getUuid())) {
+					return Response
+							.status(Response.Status.BAD_REQUEST)
+							.entity(new GenericResponse(Response.Status.BAD_REQUEST.getStatusCode(), "Group already exists with this name! Try again."))
+							.build();
+				}
 				group.setName(tempGroup.getName());
 				group.setDescription(tempGroup.getDescription());
 				group.setOwner(user);

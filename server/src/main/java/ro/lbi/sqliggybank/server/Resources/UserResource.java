@@ -395,7 +395,8 @@ public class UserResource {
 							.build();
 
 				}
-				if (userDAO.userExists(tempUser.getUsername())) {
+				User possibleUser = userDAO.findByUsername(tempUser.getUsername()).orElse(null);
+				if (possibleUser != null && !possibleUser.getUuid().equals(user.getUuid())) {
 					return Response
 						.status(Response.Status.FORBIDDEN)
 						.entity(new GenericResponse(Response.Status.FORBIDDEN.getStatusCode(), "User already exists! Please choose another username!"))
