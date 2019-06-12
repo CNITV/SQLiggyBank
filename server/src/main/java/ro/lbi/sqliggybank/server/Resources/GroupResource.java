@@ -276,7 +276,7 @@ public class GroupResource {
 				groupListDAO.addUserToGroup(userDAO.findByUsername(jwt.getClaim("username").asString()).orElseThrow(() -> new NotFoundException("No user found!")), group);
 				return Response
 						.ok()
-						.entity(new JoinedGroupResponse(group.getUuid()))
+						.entity(new JoinedGroupResponse(new UUID(0,0)))
 						.build();
 			} else { // part of group, eject client
 				return Response
