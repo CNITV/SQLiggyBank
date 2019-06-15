@@ -193,7 +193,7 @@ public class BanksResource {
 				PiggyBank possibleBank = piggyBankDAO.findByNameAndGroup(group, tempBank.getName()).orElse(null);
 				if (possibleBank != null) {
 					return Response
-							.status(Response.Status.FORBIDDEN)
+							.status(Response.Status.BAD_REQUEST)
 							.entity(new GenericResponse(Response.Status.BAD_REQUEST.getStatusCode(), "A piggy bank with this name already exists! Please try another name!"))
 							.build();
 				}
