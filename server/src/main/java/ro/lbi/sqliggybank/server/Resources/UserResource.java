@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.dropwizard.hibernate.UnitOfWork;
 import io.dropwizard.jersey.PATCH;
 import org.hibernate.HibernateException;
+import org.postgresql.util.PSQLException;
 import ro.lbi.sqliggybank.server.Core.Account;
 import ro.lbi.sqliggybank.server.Core.User;
 import ro.lbi.sqliggybank.server.Database.UserDAO;
@@ -199,7 +200,26 @@ public class UserResource {
 						.entity(new GenericResponse(Response.Status.FORBIDDEN.getStatusCode(), "User already exists! Please choose another username!"))
 						.build();
 			}
+			if (user.getEmail() != null) {
+				if (userDAO.checkForExistingEmail(user.getEmail())) {
+					return Response
+							.status(Response.Status.FORBIDDEN)
+							.entity(new GenericResponse(Response.Status.FORBIDDEN.getStatusCode(), "An user with this e-mail address already exists!"))
+							.build();
+				}
+			}
 			user.setUuid(UUID.randomUUID()); // set random UUID, Hibernate needs it FeelsBadMan
+			if (user.getUsername() == null) {
+				return Response
+						.status(Response.Status.BAD_REQUEST)
+						.entity(new GenericResponse(Response.Status.BAD_REQUEST.getStatusCode(), "Your submitted body is missing the \"username\" field, try again!"))
+						.build();
+			} else if (user.getPassword() == null) {
+				return Response
+						.status(Response.Status.BAD_REQUEST)
+						.entity(new GenericResponse(Response.Status.BAD_REQUEST.getStatusCode(), "Your submitted body is missing the \"password\" field, try again!"))
+						.build();
+			}
 			user.setPassword(hasher.hash(user.getPassword())); // hash the password now
 			String token = createJWT(user.getUsername(), user.getPassword()); // create the JWT after we hash the pass
 			userDAO.create(user); // create user
@@ -237,10 +257,10 @@ public class UserResource {
 		try {
 			Account account = mapper.readValue(body, Account.class); // read object in Account class
 			User user = userDAO.findByUsername(account.getUsername()).orElseThrow(() -> new NotFoundException("No such username."));
-			if (account.getPassword().equals("") || account.getUsername().equals("")) {
+			if (account.getPassword().equals("") || account.getUsername().equals("") || account.getUsername() == null || account.getPassword() == null) {
 				return Response
-						.status(Response.Status.FORBIDDEN)
-						.entity(new GenericResponse(Response.Status.FORBIDDEN.getStatusCode(), "No empty usernames or passwords allowed!"))
+						.status(Response.Status.BAD_REQUEST)
+						.entity(new GenericResponse(Response.Status.BAD_REQUEST.getStatusCode(), "No empty usernames or passwords allowed!"))
 						.build();
 			}
 			if (!hasher.verifyHash(account.getPassword(), user.getPassword())) { // wrong password, eject client
@@ -359,9 +379,28 @@ public class UserResource {
 				User tempUser = new ObjectMapper().readValue(newUser, User.class); // create new User object
 				if (tempUser.getPassword().trim().equals("") || tempUser.getUsername().trim().equals("")) {
 					return Response
-							.status(Response.Status.FORBIDDEN)
-							.entity(new GenericResponse(Response.Status.FORBIDDEN.getStatusCode(), "No empty usernames or passwords allowed!"))
+							.status(Response.Status.BAD_REQUEST)
+							.entity(new GenericResponse(Response.Status.BAD_REQUEST.getStatusCode(), "No empty usernames or passwords allowed!"))
 							.build();
+				}
+				if (tempUser.getUsername() == null) {
+					return Response
+							.status(Response.Status.BAD_REQUEST)
+							.entity(new GenericResponse(Response.Status.BAD_REQUEST.getStatusCode(), "The submitted body is missing the \"username\" field! Please try again!"))
+							.build();
+				} else if (tempUser.getPassword() == null) {
+					return Response
+							.status(Response.Status.BAD_REQUEST)
+							.entity(new GenericResponse(Response.Status.BAD_REQUEST.getStatusCode(), "The submitted body is missing the \"password\" field! Please try again!"))
+							.build();
+
+				}
+				User possibleUser = userDAO.findByUsername(tempUser.getUsername()).orElse(null);
+				if (possibleUser != null && !possibleUser.getUuid().equals(user.getUuid())) {
+					return Response
+						.status(Response.Status.FORBIDDEN)
+						.entity(new GenericResponse(Response.Status.FORBIDDEN.getStatusCode(), "User already exists! Please choose another username!"))
+						.build();
 				}
 				// Apparently, Hibernate doesn't like you modifying the objects it remembers in memory, even if they
 				// are functionally the same. In conclusion, crap code like this shows up, where I have to replace
@@ -381,7 +420,7 @@ public class UserResource {
 				String token = JWT.create()
 						.withIssuer("SQLiggyBank")
 						.withClaim("username", user.getUsername())
-						.withClaim("password", tempUser.getPassword())
+						.withClaim("password", user.getPassword())
 						.withExpiresAt(expiryDate)
 						.sign(authAlgorithm); // create JWT for user
 				return Response // return token
