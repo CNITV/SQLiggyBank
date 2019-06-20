@@ -24,6 +24,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.UUID;
+import java.util.List;
 
 @Path("/api/goals/")
 @Produces(MediaType.APPLICATION_JSON)
@@ -69,6 +70,20 @@ public class GoalResource {
 			return Response
 					.status(Response.Status.FORBIDDEN)
 					.entity(new GenericResponse(Response.Status.FORBIDDEN.getStatusCode(), "You must be logged in to create a goal!"))
+					.build();
+		}
+	}
+
+	@GET
+	@UnitOfWork
+	@Path("{groupName}/{bankName}/list")
+	public Response listGoalsInBank(@HeaderParam("Authorization") String authorization, @PathParam("groupName") String groupName, @PathParam("bankName") String bankName) {
+		if (authorization != null) { // are they a user? Let's see if they pass the test.
+			return listGoals(groupName, bankName, authorization);
+		} else {
+			return Response
+					.status(Response.Status.FORBIDDEN)
+					.entity(new GenericResponse(Response.Status.FORBIDDEN.getStatusCode(), "You must be logged in view the goals in this bank!"))
 					.build();
 		}
 	}
@@ -133,6 +148,36 @@ public class GoalResource {
 		Group group = groupDAO.findByName(groupName).orElseThrow(() -> new NotFoundException("Group not found!"));
 		PiggyBank bank = piggyBankDAO.findByNameAndGroup(group, bankName).orElseThrow(() -> new NotFoundException("Piggy bank not found!"));
 		return goalDAO.findByNameAndBank(bank, goalName).orElseThrow(() -> new NotFoundException("Goal not found!"));
+	}
+	
+	private Response listGoals(String groupName, String bankName, String authorization) {
+		authorization = authorization.substring(authorization.indexOf(" ") + 1); // remove "Bearer" from Authorization header
+		try {
+			DecodedJWT jwt = authVerifier.verify(authorization); // verify token
+			if (groupListDAO.isUserPartOfGroup(jwt.getClaim("username").asString(), groupName)) { // user part of group, give bank information
+				Group group = groupDAO.findByName(groupName).orElseThrow(() -> new NotFoundException("Group not found!"));
+				PiggyBank bank = piggyBankDAO.findByNameAndGroup(group, bankName).orElseThrow(() -> new NotFoundException("Piggy bank not found!"));
+				List<Goal> list = goalDAO.findByBank(bank);
+				return Response.ok(list).build();
+			} else { // not part of group, eject client
+				return Response
+						.status(Response.Status.FORBIDDEN)
+						.entity(new GenericResponse(Response.Status.FORBIDDEN.getStatusCode(), "You are not part of the group this piggy bank is in!"))
+						.build();
+			}
+		} catch (TokenExpiredException e) {
+			return Response
+					.status(Response.Status.UNAUTHORIZED)
+					.entity(new GenericResponse(Response.Status.UNAUTHORIZED.getStatusCode(), "Token expired! Log in again!"))
+					.build();
+		} catch (JWTVerificationException e) { // invalid token, eject client
+			return Response
+					.status(Response.Status.UNAUTHORIZED)
+					.entity(new GenericResponse(Response.Status.UNAUTHORIZED.getStatusCode(), "Invalid authentication scheme!"))
+					.build();
+		} catch (NotFoundException e) {
+			return EndpointExceptionHandler.parseBankNotFound(groupName, bankName, e);
+		}	
 	}
 
 	private Response createGoal(String groupName, String bankName, String authorization, String body) {
