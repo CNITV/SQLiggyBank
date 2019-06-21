@@ -39,7 +39,7 @@ public class GoalDAO extends AbstractDAO<Goal> {
 	 */
 	@SuppressWarnings("unchecked")
 	public List<Goal> findByBank(PiggyBank bank) {
-		Query query = namedQuery("ro.lbi.sqliggybank.server.Core.Group.findByName");
+		Query query = namedQuery("ro.lbi.sqliggybank.server.Core.Goal.findByBank");
 		query.setParameter("bank", bank);
 		return list((Query<Goal>) query);
 	}

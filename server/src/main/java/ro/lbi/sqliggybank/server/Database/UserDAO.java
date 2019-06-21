@@ -56,6 +56,18 @@ public class UserDAO extends AbstractDAO<User> {
 	}
 
 	/**
+	 * Checks if there is any entry in the database which uses a specific e-mail.
+	 *
+	 * @param email The e-mail to check against in the database.
+	 * @return True if a user has been found with this e-mail, false if otherwise.
+	 */
+	public boolean checkForExistingEmail(String email) {
+		Query query = namedQuery("ro.lbi.sqliggybank.server.Core.User.findByEmail");
+		query.setParameter("email", email);
+		return (query.uniqueResult() != null);
+	}
+
+	/**
 	 * Finds user by username in the database and checks whether such user exists.
 	 *
 	 * @param username The username of the user.
@@ -96,7 +108,7 @@ public class UserDAO extends AbstractDAO<User> {
 
 	/**
 	 * Finds all users from the database. Equivalent to "SELECT * FROM users".
-	 *
+	 * <p>
 	 * WARNING: At large scales, this can crash the server. There might be MANY users in the database.
 	 *
 	 * @return A List of all the users.

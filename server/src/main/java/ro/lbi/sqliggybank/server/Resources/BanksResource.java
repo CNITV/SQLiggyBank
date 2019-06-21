@@ -184,6 +184,19 @@ public class BanksResource {
 			if (groupDAO.isUserOwnerOfGroup(jwt.getClaim("username").asString(), groupName)) { // user owner of group, allow creation
 				PiggyBank tempBank = new ObjectMapper().readValue(body, PiggyBank.class);
 				Group group = groupDAO.findByName(groupName).orElseThrow(() -> new NotFoundException("Group not found!"));
+				if (tempBank.getName() == null) {
+					return Response
+							.status(Response.Status.BAD_REQUEST)
+							.entity(new GenericResponse(Response.Status.BAD_REQUEST.getStatusCode(), "Your submitted body is missing the \"name\" field, try again!"))
+							.build();
+				}
+				PiggyBank possibleBank = piggyBankDAO.findByNameAndGroup(group, tempBank.getName()).orElse(null);
+				if (possibleBank != null) {
+					return Response
+							.status(Response.Status.BAD_REQUEST)
+							.entity(new GenericResponse(Response.Status.BAD_REQUEST.getStatusCode(), "A piggy bank with this name already exists! Please try another name!"))
+							.build();
+				}
 				tempBank.setGroup(group);
 				tempBank.setUuid(UUID.randomUUID());
 				piggyBankDAO.create(tempBank);
@@ -235,6 +248,19 @@ public class BanksResource {
 				// everything in the original one.
 				//
 				// I'm just happy I don't have to make my own actual SQL queries :)
+				if (tempBank.getName() == null) {
+					return Response
+							.status(Response.Status.BAD_REQUEST)
+							.entity(new GenericResponse(Response.Status.BAD_REQUEST.getStatusCode(), "Your submitted body is missing the \"name\" field, try again!"))
+							.build();
+				}
+				PiggyBank possibleBank = piggyBankDAO.findByNameAndGroup(group, tempBank.getName()).orElse(null);
+				if (possibleBank != null && !possibleBank.getUuid().equals(piggyBank.getUuid())) {
+					return Response
+							.status(Response.Status.FORBIDDEN)
+							.entity(new GenericResponse(Response.Status.BAD_REQUEST.getStatusCode(), "A piggy bank with this name already exists! Please try another name!"))
+							.build();
+				}
 				piggyBank.setName(tempBank.getName());
 				piggyBank.setDescription(tempBank.getDescription());
 				piggyBankDAO.update(piggyBank);

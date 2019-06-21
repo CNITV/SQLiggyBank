@@ -31,6 +31,10 @@ import com.fasterxml.jackson.annotation.*;
 						name = "ro.lbi.sqliggybank.server.Core.User.findByUsername",
 						query = "SELECT u FROM User u WHERE u.username = :username"
 				),
+				@NamedQuery(
+						name = "ro.lbi.sqliggybank.server.Core.User.findByEmail",
+						query = "SELECT u FROM User u WHERE u.email = :email"
+				)
 		})
 public class User {
 	/**
