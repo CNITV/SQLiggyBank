@@ -225,8 +225,12 @@ public class DashboardController {
 		try {
 			String result = databaseHandler.getGroupsOfUser(user.getUsername(), user.getJWT());
 
+			System.out.println(result + "---------------------------------");
+
 			Gson gson = new Gson();
 			groups = gson.fromJson(result, Group[].class);
+
+			System.out.println(groups + "------------------------------------");
 
 			for (Group group : groups) {
 				rootItem.getChildren().add(new TreeItem<>(group.getName(), new ImageView(
@@ -246,7 +250,7 @@ public class DashboardController {
 				(observable, oldValue, newValue) -> {
 					try {
 						String result;
-						result = databaseHandler.getGroup(newValue.getValue(), user.getJWT());
+						result = databaseHandler.groupInfo(newValue.getValue(), user.getJWT());
 
 						Gson gson = new Gson();
 						group = gson.fromJson(result, Group.class);
@@ -289,8 +293,8 @@ public class DashboardController {
 							banksList.setOnMouseClicked((event) ->
 									{
 										try {
-											String res = databaseHandler.getBank(group.getName(),
-													banksList.getSelectionModel().getSelectedItem(), user.getJWT());
+											String res = databaseHandler.bankInfo(group.getName(),
+													user.getJWT(), banksList.getSelectionModel().getSelectedItem());
 
 											Gson gson1 = new Gson();
 											bank = gson1.fromJson(res, Bank.class);
@@ -312,9 +316,6 @@ public class DashboardController {
 						LOGGER.log(Level.ERROR, "Connection error", e);
 						Alert.errorAlert("Connection error", "Database is not available at the moment, try again" +
 								" in a few moments.");
-					} catch (ForbiddenException e) {
-						LOGGER.log(Level.ERROR, "Authorization error", e);
-						Alert.errorAlert("Authorization error", "You are not authorized to view this group.");
 					}
 				}
 		);
@@ -334,7 +335,7 @@ public class DashboardController {
 			Search for user in the database.
 		    */
 			// TODO put this in a separate thread so it doesn't block the main application thread
-			String result = databaseHandler.getUser(searchBar.getText(), user.getJWT());
+			String result = databaseHandler.userProfile(searchBar.getText(), user.getJWT());
 
 			Gson gson = new Gson();
 			User searchedUser = gson.fromJson(result, User.class);
@@ -354,11 +355,6 @@ public class DashboardController {
 							" This might be due to the server not currently working! Please try again in a few moments!")
 			);
 			LOGGER.log(Level.ERROR, "Server error", e);
-		} catch (UnauthorizedException e) {
-			Platform.runLater(() ->
-					Alert.errorAlert("Wrong authorization schema", e.getMessage())
-			);
-			LOGGER.log(Level.ERROR, "Wrong authorization schema", e);
 		} catch (NotFoundException e) {
 			Platform.runLater(() ->
 					Alert.errorAlert("User not found", e.getMessage())
@@ -515,7 +511,7 @@ public class DashboardController {
 		if (result.isPresent()) {
 			String invite = result.get();
 			try {
-				databaseHandler.joinGroup(groupName, invite, user.getJWT());
+				databaseHandler.joinGroup(groupName, user.getJWT(), invite);
 			} catch (NullPointerException e) {
 				Alert.errorAlert("Error", "You didn't select a group!");
 			} catch (IOException e) {
@@ -549,7 +545,7 @@ public class DashboardController {
 		if (result1.isPresent()) {
 			name = result1.get();
 		} else {
-			Alert.errorAlert("Error", "Group name can't be empty!");
+			Alert.errorAlert("Error", "Group name cannot be empty!");
 			return;
 		}
 
@@ -562,15 +558,14 @@ public class DashboardController {
 		description = (result2.isPresent() ? result2.get() : "");
 
 		try {
-			String result = databaseHandler.createGroup(name, description, user.getJWT());
-			if (result.equals("200")) {
-				Alert.infoAlert("Success", "Successfully created a group!");
-				Alert.infoAlert("Login", "Please login again so your changes take place.");
-				windowManager.loginMenu();
-			}
-			System.out.println(result);
+			databaseHandler.newGroup(name, description, user.getJWT());
+			Alert.infoAlert("Success", "Successfully created a group!");
+			Alert.infoAlert("Login", "Please login again so your changes take place.");
+			windowManager.loginMenu();
 		} catch (NullPointerException e) {
 			Alert.errorAlert("Error", "You didn't select a group!");
+		} catch (ForbiddenException e) {
+			Alert.errorAlert("Error", "That group name already exists!");
 		} catch (IOException e) {
 			LOGGER.log(Level.ERROR, "Connection error", e);
 			Alert.errorAlert("Connection error", "The database can't be accessed at the moment.");
@@ -657,7 +652,7 @@ public class DashboardController {
 	@FXML
 	private void showGroupInvitesButtonPressed(ActionEvent event) {
 		try {
-			String result = databaseHandler.getGroupInviteList(group.getName(), user.getJWT());
+			String result = databaseHandler.getInvitesOfGroup(group.getName(), user.getJWT());
 
 			Gson gson = new Gson();
 			Invite[] invites = gson.fromJson(result, Invite[].class);
@@ -713,12 +708,10 @@ public class DashboardController {
 		Optional<String> result2 = dialog2.showAndWait();
 		bankDescription = (result2.isPresent() ? result2.get() : "");
 		try {
-			String result = databaseHandler.createBank(group.getName(), user.getJWT(), bankName, bankDescription);
-			if (result.equals("200")) {
-				Alert.infoAlert("Success", "Successfully created a bank!");
-				Alert.infoAlert("Login", "Please login again so your changes take place.");
-				windowManager.loginMenu();
-			}
+			databaseHandler.newBank(group.getName(), user.getJWT(), bankName, bankDescription);
+			Alert.infoAlert("Success", "Successfully created a bank!");
+			Alert.infoAlert("Login", "Please login again so your changes take place.");
+			windowManager.loginMenu();
 		} catch (IOException e) {
 			LOGGER.log(Level.ERROR, "Connection error", e);
 			Alert.errorAlert("Connection error", "The database can't be accessed at the moment.");
@@ -737,12 +730,10 @@ public class DashboardController {
 	@FXML
 	private void removeBankButtonPressed(ActionEvent event) {
 		try {
-			String result = databaseHandler.deleteBank(group.getName(), bank.getName(), user.getJWT());
-			if (result.equals("200")) {
-				Alert.infoAlert("Success", "Successfully created a bank!");
-				Alert.infoAlert("Login", "Please login again so your changes take place.");
-				windowManager.loginMenu();
-			}
+			databaseHandler.deleteBank(group.getName(), user.getJWT(), bank.getName());
+			Alert.infoAlert("Success", "Successfully created a bank!");
+			Alert.infoAlert("Login", "Please login again so your changes take place.");
+			windowManager.loginMenu();
 		} catch (IOException e) {
 			LOGGER.log(Level.ERROR, "Connection error", e);
 			Alert.errorAlert("Connection error", "The database can't be accessed at the moment.");

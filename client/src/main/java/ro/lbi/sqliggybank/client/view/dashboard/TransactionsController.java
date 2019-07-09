@@ -46,7 +46,8 @@ public class TransactionsController {
 
 	@FXML
 	private void okButtonPressed(ActionEvent event) {
-		try {
+		//TODO add transactions
+		/*try {
 			if (Integer.parseInt(amountField.getText()) <= 0) {
 				throw new NumberFormatException("Amount needs to be higher than 0");
 			}
@@ -66,7 +67,7 @@ public class TransactionsController {
 		} catch (ForbiddenException e) {
 			Alert.errorAlert("Error", "You are not the owner of this group so you cannot make transactions!");
 			((Node)event.getSource()).getScene().getWindow().hide();
-		}
+		}*/
 	}
 
 }

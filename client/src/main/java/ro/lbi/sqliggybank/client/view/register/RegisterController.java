@@ -130,7 +130,7 @@ public class RegisterController {
 						throw new IllegalStateException("Username and password cannot be empty!");
 					}
 
-					result = databaseHandler.registerUser(
+					result = databaseHandler.newUser(
 							usernameTextField.getText(),
 							passwordField.getText(),
 							firstNameTextField.getText(),

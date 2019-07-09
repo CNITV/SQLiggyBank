@@ -24,7 +24,9 @@ import ro.lbi.sqliggybank.client.backend.User;
 import ro.lbi.sqliggybank.client.util.Alert;
 import ro.lbi.sqliggybank.client.view.window_manager.WindowManager;
 
+import java.awt.*;
 import java.io.IOException;
+import java.net.URI;
 
 import static ro.lbi.sqliggybank.client.view.App.win_height;
 import static ro.lbi.sqliggybank.client.view.App.win_width;
@@ -127,7 +129,7 @@ public class LoginController {
                         Get the logged in user credentials using the account created earlier.
                          */
 						String result;
-						result = databaseHandler.loginUser(account);
+						result = databaseHandler.loginUser(account.getUsername(), account.getPassword());
 
 		                /*
 		                Extract the JWT for the user from the credentials received from the server.
@@ -145,7 +147,7 @@ public class LoginController {
 		                    /*
 		                    Get the user account from the server using the JWT.
 		                     */
-							result = databaseHandler.getUser(account.getUsername(), JWT);
+							result = databaseHandler.userProfile(account.getUsername(), JWT);
 
 							Gson gson = new Gson();
 							User user = gson.fromJson(result, User.class);
@@ -157,7 +159,7 @@ public class LoginController {
 							Platform.runLater(() ->
 									{
 										windowManager.dashboardMenu(user);
-										Alert.infoAlert("Welcome", "Welcome back, " + user.getUsername() + "!");
+										Alert.infoAlert("Welcome", "Welcome, " + user.getUsername() + "!");
 									}
 							);
 							return user;
@@ -166,10 +168,6 @@ public class LoginController {
 							setButtonsEnabled(true);
 							showAlert("Error", e.getMessage());
 							LOGGER.log(Level.ERROR, "Server error", e);
-						} catch (UnauthorizedException e) {
-							setButtonsEnabled(true);
-							showAlert("Wrong authorization schema", e.getMessage());
-							LOGGER.log(Level.ERROR, "Wrong authorization schema", e);
 						} catch (NotFoundException e) {
 							setButtonsEnabled(true);
 							showAlert("User not found", e.getMessage());
