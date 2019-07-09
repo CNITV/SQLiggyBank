@@ -42,6 +42,9 @@ public class App extends Application {
      */
     /*
     The added 33 is to compensate for the border.
+
+    Unix and Windows machines have different sizes for the window, so maybe a check
+    would be appropriate, but I didn't feel like it mattered that much in this app.
      */
     public static int win_height = 720 + 33;
 
@@ -87,6 +90,8 @@ public class App extends Application {
 
         /*
         Set the host services property. Host services are needed to display a web page when a hyperlink is pressed.
+
+        !!! This might not work on some Java 8 releases, because it needs packages that aren't maintained anymore.
          */
         primaryStage.getProperties().put("hostServices", getHostServices());
 

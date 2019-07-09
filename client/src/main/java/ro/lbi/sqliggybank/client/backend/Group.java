@@ -6,7 +6,6 @@ import java.util.UUID;
 
 /**
  * This class represents a group. A new group is automatically created by GSON when the group gets retrieved from the database.
- *
  * <p>
  * WARNING: A Group instance is not supposed to be created directly by the programmer.
  *

@@ -7,7 +7,6 @@ import java.util.UUID;
 
 /**
  * This class represents a user. A new user is automatically created by GSON when the said user logs in.
- *
  * <p>
  * WARNING: A User instance is not supposed to be created directly by the programmer.
  *

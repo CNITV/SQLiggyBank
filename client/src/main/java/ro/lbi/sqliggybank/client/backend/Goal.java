@@ -8,7 +8,6 @@ import java.util.UUID;
 
 /**
  * This class represents a goal. A new goal is automatically created by GSON when the group gets retrieved from the database.
- *
  * <p>
  * WARNING: A Goal instance is not supposed to be created directly by the programmer.
  *

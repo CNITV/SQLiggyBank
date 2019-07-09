@@ -6,7 +6,6 @@ import java.util.UUID;
 
 /**
  * This class represents a bank. A new bank is automatically created by GSON when the group gets retrieved from the database.
- *
  * <p>
  * WARNING: A Bank instance is not supposed to be created directly by the programmer.
  *

@@ -110,14 +110,13 @@ public class RegisterController {
 
 	/**
 	 * This method creates a task for the register. It creates a new Thread in the background with the
-	 * task specified and start it while the application is running.
-	 *
+	 * task specified and starts it while the application is running.
 	 * <p>
 	 * It displays a loading progress indicator while the background process takes the username and the
-	 * password and checks for them in the database. If they already exist, and error prompt tells the user
+	 * password and checks for them in the database. If they already exist, an error prompt tells the user
 	 * something went wrong.
 	 *
-	 * @return it returns the task created.
+	 * @return the task created.
 	 */
 	private Task<Boolean> createWorker() {
 		return new Task<Boolean>() {
@@ -199,7 +198,6 @@ public class RegisterController {
 	 * <p>
 	 * It is called <u>right after</u> the constructor finished execution and the @FXML annotated fields
 	 * are populated.
-	 *
 	 * <p>
 	 * This method then initializes any attributes needed in the GUI.
 	 */

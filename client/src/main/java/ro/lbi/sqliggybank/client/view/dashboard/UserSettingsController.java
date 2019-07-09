@@ -95,7 +95,6 @@ public class UserSettingsController {
 	 * <p>
 	 * It is called <u>right after</u> the constructor finished execution and the @FXML annotated fields
 	 * are populated.
-	 *
 	 * <p>
 	 * This method then initializes any attributes needed in the GUI.
 	 */

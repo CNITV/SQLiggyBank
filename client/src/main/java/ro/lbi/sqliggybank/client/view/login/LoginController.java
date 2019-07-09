@@ -102,7 +102,6 @@ public class LoginController {
 	/**
 	 * This method creates a task for the login user. It creates a new Thread in the background with the
 	 * task specified and start it while the application is running.
-	 *
 	 * <p>
 	 * It displays a loading progress indicator while the background process takes the username and the
 	 * password and checks for them in the database.
@@ -224,7 +223,6 @@ public class LoginController {
 	 * <p>
 	 * It is called <u>right after</u> the constructor finished execution and the @FXML annotated fields
 	 * are populated.
-	 *
 	 * <p>
 	 * This method then initializes any attributes needed in the GUI.
 	 */
@@ -235,11 +233,9 @@ public class LoginController {
 
 	/**
 	 * This method fires whenever the login button is pressed.
-	 *
 	 * <p>
 	 * It takes the username/password combination introduced and checks them through the
 	 * <a href="https://documenter.getpostman.com/view/3806934/RWgwRFa8" target="_top">API</a>.
-	 *
 	 * <p>
 	 * If the information is correct and the user exists in the database, then the program proceeds
 	 * to the dashboard.
@@ -294,7 +290,6 @@ public class LoginController {
 
 	/**
 	 * This method fires whenever the user clicks on the Github link.
-	 *
 	 * <p>
 	 * Redirects to the project's official <a href="https://github.com/CNITV/SQLiggyBank" target="_top">Github</a>.
 	 *
@@ -314,7 +309,6 @@ public class LoginController {
 
 	/**
 	 * This method fires whenever the user clicks on the API link.
-	 *
 	 * <p>
 	 * Redirects to the project's official
 	 * <a href="https://documenter.getpostman.com/view/3806934/RWgwRFa8" target="_top">API</a>.

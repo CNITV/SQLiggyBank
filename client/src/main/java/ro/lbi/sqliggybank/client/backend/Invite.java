@@ -8,7 +8,6 @@ import java.util.UUID;
 
 /**
  * This class represents an invite. A new invite is automatically created by GSON when the database creates an invite link.
- *
  * <p>
  * WARNING: An Invite instance is not supposed to be created directly by the programmer.
  *
