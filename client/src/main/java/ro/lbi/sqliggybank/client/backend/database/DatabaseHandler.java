@@ -899,7 +899,7 @@ public class DatabaseHandler {
 		RequestBody body = RequestBody.create(JSON, "{\n" +
 				"\t\"name\":\"" + new_name + "\",\n" +
 				"\t\"description\":" + (new_description.equals("") ? "null" : "\"" + new_description + "\"") + "\",\n" +
-				"\t\"tarsget_amount\":\"" + new_target_amount + "\",\n" +
+				"\t\"target_amount\":\"" + new_target_amount + "\",\n" +
 				"\t\"deadline\":\"" + new_deadline + "\"" +
 				"}");
 
@@ -966,7 +966,7 @@ public class DatabaseHandler {
 
 	/*------------------------- Beginning of transactions -------------------------*/
 
-	//TODO do transactions
+	//TODO transactions
 
 	/*------------------------- Ending of transactions -------------------------*/
 

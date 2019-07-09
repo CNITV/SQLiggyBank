@@ -32,16 +32,17 @@ public class Group {
 	private String description;
 
 	/**
-	 * The owner of the group (represented by a user class).
+	 * The owner of the group (represented by a User class).
+	 *
+	 * @see User
 	 */
 	private User owner;
 
 	@Override
 	public String toString() {
-		return "UUID: " + uuid + "\n" +
-				"Name: " + name + "\n" +
-				"Description: " + description + "\n" +
-				"Owner: " + owner + "\n";
+		return "Name: " + name + '\n' +
+				"Description: " + (description == null ? " - " : description) + '\n' +
+				"Owner: " + owner.getUsername() + '\n';
 	}
 
 }

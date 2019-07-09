@@ -52,5 +52,13 @@ public class User {
 	 * The e-mail of the user.
 	 */
 	private String email;
+
+	@Override
+	public String toString() {
+		return "Username: " + username + '\n' +
+				"First name: " + (first_name == null ? " - " : first_name) + '\n' +
+				"Last name: " + (last_name == null ? " - " : last_name) + '\n' +
+				"E-mail: " + (email == null ? " - " : email) + '\n';
+	}
 }
 
