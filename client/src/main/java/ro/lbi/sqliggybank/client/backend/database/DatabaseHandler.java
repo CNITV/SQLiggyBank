@@ -63,9 +63,9 @@ public class DatabaseHandler {
 		Response response = httpClient.newCall(request).execute();
 
 		if (response.code() == 404) {
-			throw new NotFoundException("No such username!");
+			throw new NotFoundException("Not found", "No such username!");
 		} else if (response.code() == 403) {
-			throw new ForbiddenException("Invalid username and password combination!");
+			throw new ForbiddenException("Failed to login", "Invalid username and password combination!");
 		}
 
 		String result;
@@ -112,7 +112,7 @@ public class DatabaseHandler {
 		Response response = httpClient.newCall(request).execute();
 
 		if (response.code() == 403) {
-			throw new ForbiddenException("Username or email already exists! Please choose another username/email!");
+			throw new ForbiddenException("Error", "Username or email already exists! Please choose another username/email!");
 		}
 
 		String result;
@@ -148,7 +148,7 @@ public class DatabaseHandler {
 		Response response = httpClient.newCall(request).execute();
 
 		if (response.code() == 404) {
-			throw new NotFoundException("No such username!");
+			throw new NotFoundException("Not found", "No such username!");
 		}
 
 		String result;
@@ -163,7 +163,7 @@ public class DatabaseHandler {
 	}
 
 	/**
-	 * Patches information about a user.
+	 * Edits information about a user.
 	 * <p>
 	 * Endpoint: PATCH /api/users/{username}
 	 *
@@ -200,11 +200,11 @@ public class DatabaseHandler {
 		Response response = httpClient.newCall(request).execute();
 
 		if (response.code() == 403) {
-			throw new ForbiddenException("User already exists! Please choose another username!");
+			throw new ForbiddenException("Username taken", "User already exists! Please choose another username!");
 		}
 
 		if (response.code() == 400) {
-			throw new BadRequestException("You cannot have an empty username or password!");
+			throw new BadRequestException("Error", "You cannot have an empty username or password!");
 		}
 
 		String result;
@@ -278,7 +278,7 @@ public class DatabaseHandler {
 		Response response = httpClient.newCall(request).execute();
 
 		if (response.code() == 403) {
-			throw new ForbiddenException("A group already exists with that name, please choose another one!");
+			throw new ForbiddenException("Name taken", "A group already exists with that name, please choose another one!");
 		}
 
 		String result;
@@ -405,7 +405,7 @@ public class DatabaseHandler {
 		Response response = httpClient.newCall(request).execute();
 
 		if (response.code() == 403) {
-			throw new ForbiddenException("You are not the owner of this group!");
+			throw new ForbiddenException("Unauthorized", "You are not the owner of this group!");
 		}
 
 		String result;
@@ -441,7 +441,7 @@ public class DatabaseHandler {
 		Response response = httpClient.newCall(request).execute();
 
 		if (response.code() == 403) {
-			throw new ForbiddenException("You are not the owner of this group!");
+			throw new ForbiddenException("Unauthorized", "You are not the owner of this group!");
 		}
 
 		String result;
@@ -477,7 +477,7 @@ public class DatabaseHandler {
 		Response response = httpClient.newCall(request).execute();
 
 		if (response.code() == 403) {
-			throw new ForbiddenException("You are already part of this group!");
+			throw new ForbiddenException("Error", "You are already part of this group!");
 		}
 
 		String result;
@@ -519,11 +519,11 @@ public class DatabaseHandler {
 		Response response = httpClient.newCall(request).execute();
 
 		if (response.code() == 403) {
-			throw new ForbiddenException("You are not the owner of the group!");
+			throw new ForbiddenException("Unauthorized", "You are not the owner of the group!");
 		}
 
 		if (response.code() == 400) {
-			throw new BadRequestException("A group with this name already exists!");
+			throw new BadRequestException("Name taken", "A group with this name already exists!");
 		}
 
 		String result;
@@ -556,7 +556,7 @@ public class DatabaseHandler {
 		Response response = httpClient.newCall(request).execute();
 
 		if (response.code() == 403) {
-			throw new ForbiddenException("You are not the owner of the group, so you cannot delete it!");
+			throw new ForbiddenException("Unauthorized", "You are not the owner of the group, so you cannot delete it!");
 		}
 
 		String result;
@@ -601,7 +601,7 @@ public class DatabaseHandler {
 		Response response = httpClient.newCall(request).execute();
 
 		if (response.code() == 403) {
-			throw new ForbiddenException("You are not the owner of this group!");
+			throw new ForbiddenException("Unauthorized", "You are not the owner of this group!");
 		}
 
 		String result;
@@ -706,11 +706,11 @@ public class DatabaseHandler {
 		Response response = httpClient.newCall(request).execute();
 
 		if (response.code() == 403) {
-			throw new ForbiddenException("You are not the owner of the group!");
+			throw new ForbiddenException("Unauthorized", "You are not the owner of the group!");
 		}
 
 		if (response.code() == 400) {
-			throw new BadRequestException("A bank with that name already exists!");
+			throw new BadRequestException("Name taken", "A bank with that name already exists!");
 		}
 
 		String result;
@@ -744,7 +744,7 @@ public class DatabaseHandler {
 		Response response = httpClient.newCall(request).execute();
 
 		if (response.code() == 403) {
-			throw new ForbiddenException("You are not the owner of the group!");
+			throw new ForbiddenException("Unauthorized", "You are not the owner of the group!");
 		}
 
 		String result;
@@ -796,11 +796,11 @@ public class DatabaseHandler {
 		Response response = httpClient.newCall(request).execute();
 
 		if (response.code() == 403) {
-			throw new ForbiddenException("You are not the owner of the group!");
+			throw new ForbiddenException("Unauthorized", "You are not the owner of the group!");
 		}
 
 		if (response.code() == 400) {
-			throw new BadRequestException("Goal name already exists, please choose another name!");
+			throw new BadRequestException("Name taken", "Goal name already exists, please choose another name!");
 		}
 
 		String result;
@@ -911,11 +911,11 @@ public class DatabaseHandler {
 		Response response = httpClient.newCall(request).execute();
 
 		if (response.code() == 403) {
-			throw new ForbiddenException("You are not the owner of the group!");
+			throw new ForbiddenException("Unauthorized", "You are not the owner of the group!");
 		}
 
 		if (response.code() == 400) {
-			throw new BadRequestException("A goal with that name already exists in this bank!");
+			throw new BadRequestException("Name taken", "A goal with that name already exists in this bank!");
 		}
 
 		String result;
@@ -950,7 +950,7 @@ public class DatabaseHandler {
 		Response response = httpClient.newCall(request).execute();
 
 		if (response.code() == 403) {
-			throw new ForbiddenException("You are not the owner of the group!");
+			throw new ForbiddenException("Unauthorized", "You are not the owner of the group!");
 		}
 
 		String result;
