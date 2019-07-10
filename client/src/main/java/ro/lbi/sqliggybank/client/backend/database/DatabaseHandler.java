@@ -854,7 +854,7 @@ public class DatabaseHandler {
 	 * @return a JSON schema containing all the goals of a bank
 	 * @throws IOException if there was a connection error
 	 */
-	public String getGoalsOfGroup(String groupName, String bankName, String JWT)
+	public String getGoalsOfBank(String groupName, String bankName, String JWT)
 			throws IOException {
 		Request request = new Request.Builder()
 				.url(serverUrl + "/api/goals/" + groupName + "/" + bankName + "/list")

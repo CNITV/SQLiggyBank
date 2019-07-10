@@ -35,6 +35,10 @@ public class Bank {
 	 */
 	private Group group;
 
+	public String getDescription() {
+		return description != null ? description : "";
+	}
+
 	@Override
 	public String toString() {
 		return "Name: " + name + '\n' +

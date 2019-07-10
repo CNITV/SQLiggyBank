@@ -52,6 +52,18 @@ public class User {
 	 */
 	private String email;
 
+	public String getFirst_name() {
+		return first_name != null ? first_name : "";
+	}
+
+	public String getLast_name() {
+		return last_name != null ? last_name : "";
+	}
+
+	public String getEmail() {
+		return email != null ? email : "";
+	}
+
 	@Override
 	public String toString() {
 		return "Username: " + username + '\n' +

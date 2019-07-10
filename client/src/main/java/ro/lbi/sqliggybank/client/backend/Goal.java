@@ -47,6 +47,10 @@ public class Goal {
 	 */
 	private Bank bank;
 
+	public String getDescription() {
+		return description != null ? description : "";
+	}
+
 	@Override
 	public String toString() {
 		SimpleDateFormat format = new SimpleDateFormat("E dd.MM.yyyy',' kk:mm:ss");

@@ -19,6 +19,7 @@ import javafx.scene.shape.Circle;
 
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import lombok.Getter;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import ro.lbi.sqliggybank.client.backend.*;
@@ -50,19 +51,19 @@ public class DashboardController {
 	private static final Logger LOGGER = Logger.getLogger(DashboardController.class);
 
 	/**
-	 * This is the database handler. It handles API calls to the server.
-	 *
-	 * @see ro.lbi.sqliggybank.client.backend.database.DatabaseHandler
-	 */
-	private DatabaseHandler databaseHandler;
-
-	/**
 	 * This is the window manager. This way the controller can switch to other scenes, like for example the
 	 * login menu if the user logs out of the account.
 	 *
 	 * @see ro.lbi.sqliggybank.client.view.window_manager.WindowManager
 	 */
 	private WindowManager windowManager;
+
+	/**
+	 * This is the database handler. It handles API calls to the server.
+	 *
+	 * @see ro.lbi.sqliggybank.client.backend.database.DatabaseHandler
+	 */
+	private DatabaseHandler databaseHandler;
 
 	/**
 	 * The currently logged in user.
@@ -175,10 +176,7 @@ public class DashboardController {
 	DashboardController(WindowManager windowManager, User user) {
 		this.windowManager = windowManager;
 		this.user = user;
-		this.group = null;
-		this.bank = null;
-		this.goal = null;
-		this.databaseHandler = new DatabaseHandler();
+		databaseHandler = new DatabaseHandler();
 	}
 
 	/**
@@ -204,8 +202,7 @@ public class DashboardController {
 		 */
 		usernameLabel.setText(user.getUsername());
 		nameLabel.setText(
-				(user.getFirst_name() != null ? user.getFirst_name() : "") + " " +
-						(user.getLast_name() != null ? user.getLast_name() : "")
+				user.getFirst_name() + " " + user.getLast_name()
 		);
 
 		/*
@@ -215,15 +212,8 @@ public class DashboardController {
 		profilePicture.setFill(pattern);
 
 		/*
-		Initialize the groups, banks and goals.
-		*/
-
-		banksList.setOnMouseClicked((event) ->
-				{
-					//databaseHandler.getBank();
-				}
-		);
-
+		Initialize the groups
+		 */
 		ImageView groupIcon = new ImageView(
 				new Image("/ro/lbi/sqliggybank/client/view/dashboard/image/folder.png",
 						20, 20, true, true)
@@ -241,7 +231,6 @@ public class DashboardController {
 								20, 20, true, true)
 				)));
 			}
-
 		} catch (IOException e) {
 			LOGGER.log(Level.ERROR, "Connection error", e);
 			Alert.errorAlert("Connection error", "Database is not available at the moment, try again" +
@@ -249,6 +238,10 @@ public class DashboardController {
 			Platform.exit();
 		}
 
+		/*
+		Add a listener so when a user clicks a group, information about it like members, banks and
+		goals is retrieved.
+		 */
 		groupsTreeView.getSelectionModel().selectedItemProperty().addListener(
 				(observable, oldValue, newValue) -> {
 					try {
@@ -266,6 +259,9 @@ public class DashboardController {
 
 						groupDescriptionTooltip.setText(group.getDescription());
 
+						/*
+						Populate members list for the group.
+						 */
 						membersList.getItems().clear();
 						try {
 							result = databaseHandler.getMembersOfGroup(group.getName(), user.getJWT());
@@ -283,6 +279,9 @@ public class DashboardController {
 									" in a few moments.");
 						}
 
+						/*
+						Populate banks list for the group.
+						 */
 						banksList.getItems().clear();
 						try {
 							result = databaseHandler.getBanksOfGroup(group.getName(), user.getJWT());
@@ -317,40 +316,58 @@ public class DashboardController {
 									" in a few moments.");
 						}
 
-						goalsList.getItems().clear();
-						try {
-							result = databaseHandler.getGoalsOfGroup(group.getName(), bank.getName(),
-									user.getJWT());
+						/*
+						Add a listener so when a user clicks a bank, information like goals is retrieved.
+						 */
+						banksList.getSelectionModel().selectedItemProperty().addListener(
+								(obs, oldValu, newValu) -> {
+									goalsList.getItems().clear();
+									try {
+										String result1 = databaseHandler.bankInfo(
+												group.getName(),
+												user.getJWT(),
+												newValu
+										);
 
-							gson = new Gson();
-							goals = gson.fromJson(result, Goal[].class);
+										Gson gson1 = new Gson();
+										bank = gson1.fromJson(result1, Bank.class);
 
-							for (Goal goal : goals) {
-								goalsList.getItems().add(goal.getName());
-							}
-							goalsList.setOnMouseClicked((event) ->
-									{
-										try {
-											String res = databaseHandler.goalInfo(group.getName(), bank.getName(),
-													user.getJWT(), goalsList.getSelectionModel().getSelectedItem());
+										result1 = databaseHandler.getGoalsOfBank(
+												group.getName(),
+												bank.getName(),
+												user.getJWT()
+										);
 
-											Gson gson1 = new Gson();
-											goal = gson1.fromJson(res, Goal.class);
+										gson1 = new Gson();
+										goals = gson1.fromJson(result1, Goal[].class);
 
-											Alert.infoAlert("Goal information", goal.toString());
-										} catch (IOException e) {
-											LOGGER.log(Level.ERROR, "Connection error", e);
-											Alert.errorAlert("Connection error", "Database is not available at the moment, try again" +
-													" in a few moments.");
+										for (Goal goal : goals) {
+											goalsList.getItems().add(goal.getName());
 										}
-									}
-							);
-						} catch (IOException e) {
-							LOGGER.log(Level.ERROR, "Connection error", e);
-							Alert.errorAlert("Connection error", "Database is not available at the moment, try again" +
-									" in a few moments.");
-						}
+										goalsList.setOnMouseClicked((event) ->
+												{
+													try {
+														String res = databaseHandler.goalInfo(group.getName(), bank.getName(),
+																user.getJWT(), goalsList.getSelectionModel().getSelectedItem());
 
+														Gson gson2 = new Gson();
+														goal = gson2.fromJson(res, Goal.class);
+
+														Alert.infoAlert("Goal information", goal.toString());
+													} catch (IOException e) {
+														LOGGER.log(Level.ERROR, "Connection error", e);
+														Alert.errorAlert("Connection error", "Database is not available at the moment, try again" +
+																" in a few moments.");
+													}
+												}
+										);
+									} catch (IOException e) {
+										LOGGER.log(Level.ERROR, "Connection error", e);
+										Alert.errorAlert("Connection error", "Database is not available at the moment, try again" +
+												" in a few moments.");
+									}
+								}
+						);
 					} catch (IOException e) {
 						LOGGER.log(Level.ERROR, "Connection error", e);
 						Alert.errorAlert("Connection error", "Database is not available at the moment, try again" +
