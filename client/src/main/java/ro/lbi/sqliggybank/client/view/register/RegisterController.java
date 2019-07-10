@@ -104,7 +104,6 @@ public class RegisterController {
 	 */
 	RegisterController(WindowManager windowManager) {
 		this.windowManager = windowManager;
-
 		databaseHandler = new DatabaseHandler();
 	}
 
@@ -156,10 +155,12 @@ public class RegisterController {
 					showAlert("Failed to connect to server", "Failed to connect to the database!" +
 							" This might be due to the server not currently working! Please try again in a few moments!");
 					LOGGER.log(Level.ERROR, "Server connection error", e);
-				} catch (IllegalStateException | ForbiddenException e) {
+				} catch (IllegalStateException e) {
 					setButtonsEnabled(true);
 					showAlert("Error", e.getMessage());
-					LOGGER.log(Level.ERROR, e.getMessage(), e);
+				} catch (ForbiddenException e) {
+					setButtonsEnabled(true);
+					showAlert(e.getTitle(), e.getMessage());
 				}
 				return false;
 			}
@@ -184,7 +185,7 @@ public class RegisterController {
 	/**
 	 * This method displays an alert pop-up in another thread.
 	 *
-	 * @param title the title of the error alert.
+	 * @param title   the title of the error alert.
 	 * @param message the message of the error alert.
 	 */
 	private void showAlert(String title, String message) {

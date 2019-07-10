@@ -146,13 +146,9 @@ public class UserSettingsController {
 						" This might be due to the server not currently working! Please try again in a few moments!");
 				LOGGER.log(Level.ERROR, "Server connection error", e);
 			} catch (BadRequestException e) {
-				LOGGER.log(Level.ERROR, "Bad request", e);
-			} catch (IllegalStateException e) {
-				Alert.errorAlert("Username taken", "Username already exists in the database!");
-				LOGGER.log(Level.ERROR, "Username exists", e);
+				Alert.errorAlert(e.getTitle(), e.getMessage());
 			} catch (ForbiddenException e) {
-				Alert.errorAlert("Empty fields", "Username and password cannot be empty!");
-				LOGGER.log(Level.ERROR, "Empty username or password", e);
+				Alert.errorAlert(e.getTitle(), e.getMessage());
 			}
 		}
 	}

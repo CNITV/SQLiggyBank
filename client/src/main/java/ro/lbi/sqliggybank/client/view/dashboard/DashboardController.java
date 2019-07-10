@@ -396,9 +396,8 @@ public class DashboardController {
 			LOGGER.log(Level.ERROR, "Server error", e);
 		} catch (NotFoundException e) {
 			Platform.runLater(() ->
-					Alert.errorAlert("User not found", e.getMessage())
+					Alert.errorAlert(e.getTitle(), e.getMessage())
 			);
-			LOGGER.log(Level.ERROR, "User not found", e);
 		}
 	}
 
@@ -490,7 +489,7 @@ public class DashboardController {
 			Stage settings = new Stage();
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("/ro/lbi/sqliggybank/client/view/dashboard/groupSettings.fxml"));
 			loader.setControllerFactory(
-					c -> new GroupSettingsController(windowManager, user)
+					c -> new GroupSettingsController(windowManager, user, group)
 			);
 
 			Parent root = loader.load();
@@ -557,8 +556,7 @@ public class DashboardController {
 				LOGGER.log(Level.ERROR, "Connection error", e);
 				Alert.errorAlert("Connection error", "The database can't be accessed at the moment.");
 			} catch (ForbiddenException e) {
-				LOGGER.log(Level.ERROR, "Error", e);
-				Alert.errorAlert("Error", "You are already part of the group or the invitation is wrong!!");
+				Alert.errorAlert(e.getTitle(), e.getMessage());
 			}
 		} else {
 			Alert.errorAlert("Error", "Group invite ID cannot be empty!");
@@ -604,7 +602,7 @@ public class DashboardController {
 		} catch (NullPointerException e) {
 			Alert.errorAlert("Error", "You didn't select a group!");
 		} catch (ForbiddenException e) {
-			Alert.errorAlert("Error", "That group name already exists!");
+			Alert.errorAlert(e.getTitle(), e.getMessage());
 		} catch (IOException e) {
 			LOGGER.log(Level.ERROR, "Connection error", e);
 			Alert.errorAlert("Connection error", "The database can't be accessed at the moment.");
@@ -677,9 +675,7 @@ public class DashboardController {
 			LOGGER.log(Level.ERROR, "Connection error", e);
 			Alert.errorAlert("Connection error", "The database can't be accessed at the moment.");
 		} catch (ForbiddenException e) {
-			LOGGER.log(Level.ERROR, "Authorization error", e);
-			Alert.errorAlert("Authorization error", "You are not the owner of the group so you cannot " +
-					"perform such an action!");
+			Alert.errorAlert(e.getTitle(), e.getMessage());
 		}
 	}
 
@@ -710,9 +706,7 @@ public class DashboardController {
 			LOGGER.log(Level.ERROR, "Connection error", e);
 			Alert.errorAlert("Connection error", "The database can't be accessed at the moment.");
 		} catch (ForbiddenException e) {
-			LOGGER.log(Level.ERROR, "Authorization error", e);
-			Alert.errorAlert("Authorization error", "You are not the owner of the group so you cannot " +
-					"perform such an action!");
+			Alert.errorAlert(e.getTitle(), e.getMessage());
 		}
 	}
 
@@ -755,9 +749,7 @@ public class DashboardController {
 			LOGGER.log(Level.ERROR, "Connection error", e);
 			Alert.errorAlert("Connection error", "The database can't be accessed at the moment.");
 		} catch (ForbiddenException e) {
-			LOGGER.log(Level.ERROR, "Authorization error", e);
-			Alert.errorAlert("Authorization error", "You are not the owner of the group so you cannot " +
-					"perform such an action!");
+			Alert.errorAlert(e.getTitle(), e.getMessage());
 		}
 	}
 
@@ -777,9 +769,7 @@ public class DashboardController {
 			LOGGER.log(Level.ERROR, "Connection error", e);
 			Alert.errorAlert("Connection error", "The database can't be accessed at the moment.");
 		} catch (ForbiddenException e) {
-			LOGGER.log(Level.ERROR, "Authorization error", e);
-			Alert.errorAlert("Authorization error", "You are not the owner of the group so you cannot " +
-					"perform such an action!");
+			Alert.errorAlert(e.getTitle(), e.getMessage());
 		}
 	}
 

@@ -15,6 +15,7 @@ import ro.lbi.sqliggybank.client.view.window_manager.WindowManager;
 
 import java.io.IOException;
 
+//TODO transactions
 public class TransactionsController {
 
 	private WindowManager windowManager;
@@ -46,7 +47,6 @@ public class TransactionsController {
 
 	@FXML
 	private void okButtonPressed(ActionEvent event) {
-		//TODO add transactions
 		/*try {
 			if (Integer.parseInt(amountField.getText()) <= 0) {
 				throw new NumberFormatException("Amount needs to be higher than 0");
