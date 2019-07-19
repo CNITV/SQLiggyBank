@@ -10,9 +10,18 @@ package ro.lbi.sqliggybank.server.Core;
  */
 public class Account {
 
+	/**
+	 * The username of the account.
+	 */
 	private String username;
+	/**
+	 * The password of the account.
+	 */
 	private String password;
 
+	/**
+	 * Default constructor, used by Hibernate to enable useful casting for persistence, among other things.
+	 */
 	public Account() {
 	}
 
