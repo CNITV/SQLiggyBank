@@ -27,9 +27,9 @@ import java.util.UUID;
 import java.util.List;
 
 /**
- * GoalResource covers the goals endpoint for the SQLiggyBank API.
+ * GroupResource covers the groups endpoint for the SQLiggyBank API.
  *
- * It is in charge of getting and editing piggybank information.
+ * It is in charge of getting and editing group information.
  *
  * Details for the implementation of these methods can be found in the
  * SQLiggyBank API Documentation.
