@@ -87,6 +87,7 @@ public class Deposit {
 	 * The main constructor for Deposit.
 	 *
 	 * @param uuid 	    The UUID of the deposit.
+	 * @param amount    The amount of the deposit.
 	 * @param payee     The payee of the deposit.
 	 * @param timestamp The timestamp of the deposit.
 	 * @param tags      Tags, optional for the deposit.
@@ -183,7 +184,7 @@ public class Deposit {
 	}
 
 	/**
-	 * Sets the payeeof the deposit.
+	 * Sets the payee of the deposit.
 	 *
 	 * @param payee The payee to change to.
 	 */
