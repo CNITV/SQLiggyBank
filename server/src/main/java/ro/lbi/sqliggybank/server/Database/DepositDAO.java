@@ -29,6 +29,15 @@ public class DepositDAO extends AbstractDAO<Deposit> {
 		return Optional.ofNullable(get(id));
 	}
 
+	/**
+	 * Finds deposit by group and bank.
+	 *
+	 * @param group The group from which to look for the piggy bank.
+	 * @param bank  The piggy bank to which the deposit was made to.
+	 *
+	 * @return A List of Deposit objects, or an empty list if no objects
+	 * 	   were found.
+	 */
 	@SuppressWarnings("unchecked")
 	public List<Deposit> findByGroupAndBank(String group, String bank) {
 		Query query = namedQuery("ro.lbi.sqliggybank.server.Core.Deposit.findByGroupAndBank");

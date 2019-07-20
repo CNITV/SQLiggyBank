@@ -48,6 +48,14 @@ public class PiggyBankDAO extends AbstractDAO<PiggyBank> {
 		}
 	}
 
+	/**
+	 * Finds piggy banks by group.
+	 *
+	 * @param group The group to check piggy banks for.
+	 *
+	 * @return A List of PiggyBank objects. An empty List is returned if no
+	 * 	   piggy banks are found linked to the provided group.
+	 */
 	@SuppressWarnings("unchecked")
 	public List<PiggyBank> findByGroup(Group group) {
 			Query query = namedQuery("ro.lbi.sqliggybank.server.Core.PiggyBank.findByGroup");
@@ -55,6 +63,14 @@ public class PiggyBankDAO extends AbstractDAO<PiggyBank> {
 			return query.getResultList();
 	}
 
+	/**
+	 * Finds piggy bank by name and group.
+	 *
+	 * @param group The group to look for piggy banks at.
+	 * @param name	The name of the piggy bank.
+	 *
+	 * @return An Optional of any found PiggyBank object.
+	 */
 	public Optional<PiggyBank> findByNameAndGroup(Group group, String name) {
 		try {
 			Query query = namedQuery("ro.lbi.sqliggybank.server.Core.PiggyBank.findByGroupAndName");
@@ -67,6 +83,13 @@ public class PiggyBankDAO extends AbstractDAO<PiggyBank> {
 		}
 	}
 
+	/**
+	 * Finds all the piggy banks that are part of a specific group.
+	 *
+	 * @param group The group to look for piggy banks at.
+	 * 
+	 * @return A List of Piggy Bank objects that are part of the bank.
+	 */
 	public List findAllBanksInGroup(Group group) {
 		Query query = namedQuery("ro.lbi.sqliggybank.server.Core.PiggyBank.findByGroup");
 		query.setParameter("passed_group", group);

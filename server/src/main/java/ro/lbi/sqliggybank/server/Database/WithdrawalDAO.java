@@ -29,6 +29,15 @@ public class WithdrawalDAO extends AbstractDAO<Withdrawal> {
 		return Optional.ofNullable(get(id));
 	}
 
+	/**
+	 * Finds withdrawals by group and bank.
+	 *
+	 * @param group The name of the group to look for piggy banks in.
+	 * @param bank  The name of the piggy bank to look for withdrawals in.
+	 *
+	 * @return A List of Withdrawal objects. An empty List is returned if 
+	 * 	   no withdrawals are found in the provided piggy bank.
+	 */
 	@SuppressWarnings("unchecked")
 	public List<Withdrawal> findByGroupAndBank(String group, String bank) {
 		Query query = namedQuery("ro.lbi.sqliggybank.server.Core.Withdrawal.findByGroupAndBank");

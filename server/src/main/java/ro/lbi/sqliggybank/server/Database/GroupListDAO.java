@@ -12,7 +12,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class GroupListDAO extends AbstractDAO<GroupEntry> {
-
+	/**
+	 * The constructor for the group list DAO.
+	 *
+	 * @param factory The session factory required. Handed in by Dropwizard.
+	 */
 	public GroupListDAO(SessionFactory factory, UserDAO userDAO) {
 		super(factory);
 	}
@@ -27,6 +31,17 @@ public class GroupListDAO extends AbstractDAO<GroupEntry> {
 		return Optional.ofNullable(get(id));
 	}
 
+	/**
+	 * Checks whether a user is a member of a group.
+	 *
+	 * @param username  The username of the potential member.
+	 * @param groupName The name of the group to check whether the user is a
+	 * 		    member or not.
+	 *
+	 * @return True if the provided username is a member of the provided
+	 * 	   group, false if otherwise.
+	 *
+	 */
 	public boolean isUserPartOfGroup(String username, String groupName) {
 		Query query = namedQuery("ro.lbi.sqliggybank.server.Core.GroupEntry.isUserPartOfGroup");
 		query.setParameter("username", username);
@@ -47,6 +62,14 @@ public class GroupListDAO extends AbstractDAO<GroupEntry> {
 		return query.getResultList();
 	}
 
+	/**
+	 * Lists all the groups that a user is a member of.
+	 *
+	 * @param user The user to check groups for.
+	 *
+	 * @return A List of Group objects, representing the groups that the
+	 * user is a part of. An empty list is returned
+	 */
 	@SuppressWarnings("unchecked")
 	public List<Group> groupsOfUser(User user) {
 		Query query = namedQuery("ro.lbi.sqliggybank.server.Core.GroupEntry.groupsOfUser");
@@ -54,6 +77,15 @@ public class GroupListDAO extends AbstractDAO<GroupEntry> {
 		return query.getResultList();
 	}
 
+	/**
+	 * Finds group lists by group.
+	 *
+	 * @param group The group to check group lists for.
+	 *
+	 * @return List of any found group lists, null List if no members are
+	 * 	   found. A null List is guaranteed to never appear, due to a
+	 * 	   group always having one member, its owner.
+	 */
 	@SuppressWarnings("unchecked")
 	public List<GroupEntry> findByGroup(Group group) {
 		Query query = namedQuery("ro.lbi.sqliggybank.server.Core.GroupEntry.isUserPartOfGroup");
@@ -70,6 +102,13 @@ public class GroupListDAO extends AbstractDAO<GroupEntry> {
 		persist(groupEntry);
 	}
 
+	/**
+	 * Adds a user to a group.
+	 *
+	 * @param user  The user to add to a group.
+	 * @param group The group to add the user to.
+	 *
+	 */
 	public void addUserToGroup(User user, Group group) {
 		GroupEntry entry = new GroupEntry(user, group);
 		create(entry);
