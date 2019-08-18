@@ -8,11 +8,10 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import ro.lbi.sqliggybank.client.backend.User;
 import ro.lbi.sqliggybank.client.backend.database.DatabaseHandler;
 import ro.lbi.sqliggybank.client.backend.exceptions.BadRequestException;
 import ro.lbi.sqliggybank.client.backend.exceptions.ForbiddenException;
-import ro.lbi.sqliggybank.client.backend.exceptions.UnauthorizedException;
-import ro.lbi.sqliggybank.client.backend.User;
 import ro.lbi.sqliggybank.client.util.Alert;
 import ro.lbi.sqliggybank.client.view.window_manager.WindowManager;
 

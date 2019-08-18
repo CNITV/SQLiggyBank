@@ -1,7 +1,5 @@
 package ro.lbi.sqliggybank.client.backend;
 
-import lombok.Getter;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
@@ -14,7 +12,6 @@ import java.util.UUID;
  * @author Alexandru GHERGHESCU (alexghergh)
  * @since 2019-07-09
  */
-@Getter
 public class Goal {
 
 	/**
@@ -60,5 +57,25 @@ public class Goal {
 				"Target amount: " + target_amount + '\n' +
 				"Deadline: " + format.format(deadline) + '\n' +
 				"Bank: " + bank.getName() + '\n';
+	}
+
+	public UUID getUuid() {
+		return this.uuid;
+	}
+
+	public String getName() {
+		return this.name;
+	}
+
+	public int getTarget_amount() {
+		return this.target_amount;
+	}
+
+	public Date getDeadline() {
+		return this.deadline;
+	}
+
+	public Bank getBank() {
+		return this.bank;
 	}
 }

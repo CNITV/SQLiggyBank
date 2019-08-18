@@ -1,10 +1,7 @@
 package ro.lbi.sqliggybank.client.backend.exceptions;
 
-import lombok.Getter;
-
 public class ForbiddenException extends Exception {
 
-	@Getter
 	private String title;
 
 	public ForbiddenException(String title, String message) {
@@ -20,4 +17,7 @@ public class ForbiddenException extends Exception {
 		super();
 	}
 
+	public String getTitle() {
+		return this.title;
+	}
 }

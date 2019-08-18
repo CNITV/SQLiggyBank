@@ -2,18 +2,13 @@ package ro.lbi.sqliggybank.client.view.dashboard;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import ro.lbi.sqliggybank.client.backend.Bank;
 import ro.lbi.sqliggybank.client.backend.Group;
 import ro.lbi.sqliggybank.client.backend.User;
 import ro.lbi.sqliggybank.client.backend.database.DatabaseHandler;
-import ro.lbi.sqliggybank.client.backend.exceptions.ForbiddenException;
-import ro.lbi.sqliggybank.client.util.Alert;
 import ro.lbi.sqliggybank.client.view.window_manager.WindowManager;
-
-import java.io.IOException;
 
 //TODO transactions
 public class TransactionsController {
