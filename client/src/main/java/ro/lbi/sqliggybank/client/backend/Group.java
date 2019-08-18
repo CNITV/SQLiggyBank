@@ -1,7 +1,5 @@
 package ro.lbi.sqliggybank.client.backend;
 
-import lombok.Getter;
-
 import java.util.UUID;
 
 /**
@@ -12,7 +10,6 @@ import java.util.UUID;
  * @author Alexandru GHERGHESCU (alexghergh)
  * @since 2019-05-13
  */
-@Getter
 public class Group {
 
 	/**
@@ -44,4 +41,19 @@ public class Group {
 				"Owner: " + owner.getUsername() + '\n';
 	}
 
+	public UUID getUuid() {
+		return this.uuid;
+	}
+
+	public String getName() {
+		return this.name;
+	}
+
+	public String getDescription() {
+		return this.description;
+	}
+
+	public User getOwner() {
+		return this.owner;
+	}
 }

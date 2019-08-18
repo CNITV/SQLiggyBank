@@ -1,7 +1,5 @@
 package ro.lbi.sqliggybank.client.backend;
 
-import lombok.Getter;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
@@ -14,7 +12,6 @@ import java.util.UUID;
  * @author Alexandru GHERGHESCU (alexghergh)
  * @since 2019-05-13
  */
-@Getter
 public class Invite {
 
 	/**
@@ -37,5 +34,17 @@ public class Invite {
 		SimpleDateFormat format = new SimpleDateFormat("E dd.MM.yyyy',' kk:mm:ss");
 
 		return uuid + " (" + format.format(dateCreated) + ")\n";
+	}
+
+	public UUID getUuid() {
+		return this.uuid;
+	}
+
+	public String getGroupName() {
+		return this.groupName;
+	}
+
+	public Date getDateCreated() {
+		return this.dateCreated;
 	}
 }

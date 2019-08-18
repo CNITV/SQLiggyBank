@@ -1,8 +1,5 @@
 package ro.lbi.sqliggybank.client.backend;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import java.util.UUID;
 
 /**
@@ -13,13 +10,11 @@ import java.util.UUID;
  * @author Alexandru GHERGHESCU (alexghergh)
  * @since 2018-12-08
  */
-@Getter
 public class User {
 
 	/**
 	 * The JWT of the user received when logging in.
 	 */
-	@Setter
 	private String JWT;
 
 	/**
@@ -70,6 +65,26 @@ public class User {
 				"First name: " + (first_name == null ? " - " : first_name) + '\n' +
 				"Last name: " + (last_name == null ? " - " : last_name) + '\n' +
 				"E-mail: " + (email == null ? " - " : email) + '\n';
+	}
+
+	public String getJWT() {
+		return this.JWT;
+	}
+
+	public UUID getUuid() {
+		return this.uuid;
+	}
+
+	public String getUsername() {
+		return this.username;
+	}
+
+	public String getPassword() {
+		return this.password;
+	}
+
+	public void setJWT(String JWT) {
+		this.JWT = JWT;
 	}
 }
 

@@ -1,32 +1,26 @@
 package ro.lbi.sqliggybank.client.view.dashboard;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
-
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
-
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import lombok.Getter;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import ro.lbi.sqliggybank.client.backend.*;
 import ro.lbi.sqliggybank.client.backend.database.DatabaseHandler;
 import ro.lbi.sqliggybank.client.backend.exceptions.ForbiddenException;
 import ro.lbi.sqliggybank.client.backend.exceptions.NotFoundException;
-import ro.lbi.sqliggybank.client.backend.exceptions.UnauthorizedException;
 import ro.lbi.sqliggybank.client.util.Alert;
 import ro.lbi.sqliggybank.client.view.window_manager.WindowManager;
 

@@ -9,7 +9,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.Region;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import ro.lbi.sqliggybank.client.backend.database.DatabaseHandler;
@@ -18,7 +17,6 @@ import ro.lbi.sqliggybank.client.util.Alert;
 import ro.lbi.sqliggybank.client.view.window_manager.WindowManager;
 
 import java.io.IOException;
-import java.util.concurrent.ExecutionException;
 
 import static ro.lbi.sqliggybank.client.view.App.win_height;
 import static ro.lbi.sqliggybank.client.view.App.win_width;

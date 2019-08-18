@@ -2,9 +2,7 @@ package ro.lbi.sqliggybank.client.view;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
-
 import org.apache.log4j.Logger;
-
 import ro.lbi.sqliggybank.client.view.window_manager.WindowManager;
 import ro.lbi.sqliggybank.client.view.window_manager.WindowManagerImpl;
 
