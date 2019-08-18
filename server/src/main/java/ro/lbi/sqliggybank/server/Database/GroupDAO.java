@@ -47,6 +47,16 @@ public class GroupDAO extends AbstractDAO<Group> {
 		}
 	}
 
+	/**
+	 * Checks if a specific user is the owner of a provided group.
+	 *
+	 * @param username  The username of the user to check.
+	 * @param groupName The name of the group to check whether the user is
+	 * 		    the owner of said group.
+	 *
+	 * @return True if the user provided is the owner of the provided group,
+	 * 	   false if otherwise.
+	 */
 	public boolean isUserOwnerOfGroup(String username, String groupName) {
 		Query query = namedQuery("ro.lbi.sqliggybank.server.Core.Group.isUserOwnerOfGroup");
 		query.setParameter("username", username);

@@ -27,15 +27,54 @@ import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * BanksResource covers the banks endpoint for the SQLiggyBank API. It is in charge of getting piggy bank information
+ * and editing piggy bank information.
+ * <p>
+ * Details for the implementation of these methods can be found in the SQLiggyBank API Documentation.
+ *
+ * @author StormFireFox1
+ * @see <a href="https://documenter.getpostman.com/view/3806934/RWgwRFa8?version=latest#90e27b58-617b-4249-96bf-d3ef8f2f61db">SQLiggyBank API Documentation</a>
+ * @since 2019-01-29
+ */
 @Path("/api/banks/")
 @Produces(MediaType.APPLICATION_JSON)
 public class BanksResource {
 
+	/**
+	 * groupDAO is the DAO for the "groups" table in the database. This is modified by the constructor.
+	 *
+	 * @see ro.lbi.sqliggybank.server.Database.GroupDAO
+	 */
 	private final GroupDAO groupDAO;
+
+	/**
+	 * groupListDAO is the DAO for the "group_lists" table in the database. This is modified by the constructor.
+	 *
+	 * @see ro.lbi.sqliggybank.server.Database.GroupListDAO
+	 */
 	private final GroupListDAO groupListDAO;
+
+	/**
+	 * piggyBankDAO is the DAO for the "banks" table in the database. This is modified by the constructor.
+	 *
+	 * @see ro.lbi.sqliggybank.server.Database.PiggyBankDAO
+	 */
 	private final PiggyBankDAO piggyBankDAO;
+
+	/**
+	 * authVerifier is the verifier for the HMAC256 algorithm used to sign JWT's.
+	 */
 	private final JWTVerifier authVerifier;
 
+	/**
+	 * The constructor for BanksResource. The parameters should be passed solely by the ServerApplication class.
+	 *
+	 * @param groupDAO     The DAO to the "groups" table in the database.
+	 * @param groupListDAO The DAO to the "group_lists" table in the database.
+	 * @param piggyBankDAO The DAO for the "banks" table in the database.
+	 * @param JWTSecret    The secret to be used for signing JWT's using the HMAC256 algorithm.
+	 */
 	public BanksResource(GroupDAO groupDAO, GroupListDAO groupListDAO, PiggyBankDAO piggyBankDAO, byte[] JWTSecret) {
 		this.groupDAO = groupDAO;
 		this.groupListDAO = groupListDAO;
@@ -46,6 +85,16 @@ public class BanksResource {
 				.build();
 	}
 
+	/**
+	 * The endpoint for extracting piggy bank information. This endpoint requires authentication.
+	 *
+	 * @param authorization The "Authorization" header in the HTTP request.
+	 * @param groupName     The "groupName" parameter of the request. Passed in the URL.
+	 * @param bankName      The "bankName" parameter of the request. Passed in the URL.
+	 * @return A response according to the SQLiggyBank API Documentation. In general, it returns a JSON representation of the PiggyBank class.
+	 * @see ro.lbi.sqliggybank.server.Core.PiggyBank
+	 * @see <a href="https://documenter.getpostman.com/view/3806934/RWgwRFa8?version=latest#3463fa61-f4ac-4e0c-b288-a8b6fa7a715b">API Documentation</a>
+	 */
 	@GET
 	@UnitOfWork
 	@Path("{groupName}/{bankName}")
@@ -60,6 +109,15 @@ public class BanksResource {
 		}
 	}
 
+	/**
+	 * The endpoint for listing all the piggy banks that are part of a group. This endpoint requires authentication.
+	 *
+	 * @param authorization The "Authorization" header in the HTTP request.
+	 * @param groupName     The "groupName" parameter of the request. Passed in the URL.
+	 * @return A response according to the SQLiggyBank API Documentation. In general, it returns a JSON array of PiggyBank objects.
+	 * @see ro.lbi.sqliggybank.server.Core.PiggyBank
+	 * @see <a href="https://documenter.getpostman.com/view/3806934/RWgwRFa8?version=latest#594dea63-8961-45ba-b556-9c8f0f0a595e">API Documentation</a>
+	 */
 	@GET
 	@UnitOfWork
 	@Path("{groupName}/list")
@@ -74,6 +132,16 @@ public class BanksResource {
 		}
 	}
 
+	/**
+	 * The endpoint for creating a new piggy bank. This endpoint requires authentication. The user must also be the group
+	 * owner in order to be capable of creating a piggy bank.
+	 *
+	 * @param authorization The "Authorization" header in the HTTP request.
+	 * @param groupName     The "groupName" parameter of the request. Passed in the URL.
+	 * @return A response according to the SQLiggyBank API Documentation. In general, it returns a message relaying success.
+	 * @see ro.lbi.sqliggybank.server.Core.PiggyBank
+	 * @see <a href="https://documenter.getpostman.com/view/3806934/RWgwRFa8?version=latest#f3f2c366-c7b5-4a97-8fe1-3ecb78b6507e">API Documentation</a>
+	 */
 	@POST
 	@UnitOfWork
 	@Path("{groupName}/new")
@@ -88,6 +156,17 @@ public class BanksResource {
 		}
 	}
 
+	/**
+	 * The endpoint for editing piggy bank information. This endpoint requires authentication. The user must also be the
+	 * group owner in order to be capable of editing piggy bank information.
+	 *
+	 * @param authorization The "Authorization" header in the HTTP request.
+	 * @param groupName     The "groupName" parameter of the request. Passed in the URL.
+	 * @param bankName      The "bankName" parameter of the request. Passed in the URL.
+	 * @return A response according to the SQLiggyBank API Documentation. In general, it returns a message relaying success.
+	 * @see ro.lbi.sqliggybank.server.Core.PiggyBank
+	 * @see <a href="https://documenter.getpostman.com/view/3806934/RWgwRFa8?version=latest#b3d8f1df-a365-44dc-b890-8dff627a4a6f">API Documentation</a>
+	 */
 	@PATCH
 	@UnitOfWork
 	@Path("{groupName}/{bankName}")
@@ -102,6 +181,17 @@ public class BanksResource {
 		}
 	}
 
+	/**
+	 * The endpoint for deleting a piggy bank. This endpoint requires authentication. The user must also be the
+	 * group owner in order to be capable of deleting a piggy bank.
+	 *
+	 * @param authorization The "Authorization" header in the HTTP request.
+	 * @param groupName     The "groupName" parameter of the request. Passed in the URL.
+	 * @param bankName      The "bankName" parameter of the request. Passed in the URL.
+	 * @return A response according to the SQLiggyBank API Documentation. In general, it returns a message relaying success.
+	 * @see ro.lbi.sqliggybank.server.Core.PiggyBank
+	 * @see <a href="https://documenter.getpostman.com/view/3806934/RWgwRFa8?version=latest#1d4f4412-1d0b-444a-a7cf-6f532159aa3f">API Documentation</a>
+	 */
 	@DELETE
 	@UnitOfWork
 	@Path("{groupName}/{bankName}")
@@ -116,6 +206,17 @@ public class BanksResource {
 		}
 	}
 
+	/**
+	 * Gets the list of piggy banks belonging to a specific group. This handles the logic behind the endpoint. It checks
+	 * whether the user is a member of the group and returns the JSON array of piggy banks that are part of a group.
+	 *
+	 * @param groupName     The name of the group to check piggy banks in.
+	 * @param authorization The "Authorization" header in the HTTP request.
+	 * @return A response, depending on the query and errors. In general, 200 (OK) status code is returned if every
+	 * parameter is met in the request, and 404 (Not Found) status code is returned if the group (or user)
+	 * cannot be found in the database. If an authenticated user is not part of the group, a 403 (Forbidden) status code
+	 * is returned.
+	 */
 	private Response getPiggyBankList(String groupName, String authorization) {
 		authorization = authorization.substring(authorization.indexOf(" ") + 1); // remove "Bearer" from Authorization header
 		try {
@@ -141,13 +242,25 @@ public class BanksResource {
 					.entity(new GenericResponse(Response.Status.UNAUTHORIZED.getStatusCode(), "Invalid authentication scheme!"))
 					.build();
 		} catch (NotFoundException e) {
-				return Response
-						.status(Response.Status.NOT_FOUND)
-						.entity(new NotFoundResponse("The group \"" + groupName + "\" could not be found!"))
-						.build();
+			return Response
+					.status(Response.Status.NOT_FOUND)
+					.entity(new NotFoundResponse("The group \"" + groupName + "\" could not be found!"))
+					.build();
 		}
 	}
 
+	/**
+	 * Finds a piggy bank belonging to a specific group. This handles the logic behind the endpoint. It checks
+	 * whether the user is a member of the group and returns the JSON representation of a PiggyBank object.
+	 *
+	 * @param groupName     The name of the group to check piggy banks in.
+	 * @param bankName      The name of the piggy bank to find.
+	 * @param authorization The "Authorization" header in the HTTP request.
+	 * @return A response, depending on the query and errors. In general, 200 (OK) status code is returned if a piggy
+	 * bank is found, and 404 (Not Found) status code is returned if a piggy bank cannot be found in the database. If an
+	 * authenticated user is not a member of the piggy bank's group, he is restricted access using a 403 (Forbidden)
+	 * status code.
+	 */
 	private Response findPiggyBank(String groupName, String bankName, String authorization) {
 		authorization = authorization.substring(authorization.indexOf(" ") + 1); // remove "Bearer" from Authorization header
 		try {
@@ -177,6 +290,18 @@ public class BanksResource {
 		}
 	}
 
+	/**
+	 * Creates a piggy bank belonging to a specific group. This handles the logic behind the endpoint. It checks
+	 * whether the user is the owner of the group, reads the body passed to it and creates a new PiggyBank object.
+	 *
+	 * @param groupName     The name of the group to put the piggy bank in.
+	 * @param body          The JSON representation of the PiggyBank object to create.
+	 * @param authorization The "Authorization" header in the HTTP request.
+	 * @return A response, depending on the query and errors. In general, 200 (OK) status code is returned if a piggy
+	 * bank is created, and 404 (Not Found) status code is returned if a piggy bank cannot be found in the database. If an
+	 * authenticated user is not the owner of the new piggy bank's group, they are restricted access using a 403 (Forbidden)
+	 * status code.
+	 */
 	private Response createPiggyBank(String groupName, String authorization, String body) {
 		authorization = authorization.substring(authorization.indexOf(" ") + 1); // remove "Bearer" from Authorization header
 		try {
@@ -228,13 +353,27 @@ public class BanksResource {
 					.entity(new InternalErrorResponse(e.getMessage()))
 					.build();
 		} catch (NotFoundException e) {
-				return Response
-						.status(Response.Status.NOT_FOUND)
-						.entity(new NotFoundResponse("The group \"" + groupName + "\" could not be found!"))
-						.build();
+			return Response
+					.status(Response.Status.NOT_FOUND)
+					.entity(new NotFoundResponse("The group \"" + groupName + "\" could not be found!"))
+					.build();
 		}
 	}
 
+	/**
+	 * Modifies an existing piggy bank belonging to a specific group. This handles the logic behind the endpoint.
+	 * It checks whether the user is the owner of the group, reads the body passed to it and edits the existing
+	 * PiggyBank object in the database.
+	 *
+	 * @param groupName     The name of the group the piggy bank is in.
+	 * @param bankName      The name of the piggy bank to edit.
+	 * @param body          The JSON representation of the PiggyBank object to modify, in essence inserting all the different information.
+	 * @param authorization The "Authorization" header in the HTTP request.
+	 * @return A response, depending on the query and errors. In general, 200 (OK) status code is returned if a piggy
+	 * bank is successfully edited, and 404 (Not Found) status code is returned if a piggy bank cannot be found in the
+	 * database. If an authenticated user is not the owner of the new piggy bank's group, they are restricted access
+	 * using a 403 (Forbidden) status code.
+	 */
 	private Response editPiggyBank(String groupName, String bankName, String authorization, String body) {
 		authorization = authorization.substring(authorization.indexOf(" ") + 1); // remove "Bearer" from Authorization header
 		try {
@@ -296,6 +435,18 @@ public class BanksResource {
 		}
 	}
 
+	/**
+	 * Deletes an existing piggy bank belonging to a specific group. This handles the logic behind the endpoint.
+	 * It checks whether the user is the owner of the group, and deletes the existing PiggyBank object from the database.
+	 *
+	 * @param groupName     The name of the group to put the piggy bank in.
+	 * @param bankName      The name of the bank to delete.
+	 * @param authorization The "Authorization" header in the HTTP request.
+	 * @return A response, depending on the query and errors. In general, 200 (OK) status code is returned if a piggy
+	 * bank is successfully deleted, and 404 (Not Found) status code is returned if a piggy bank cannot be found in the
+	 * database. If an authenticated user is not the owner of the new piggy bank's group, they are restricted access
+	 * using a 403 (Forbidden) status code.
+	 */
 	private Response removePiggyBank(String groupName, String bankName, String authorization) {
 		authorization = authorization.substring(authorization.indexOf(" ") + 1); // remove "Bearer" from Authorization header
 		try {
@@ -326,6 +477,15 @@ public class BanksResource {
 		}
 	}
 
+	/**
+	 * Receives a NotFoundException and checks which part of the queries threw this exception. Since it is impossible
+	 * to figure this out at application level, the message must be checked.
+	 *
+	 * @param groupName The name of the group to handle the exception with.
+	 * @param bankName  The name of the bank to handle the exception with.
+	 * @param e         The NotFoundException to handle.
+	 * @return A Response with a 404 (Not Found) status code, depending on the exception thrown.
+	 */
 	private Response handleBankNotFoundException(String groupName, String bankName, NotFoundException e) {
 		if (e.getMessage().split(" ")[0].equals("Group")) {
 			return Response

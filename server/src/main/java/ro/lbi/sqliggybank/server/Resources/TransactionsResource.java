@@ -27,17 +27,81 @@ import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.UUID;
 
+/**
+ * TransactionsResource covers the transactions endpoint for the SQLiggyBank API.
+ *
+ * It is in charge of getting and deleting transaction information. It is
+ * important to note that transactions are immutable.
+ *
+ * Details for the implementation of these methods can be found in the
+ * SQLiggyBank API Documentation.
+ *
+ * @author StormFireFox1
+ * @since 2019-03-28
+ * @see <a href="https://documenter.getpostman.com/view/3806934/RWgwRFa8?version=latest#2ed666f7-3a03-47e3-9652-67b8e5f18c4c">SQLiggyBank API Documentation</a>
+ */
 @Path("/api/transactions/")
 @Produces(MediaType.APPLICATION_JSON)
 public class TransactionsResource {
+	/**
+	 * groupDAO is the DAO for the "groups" table in the database.
+	 *
+	 * This is modified by the constructor.
+	 */
 	private final GroupDAO groupDAO;
+	/**
+	 * groupListDAO is the DAO for the "group_lists" table in the database.
+	 *
+	 * This is modified by the constructor.
+	 */
 	private final GroupListDAO groupListDAO;
+	/**
+	 * userDAO is the DAO for the "users" table in the database.
+	 *
+	 * This is modified by the constructor.
+	 */
 	private final UserDAO userDAO;
+	/**
+	 * depositDAO is the DAO for the "deposits" table in the database.
+	 *
+	 * This is modified by the constructor.
+	 */
 	private final DepositDAO depositDAO;
+	/**
+	 * withdrawalDAO is the DAO for the "withdrawals" table in the datbase.
+	 *
+	 * This is modified by the constructor.
+	 */
 	private final WithdrawalDAO withdrawalDAO;
+	/**
+	 * piggyBankDAO is the DAO for the "banks" table in the database.
+	 *
+	 * This is modified by the constructor.
+	 */
 	private final PiggyBankDAO piggyBankDAO;
+	/**
+	 * authVerifier is the verifier for the HMAC256 algorithm used to sign
+	 * JWT's.
+	 */
 	private final JWTVerifier authVerifier;
 
+	/**
+	 * The constructor for TransactionResource.
+	 *
+	 * The parameters should be passed solely by the ServerApplication
+	 * class.
+	 *
+	 * @param groupDAO      The DAO to the "groups" table in the database.
+	 * @param groupListDAO  The DAO to the "group_lists" table in the
+	 *                      database.
+	 * @param userDAO       The DAO to the "users" table in the database.
+	 * @param depositDAO    The DAO to the "deposits" table in the database.
+	 * @param withdrawalDAO The DAO to the "withdrawals" table in the
+	 * 			database.
+	 * @param piggyBankDAO  The DAO to the "banks" table in the database. 
+	 * @param JWTSecret     The secret to be used for signing JWT's using
+	 * 			the HMAC256 algorithm.
+	 */
 	public TransactionsResource(GroupDAO groupDAO, GroupListDAO groupListDAO, UserDAO userDAO, DepositDAO depositDAO, WithdrawalDAO withdrawalDAO, PiggyBankDAO piggyBankDAO, byte[] JWTSecret) {
 		this.groupDAO = groupDAO;
 		this.groupListDAO = groupListDAO;
@@ -51,6 +115,23 @@ public class TransactionsResource {
 				.build();
 	}
 
+	/**
+	 * The endpoint for extracting transaction information.
+	 *
+	 * This endpoint, like almost all other endpoints in GroupResource,
+	 * requires authentication.
+	 *
+	 * @param authorization The "Authorization" header of the HTTP request.
+	 * @param groupName     The "groupName" parameter of the request. Passed
+	 *			in the URL.
+	 * @param bankName	The "bankName" parameter of the request. Passed
+	 * 			in the URL.
+	 * @param transactionID The UUID of the transaction. Passed in the URL.
+	 *
+	 * @return A response according to the SQLiggyBank API Documentation. In
+	 *         general, it returns a JSON object representing a Transaction.
+	 * @see <a href="https://documenter.getpostman.com/view/3806934/RWgwRFa8?version=latest#0f829f51-50d1-4e7c-8a3f-f77b9e0c772b">API Documentation</a>
+	 */
 	@GET
 	@UnitOfWork
 	@Path("{groupName}/{bankName}/{transactionID}")
@@ -65,6 +146,24 @@ public class TransactionsResource {
 		}
 	}
 
+	/**
+	 * The endpoint for creating a transaction.
+	 *
+	 * This endpoint, like almost all other endpoints in GroupResource,
+	 * requires authentication.
+	 *
+	 * @param authorization The "Authorization" header of the HTTP request.
+	 * @param groupName     The "groupName" parameter of the request. Passed
+	 *			in the URL.
+	 * @param bankName	The "bankName" parameter of the request. Passed
+	 * 			in the URL.
+	 * @param body		The body of the request. Usually a JSON
+	 * 			representation of a transaction.
+	 *
+	 * @return A response according to the SQLiggyBank API Documentation. In
+	 *         general, it returns a JSON object relaying success.
+	 * @see <a href="https://documenter.getpostman.com/view/3806934/RWgwRFa8?version=latest#0f829f51-50d1-4e7c-8a3f-f77b9e0c772b">API Documentation</a>
+	 */
 	@POST
 	@UnitOfWork
 	@Path("{groupName}/{bankName}/new")
@@ -79,6 +178,25 @@ public class TransactionsResource {
 		}
 	}
 
+	/**
+	 * Finds a transaction, querying by UUID, group and bank. 
+	 *
+	 * This handles the logic behind the endpoint. It checks whether the
+	 * logged in user is a member of the group and returns the transaction,
+	 * whether it be a deposit or withdrawal. 
+	 *
+	 * @param groupName	The name of the group to query transactions for.
+	 * @param bankName 	The name of the bank to query transactions for.
+	 * @param transactionID The UUID of the transaction.
+	 * @param authorization The "Authorization" header in the HTTP request.
+	 *
+	 * @return A response, depending on the query and errors. In general,
+	 *         200 (OK) status code is returned if a transaction is found, and
+	 *         a 404 (Not Found) status code is returned if any element of 
+	 *         the query cannot be found in the database. If a client is
+	 *         not a member of the group, they are restricted access using
+	 *         a 403 (Forbidden) status code.
+	 */
 	private Response findTransaction(String groupName, String bankName, String transactionID, String authorization) {
 		authorization = authorization.substring(authorization.indexOf(" ") + 1); // remove "Bearer" from Authorization header
 		try {
@@ -115,6 +233,26 @@ public class TransactionsResource {
 		}
 	}
 
+	/**
+	 * Creates a transaction. 
+	 *
+	 * This handles the logic behind the endpoint. It checks whether the
+	 * logged in user is the owner of the group and creates the transaction,
+	 * whether it be a deposit or withdrawal. 
+	 *
+	 * @param groupName	The name of the group to query transactions for.
+	 * @param bankName 	The name of the bank to query transactions for.
+	 * @param authorization The "Authorization" header in the HTTP request.
+	 * @param body		The body of the request. Usually a JSON
+	 * 			representation of the transaction to create.
+	 *
+	 * @return A response, depending on the query and errors. In general,
+	 *         200 (OK) status code is returned if a transaction is created,
+	 *         and a 404 (Not Found) status code is returned if any element
+	 *         of the query cannot be found in the database. If a client is
+	 *         not the owner of the group, they are restricted access using
+	 *         a 403 (Forbidden) status code.
+	 */
 	private Response createTransaction(String groupName, String bankName, String authorization, String body) {
 		authorization = authorization.substring(authorization.indexOf(" ") + 1); // remove "Bearer" from Authorization header
 		try {
