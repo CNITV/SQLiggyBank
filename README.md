@@ -28,4 +28,6 @@ javafx.controls,javafx.fxml,javafx.graphics -jar target/sqliggybank.jar**
 **!!!** This means that an additional JAVAFX SDK needs to be downloaded for this to work. It can be downloaded from [here](https://gluonhq.com/products/javafx/).
 (At the time of writing this, the community is still working on developing a javafx packager, so this odd behaviour can 
 be avoided and there's no need to download an additional JAVAFX SDK anymore; until that time comes, this awkward solution 
-is the only way to make this work).  
+is the only way to make this work).
+4. Jlink (a tool to make custom runtime images) doesn't work with some Java 12 modules, one of them being okhtpp3, that
+is used in this project. A Java 13 Jpackage is being developed so behaviours like these are avoided.
