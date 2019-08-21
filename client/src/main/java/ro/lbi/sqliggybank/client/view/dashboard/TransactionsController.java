@@ -2,19 +2,15 @@ package ro.lbi.sqliggybank.client.view.dashboard;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import ro.lbi.sqliggybank.client.backend.Bank;
 import ro.lbi.sqliggybank.client.backend.Group;
 import ro.lbi.sqliggybank.client.backend.User;
 import ro.lbi.sqliggybank.client.backend.database.DatabaseHandler;
-import ro.lbi.sqliggybank.client.backend.exceptions.ForbiddenException;
-import ro.lbi.sqliggybank.client.util.Alert;
 import ro.lbi.sqliggybank.client.view.window_manager.WindowManager;
 
-import java.io.IOException;
-
+//TODO transactions
 public class TransactionsController {
 
 	private WindowManager windowManager;
@@ -46,7 +42,7 @@ public class TransactionsController {
 
 	@FXML
 	private void okButtonPressed(ActionEvent event) {
-		try {
+		/*try {
 			if (Integer.parseInt(amountField.getText()) <= 0) {
 				throw new NumberFormatException("Amount needs to be higher than 0");
 			}
@@ -66,7 +62,7 @@ public class TransactionsController {
 		} catch (ForbiddenException e) {
 			Alert.errorAlert("Error", "You are not the owner of this group so you cannot make transactions!");
 			((Node)event.getSource()).getScene().getWindow().hide();
-		}
+		}*/
 	}
 
 }

@@ -9,7 +9,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.Region;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import ro.lbi.sqliggybank.client.backend.database.DatabaseHandler;
@@ -18,7 +17,6 @@ import ro.lbi.sqliggybank.client.util.Alert;
 import ro.lbi.sqliggybank.client.view.window_manager.WindowManager;
 
 import java.io.IOException;
-import java.util.concurrent.ExecutionException;
 
 import static ro.lbi.sqliggybank.client.view.App.win_height;
 import static ro.lbi.sqliggybank.client.view.App.win_width;
@@ -104,20 +102,18 @@ public class RegisterController {
 	 */
 	RegisterController(WindowManager windowManager) {
 		this.windowManager = windowManager;
-
 		databaseHandler = new DatabaseHandler();
 	}
 
 	/**
 	 * This method creates a task for the register. It creates a new Thread in the background with the
-	 * task specified and start it while the application is running.
-	 *
+	 * task specified and starts it while the application is running.
 	 * <p>
 	 * It displays a loading progress indicator while the background process takes the username and the
-	 * password and checks for them in the database. If they already exist, and error prompt tells the user
+	 * password and checks for them in the database. If they already exist, an error prompt tells the user
 	 * something went wrong.
 	 *
-	 * @return it returns the task created.
+	 * @return the task created.
 	 */
 	private Task<Boolean> createWorker() {
 		return new Task<Boolean>() {
@@ -130,7 +126,7 @@ public class RegisterController {
 						throw new IllegalStateException("Username and password cannot be empty!");
 					}
 
-					result = databaseHandler.registerUser(
+					result = databaseHandler.newUser(
 							usernameTextField.getText(),
 							passwordField.getText(),
 							firstNameTextField.getText(),
@@ -157,10 +153,12 @@ public class RegisterController {
 					showAlert("Failed to connect to server", "Failed to connect to the database!" +
 							" This might be due to the server not currently working! Please try again in a few moments!");
 					LOGGER.log(Level.ERROR, "Server connection error", e);
-				} catch (IllegalStateException | ForbiddenException e) {
+				} catch (IllegalStateException e) {
 					setButtonsEnabled(true);
 					showAlert("Error", e.getMessage());
-					LOGGER.log(Level.ERROR, e.getMessage(), e);
+				} catch (ForbiddenException e) {
+					setButtonsEnabled(true);
+					showAlert(e.getTitle(), e.getMessage());
 				}
 				return false;
 			}
@@ -185,7 +183,7 @@ public class RegisterController {
 	/**
 	 * This method displays an alert pop-up in another thread.
 	 *
-	 * @param title the title of the error alert.
+	 * @param title   the title of the error alert.
 	 * @param message the message of the error alert.
 	 */
 	private void showAlert(String title, String message) {
@@ -199,7 +197,6 @@ public class RegisterController {
 	 * <p>
 	 * It is called <u>right after</u> the constructor finished execution and the @FXML annotated fields
 	 * are populated.
-	 *
 	 * <p>
 	 * This method then initializes any attributes needed in the GUI.
 	 */

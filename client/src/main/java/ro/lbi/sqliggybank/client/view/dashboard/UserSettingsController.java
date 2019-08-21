@@ -8,11 +8,10 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import ro.lbi.sqliggybank.client.backend.User;
 import ro.lbi.sqliggybank.client.backend.database.DatabaseHandler;
 import ro.lbi.sqliggybank.client.backend.exceptions.BadRequestException;
 import ro.lbi.sqliggybank.client.backend.exceptions.ForbiddenException;
-import ro.lbi.sqliggybank.client.backend.exceptions.UnauthorizedException;
-import ro.lbi.sqliggybank.client.backend.User;
 import ro.lbi.sqliggybank.client.util.Alert;
 import ro.lbi.sqliggybank.client.view.window_manager.WindowManager;
 
@@ -95,7 +94,6 @@ public class UserSettingsController {
 	 * <p>
 	 * It is called <u>right after</u> the constructor finished execution and the @FXML annotated fields
 	 * are populated.
-	 *
 	 * <p>
 	 * This method then initializes any attributes needed in the GUI.
 	 */
@@ -127,12 +125,12 @@ public class UserSettingsController {
 			 */
 			try {
 				databaseHandler.editUser(user.getUsername(),
+						user.getJWT(),
 						usernameBox.getText().isEmpty() ? user.getUsername() : usernameBox.getText(),
 						passwordBox.getText(),
 						firstNameBox.getText().isEmpty() ? (user.getFirst_name() == null ? "" : user.getFirst_name()) : firstNameBox.getText(),
 						lastNameBox.getText().isEmpty() ? (user.getLast_name() == null ? "" :user.getLast_name()) : lastNameBox.getText(),
-						emailBox.getText().isEmpty() ? (user.getEmail() == null ? "" : user.getEmail()) : emailBox.getText(),
-						user.getJWT()
+						emailBox.getText().isEmpty() ? (user.getEmail() == null ? "" : user.getEmail()) : emailBox.getText()
 				);
 
 				Alert.infoAlert("Success", "You successfully changed your data!!");
@@ -146,17 +144,10 @@ public class UserSettingsController {
 				Alert.errorAlert("Failed to connect to server", "Failed to connect to the database!" +
 						" This might be due to the server not currently working! Please try again in a few moments!");
 				LOGGER.log(Level.ERROR, "Server connection error", e);
-			} catch (UnauthorizedException e) {
-				Alert.errorAlert("Not authorized", "Wrong authorization schema!");
-				LOGGER.log(Level.ERROR, "Authorization error", e);
 			} catch (BadRequestException e) {
-				LOGGER.log(Level.ERROR, "Bad request", e);
-			} catch (IllegalStateException e) {
-				Alert.errorAlert("Username taken", "Username already exists in the database!");
-				LOGGER.log(Level.ERROR, "Username exists", e);
+				Alert.errorAlert(e.getTitle(), e.getMessage());
 			} catch (ForbiddenException e) {
-				Alert.errorAlert("Empty fields", "Username and password cannot be empty!");
-				LOGGER.log(Level.ERROR, "Empty username or password", e);
+				Alert.errorAlert(e.getTitle(), e.getMessage());
 			}
 		}
 	}
@@ -180,7 +171,7 @@ public class UserSettingsController {
 			Delete user account.
 			 */
 			try {
-				databaseHandler.deleteUser(user);
+				databaseHandler.deleteUser(user.getUsername(), user.getJWT());
 
 				Alert.infoAlert("Success", "Your account was removed!!");
 
@@ -192,9 +183,6 @@ public class UserSettingsController {
 				Alert.errorAlert("Failed to connect to server", "Failed to connect to the database!" +
 						" This might be due to the server not currently working! Please try again in a few moments!");
 				LOGGER.log(Level.ERROR, "Server connection error", e);
-			} catch (UnauthorizedException e) {
-				Alert.errorAlert("Not authorized", "Wrong authorization schema!");
-				LOGGER.log(Level.ERROR, "Authorization error", e);
 			}
 		}
 	}

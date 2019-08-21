@@ -1,34 +1,26 @@
 package ro.lbi.sqliggybank.client.view.dashboard;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
-
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
-
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import ro.lbi.sqliggybank.client.backend.Bank;
-import ro.lbi.sqliggybank.client.backend.Invite;
+import ro.lbi.sqliggybank.client.backend.*;
 import ro.lbi.sqliggybank.client.backend.database.DatabaseHandler;
 import ro.lbi.sqliggybank.client.backend.exceptions.ForbiddenException;
 import ro.lbi.sqliggybank.client.backend.exceptions.NotFoundException;
-import ro.lbi.sqliggybank.client.backend.exceptions.UnauthorizedException;
-import ro.lbi.sqliggybank.client.backend.Group;
-import ro.lbi.sqliggybank.client.backend.User;
 import ro.lbi.sqliggybank.client.util.Alert;
 import ro.lbi.sqliggybank.client.view.window_manager.WindowManager;
 
@@ -53,19 +45,19 @@ public class DashboardController {
 	private static final Logger LOGGER = Logger.getLogger(DashboardController.class);
 
 	/**
-	 * This is the database handler. It handles API calls to the server.
-	 *
-	 * @see ro.lbi.sqliggybank.client.backend.database.DatabaseHandler
-	 */
-	private DatabaseHandler databaseHandler;
-
-	/**
 	 * This is the window manager. This way the controller can switch to other scenes, like for example the
 	 * login menu if the user logs out of the account.
 	 *
 	 * @see ro.lbi.sqliggybank.client.view.window_manager.WindowManager
 	 */
 	private WindowManager windowManager;
+
+	/**
+	 * This is the database handler. It handles API calls to the server.
+	 *
+	 * @see ro.lbi.sqliggybank.client.backend.database.DatabaseHandler
+	 */
+	private DatabaseHandler databaseHandler;
 
 	/**
 	 * The currently logged in user.
@@ -98,6 +90,16 @@ public class DashboardController {
 	 * All the banks of a group.
 	 */
 	private Bank[] banks;
+
+	/**
+	 * The current highlighted goal.
+	 */
+	private Goal goal;
+
+	/**
+	 * All goals of a bank.
+	 */
+	private Goal[] goals;
 
 	/**
 	 * The label that contains the username.
@@ -168,9 +170,7 @@ public class DashboardController {
 	DashboardController(WindowManager windowManager, User user) {
 		this.windowManager = windowManager;
 		this.user = user;
-		this.group = null;
-		this.bank = null;
-		this.databaseHandler = new DatabaseHandler();
+		databaseHandler = new DatabaseHandler();
 	}
 
 	/**
@@ -178,7 +178,6 @@ public class DashboardController {
 	 * <p>
 	 * It is called <u>right after</u> the constructor finished execution and the @FXML annotated fields
 	 * are populated.
-	 *
 	 * <p>
 	 * This method then initializes any attributes needed in the GUI.
 	 */
@@ -197,8 +196,7 @@ public class DashboardController {
 		 */
 		usernameLabel.setText(user.getUsername());
 		nameLabel.setText(
-				(user.getFirst_name() != null ? user.getFirst_name() : "") + " " +
-						(user.getLast_name() != null ? user.getLast_name() : "")
+				user.getFirst_name() + " " + user.getLast_name()
 		);
 
 		/*
@@ -208,15 +206,8 @@ public class DashboardController {
 		profilePicture.setFill(pattern);
 
 		/*
-		Initialize the groups, banks and goals.
-		*/
-
-		banksList.setOnMouseClicked((event) ->
-				{
-					//databaseHandler.getBank();
-				}
-		);
-
+		Initialize the groups
+		 */
 		ImageView groupIcon = new ImageView(
 				new Image("/ro/lbi/sqliggybank/client/view/dashboard/image/folder.png",
 						20, 20, true, true)
@@ -234,7 +225,6 @@ public class DashboardController {
 								20, 20, true, true)
 				)));
 			}
-
 		} catch (IOException e) {
 			LOGGER.log(Level.ERROR, "Connection error", e);
 			Alert.errorAlert("Connection error", "Database is not available at the moment, try again" +
@@ -242,11 +232,15 @@ public class DashboardController {
 			Platform.exit();
 		}
 
+		/*
+		Add a listener so when a user clicks a group, information about it like members, banks and
+		goals is retrieved.
+		 */
 		groupsTreeView.getSelectionModel().selectedItemProperty().addListener(
 				(observable, oldValue, newValue) -> {
 					try {
 						String result;
-						result = databaseHandler.getGroup(newValue.getValue(), user.getJWT());
+						result = databaseHandler.groupInfo(newValue.getValue(), user.getJWT());
 
 						Gson gson = new Gson();
 						group = gson.fromJson(result, Group.class);
@@ -259,6 +253,9 @@ public class DashboardController {
 
 						groupDescriptionTooltip.setText(group.getDescription());
 
+						/*
+						Populate members list for the group.
+						 */
 						membersList.getItems().clear();
 						try {
 							result = databaseHandler.getMembersOfGroup(group.getName(), user.getJWT());
@@ -276,6 +273,9 @@ public class DashboardController {
 									" in a few moments.");
 						}
 
+						/*
+						Populate banks list for the group.
+						 */
 						banksList.getItems().clear();
 						try {
 							result = databaseHandler.getBanksOfGroup(group.getName(), user.getJWT());
@@ -289,11 +289,13 @@ public class DashboardController {
 							banksList.setOnMouseClicked((event) ->
 									{
 										try {
-											String res = databaseHandler.getBank(group.getName(),
-													banksList.getSelectionModel().getSelectedItem(), user.getJWT());
+											String res = databaseHandler.bankInfo(group.getName(),
+													user.getJWT(), banksList.getSelectionModel().getSelectedItem());
 
 											Gson gson1 = new Gson();
 											bank = gson1.fromJson(res, Bank.class);
+
+											Alert.infoAlert("Bank information", bank.toString());
 										} catch (IOException e) {
 											LOGGER.log(Level.ERROR, "Connection error", e);
 											Alert.errorAlert("Connection error", "Database is not available at the moment, try again" +
@@ -308,13 +310,62 @@ public class DashboardController {
 									" in a few moments.");
 						}
 
+						/*
+						Add a listener so when a user clicks a bank, information like goals is retrieved.
+						 */
+						banksList.getSelectionModel().selectedItemProperty().addListener(
+								(obs, oldValu, newValu) -> {
+									goalsList.getItems().clear();
+									try {
+										String result1 = databaseHandler.bankInfo(
+												group.getName(),
+												user.getJWT(),
+												newValu
+										);
+
+										Gson gson1 = new Gson();
+										bank = gson1.fromJson(result1, Bank.class);
+
+										result1 = databaseHandler.getGoalsOfBank(
+												group.getName(),
+												bank.getName(),
+												user.getJWT()
+										);
+
+										gson1 = new Gson();
+										goals = gson1.fromJson(result1, Goal[].class);
+
+										for (Goal goal : goals) {
+											goalsList.getItems().add(goal.getName());
+										}
+										goalsList.setOnMouseClicked((event) ->
+												{
+													try {
+														String res = databaseHandler.goalInfo(group.getName(), bank.getName(),
+																user.getJWT(), goalsList.getSelectionModel().getSelectedItem());
+
+														Gson gson2 = new Gson();
+														goal = gson2.fromJson(res, Goal.class);
+
+														Alert.infoAlert("Goal information", goal.toString());
+													} catch (IOException e) {
+														LOGGER.log(Level.ERROR, "Connection error", e);
+														Alert.errorAlert("Connection error", "Database is not available at the moment, try again" +
+																" in a few moments.");
+													}
+												}
+										);
+									} catch (IOException e) {
+										LOGGER.log(Level.ERROR, "Connection error", e);
+										Alert.errorAlert("Connection error", "Database is not available at the moment, try again" +
+												" in a few moments.");
+									}
+								}
+						);
 					} catch (IOException e) {
 						LOGGER.log(Level.ERROR, "Connection error", e);
 						Alert.errorAlert("Connection error", "Database is not available at the moment, try again" +
 								" in a few moments.");
-					} catch (ForbiddenException e) {
-						LOGGER.log(Level.ERROR, "Authorization error", e);
-						Alert.errorAlert("Authorization error", "You are not authorized to view this group.");
 					}
 				}
 		);
@@ -334,7 +385,7 @@ public class DashboardController {
 			Search for user in the database.
 		    */
 			// TODO put this in a separate thread so it doesn't block the main application thread
-			String result = databaseHandler.getUser(searchBar.getText(), user.getJWT());
+			String result = databaseHandler.userProfile(searchBar.getText(), user.getJWT());
 
 			Gson gson = new Gson();
 			User searchedUser = gson.fromJson(result, User.class);
@@ -354,16 +405,10 @@ public class DashboardController {
 							" This might be due to the server not currently working! Please try again in a few moments!")
 			);
 			LOGGER.log(Level.ERROR, "Server error", e);
-		} catch (UnauthorizedException e) {
-			Platform.runLater(() ->
-					Alert.errorAlert("Wrong authorization schema", e.getMessage())
-			);
-			LOGGER.log(Level.ERROR, "Wrong authorization schema", e);
 		} catch (NotFoundException e) {
 			Platform.runLater(() ->
-					Alert.errorAlert("User not found", e.getMessage())
+					Alert.errorAlert(e.getTitle(), e.getMessage())
 			);
-			LOGGER.log(Level.ERROR, "User not found", e);
 		}
 	}
 
@@ -455,7 +500,7 @@ public class DashboardController {
 			Stage settings = new Stage();
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("/ro/lbi/sqliggybank/client/view/dashboard/groupSettings.fxml"));
 			loader.setControllerFactory(
-					c -> new GroupSettingsController(windowManager, user)
+					c -> new GroupSettingsController(windowManager, user, group)
 			);
 
 			Parent root = loader.load();
@@ -515,15 +560,14 @@ public class DashboardController {
 		if (result.isPresent()) {
 			String invite = result.get();
 			try {
-				databaseHandler.joinGroup(groupName, invite, user.getJWT());
+				databaseHandler.joinGroup(groupName, user.getJWT(), invite);
 			} catch (NullPointerException e) {
 				Alert.errorAlert("Error", "You didn't select a group!");
 			} catch (IOException e) {
 				LOGGER.log(Level.ERROR, "Connection error", e);
 				Alert.errorAlert("Connection error", "The database can't be accessed at the moment.");
 			} catch (ForbiddenException e) {
-				LOGGER.log(Level.ERROR, "Error", e);
-				Alert.errorAlert("Error", "You are already part of the group or the invitation is wrong!!");
+				Alert.errorAlert(e.getTitle(), e.getMessage());
 			}
 		} else {
 			Alert.errorAlert("Error", "Group invite ID cannot be empty!");
@@ -549,7 +593,7 @@ public class DashboardController {
 		if (result1.isPresent()) {
 			name = result1.get();
 		} else {
-			Alert.errorAlert("Error", "Group name can't be empty!");
+			Alert.errorAlert("Error", "Group name cannot be empty!");
 			return;
 		}
 
@@ -562,15 +606,14 @@ public class DashboardController {
 		description = (result2.isPresent() ? result2.get() : "");
 
 		try {
-			String result = databaseHandler.createGroup(name, description, user.getJWT());
-			if (result.equals("200")) {
-				Alert.infoAlert("Success", "Successfully created a group!");
-				Alert.infoAlert("Login", "Please login again so your changes take place.");
-				windowManager.loginMenu();
-			}
-			System.out.println(result);
+			databaseHandler.newGroup(name, description, user.getJWT());
+			Alert.infoAlert("Success", "Successfully created a group!");
+			Alert.infoAlert("Login", "Please login again so your changes take place.");
+			windowManager.loginMenu();
 		} catch (NullPointerException e) {
 			Alert.errorAlert("Error", "You didn't select a group!");
+		} catch (ForbiddenException e) {
+			Alert.errorAlert(e.getTitle(), e.getMessage());
 		} catch (IOException e) {
 			LOGGER.log(Level.ERROR, "Connection error", e);
 			Alert.errorAlert("Connection error", "The database can't be accessed at the moment.");
@@ -643,9 +686,7 @@ public class DashboardController {
 			LOGGER.log(Level.ERROR, "Connection error", e);
 			Alert.errorAlert("Connection error", "The database can't be accessed at the moment.");
 		} catch (ForbiddenException e) {
-			LOGGER.log(Level.ERROR, "Authorization error", e);
-			Alert.errorAlert("Authorization error", "You are not the owner of the group so you cannot " +
-					"perform such an action!");
+			Alert.errorAlert(e.getTitle(), e.getMessage());
 		}
 	}
 
@@ -657,7 +698,7 @@ public class DashboardController {
 	@FXML
 	private void showGroupInvitesButtonPressed(ActionEvent event) {
 		try {
-			String result = databaseHandler.getGroupInviteList(group.getName(), user.getJWT());
+			String result = databaseHandler.getInvitesOfGroup(group.getName(), user.getJWT());
 
 			Gson gson = new Gson();
 			Invite[] invites = gson.fromJson(result, Invite[].class);
@@ -676,9 +717,7 @@ public class DashboardController {
 			LOGGER.log(Level.ERROR, "Connection error", e);
 			Alert.errorAlert("Connection error", "The database can't be accessed at the moment.");
 		} catch (ForbiddenException e) {
-			LOGGER.log(Level.ERROR, "Authorization error", e);
-			Alert.errorAlert("Authorization error", "You are not the owner of the group so you cannot " +
-					"perform such an action!");
+			Alert.errorAlert(e.getTitle(), e.getMessage());
 		}
 	}
 
@@ -713,19 +752,15 @@ public class DashboardController {
 		Optional<String> result2 = dialog2.showAndWait();
 		bankDescription = (result2.isPresent() ? result2.get() : "");
 		try {
-			String result = databaseHandler.createBank(group.getName(), user.getJWT(), bankName, bankDescription);
-			if (result.equals("200")) {
-				Alert.infoAlert("Success", "Successfully created a bank!");
-				Alert.infoAlert("Login", "Please login again so your changes take place.");
-				windowManager.loginMenu();
-			}
+			databaseHandler.newBank(group.getName(), user.getJWT(), bankName, bankDescription);
+			Alert.infoAlert("Success", "Successfully created a bank!");
+			Alert.infoAlert("Login", "Please login again so your changes take place.");
+			windowManager.loginMenu();
 		} catch (IOException e) {
 			LOGGER.log(Level.ERROR, "Connection error", e);
 			Alert.errorAlert("Connection error", "The database can't be accessed at the moment.");
 		} catch (ForbiddenException e) {
-			LOGGER.log(Level.ERROR, "Authorization error", e);
-			Alert.errorAlert("Authorization error", "You are not the owner of the group so you cannot " +
-					"perform such an action!");
+			Alert.errorAlert(e.getTitle(), e.getMessage());
 		}
 	}
 
@@ -737,19 +772,15 @@ public class DashboardController {
 	@FXML
 	private void removeBankButtonPressed(ActionEvent event) {
 		try {
-			String result = databaseHandler.deleteBank(group.getName(), bank.getName(), user.getJWT());
-			if (result.equals("200")) {
-				Alert.infoAlert("Success", "Successfully created a bank!");
-				Alert.infoAlert("Login", "Please login again so your changes take place.");
-				windowManager.loginMenu();
-			}
+			databaseHandler.deleteBank(group.getName(), user.getJWT(), bank.getName());
+			Alert.infoAlert("Success", "Successfully created a bank!");
+			Alert.infoAlert("Login", "Please login again so your changes take place.");
+			windowManager.loginMenu();
 		} catch (IOException e) {
 			LOGGER.log(Level.ERROR, "Connection error", e);
 			Alert.errorAlert("Connection error", "The database can't be accessed at the moment.");
 		} catch (ForbiddenException e) {
-			LOGGER.log(Level.ERROR, "Authorization error", e);
-			Alert.errorAlert("Authorization error", "You are not the owner of the group so you cannot " +
-					"perform such an action!");
+			Alert.errorAlert(e.getTitle(), e.getMessage());
 		}
 	}
 

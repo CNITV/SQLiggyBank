@@ -1,7 +1,5 @@
 package ro.lbi.sqliggybank.client.backend;
 
-import lombok.Getter;
-
 /**
  * An account for the application. This is just a POJO holding the username and the password.
  *
@@ -10,7 +8,6 @@ import lombok.Getter;
  * @author Alexandru GHERGHESCU (alexghergh)
  * @since 2018-12-06
  */
-@Getter
 public class Account {
 
 	/**
@@ -39,4 +36,11 @@ public class Account {
 		this.password = password;
 	}
 
+	public String getUsername() {
+		return this.username;
+	}
+
+	public String getPassword() {
+		return this.password;
+	}
 }

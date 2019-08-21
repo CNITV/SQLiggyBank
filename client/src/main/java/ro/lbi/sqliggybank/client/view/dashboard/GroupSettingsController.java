@@ -2,15 +2,21 @@ package ro.lbi.sqliggybank.client.view.dashboard;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import ro.lbi.sqliggybank.client.backend.database.DatabaseHandler;
+import ro.lbi.sqliggybank.client.backend.Group;
 import ro.lbi.sqliggybank.client.backend.User;
+import ro.lbi.sqliggybank.client.backend.database.DatabaseHandler;
+import ro.lbi.sqliggybank.client.backend.exceptions.BadRequestException;
+import ro.lbi.sqliggybank.client.backend.exceptions.ForbiddenException;
 import ro.lbi.sqliggybank.client.util.Alert;
 import ro.lbi.sqliggybank.client.view.window_manager.WindowManager;
 
+import java.io.IOException;
 import java.util.Optional;
 
 /**
@@ -49,6 +55,13 @@ public class GroupSettingsController {
 	private User user;
 
 	/**
+	 * The currently selected group.
+	 *
+	 * @see Group
+	 */
+	private Group group;
+
+	/**
 	 * Group name.
 	 */
 	@FXML
@@ -60,9 +73,10 @@ public class GroupSettingsController {
 	@FXML
 	private TextArea descriptionArea;
 
-	GroupSettingsController(WindowManager windowManager, User user) {
+	GroupSettingsController(WindowManager windowManager, User user, Group group) {
 		this.windowManager = windowManager;
 		this.user = user;
+		this.group = group;
 		databaseHandler = new DatabaseHandler();
 	}
 
@@ -71,7 +85,6 @@ public class GroupSettingsController {
 	 * <p>
 	 * It is called <u>right after</u> the constructor finished execution and the @FXML annotated fields
 	 * are populated.
-	 *
 	 * <p>
 	 * This method then initializes any attributes needed in the GUI.
 	 */
@@ -97,7 +110,29 @@ public class GroupSettingsController {
 			/*
 			Check that everything is ok and edit group information.
 			 */
-			//databaseHandler.editGroup();
+			try {
+				databaseHandler.editGroup(
+						group.getName(),
+						user.getJWT(),
+						groupNameBox.getText(),
+						descriptionArea.getText()
+				);
+
+				Alert.infoAlert("Success", "You successfully changed the group data!!");
+				Alert.infoAlert("New session", "You need to login again");
+
+				windowManager.loginMenu();
+
+				((Node) event.getSource()).getScene().getWindow().hide();
+			} catch (IOException e) {
+				Alert.errorAlert("Failed to connect to server", "Failed to connect to the database!" +
+						" This might be due to the server not currently working! Please try again in a few moments!");
+				LOGGER.log(Level.ERROR, "Server connection error", e);
+			} catch (BadRequestException e) {
+				Alert.errorAlert(e.getTitle(), e.getMessage());
+			} catch (ForbiddenException e) {
+				Alert.errorAlert(e.getTitle(), e.getMessage());
+			}
 		}
 	}
 

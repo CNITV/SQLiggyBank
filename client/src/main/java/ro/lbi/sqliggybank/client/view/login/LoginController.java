@@ -16,11 +16,10 @@ import javafx.stage.Stage;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import ro.lbi.sqliggybank.client.backend.Account;
+import ro.lbi.sqliggybank.client.backend.User;
 import ro.lbi.sqliggybank.client.backend.database.DatabaseHandler;
 import ro.lbi.sqliggybank.client.backend.exceptions.ForbiddenException;
 import ro.lbi.sqliggybank.client.backend.exceptions.NotFoundException;
-import ro.lbi.sqliggybank.client.backend.exceptions.UnauthorizedException;
-import ro.lbi.sqliggybank.client.backend.User;
 import ro.lbi.sqliggybank.client.util.Alert;
 import ro.lbi.sqliggybank.client.view.window_manager.WindowManager;
 
@@ -100,7 +99,6 @@ public class LoginController {
 	/**
 	 * This method creates a task for the login user. It creates a new Thread in the background with the
 	 * task specified and start it while the application is running.
-	 *
 	 * <p>
 	 * It displays a loading progress indicator while the background process takes the username and the
 	 * password and checks for them in the database.
@@ -127,7 +125,7 @@ public class LoginController {
                         Get the logged in user credentials using the account created earlier.
                          */
 						String result;
-						result = databaseHandler.loginUser(account);
+						result = databaseHandler.loginUser(account.getUsername(), account.getPassword());
 
 		                /*
 		                Extract the JWT for the user from the credentials received from the server.
@@ -145,7 +143,7 @@ public class LoginController {
 		                    /*
 		                    Get the user account from the server using the JWT.
 		                     */
-							result = databaseHandler.getUser(account.getUsername(), JWT);
+							result = databaseHandler.userProfile(account.getUsername(), JWT);
 
 							Gson gson = new Gson();
 							User user = gson.fromJson(result, User.class);
@@ -157,23 +155,19 @@ public class LoginController {
 							Platform.runLater(() ->
 									{
 										windowManager.dashboardMenu(user);
-										Alert.infoAlert("Welcome", "Welcome back, " + user.getUsername() + "!");
+										Alert.infoAlert("Welcome", "Welcome, " + user.getUsername() + "!");
 									}
 							);
 							return user;
 
 						} catch (IOException e) {
 							setButtonsEnabled(true);
-							showAlert("Error", e.getMessage());
-							LOGGER.log(Level.ERROR, "Server error", e);
-						} catch (UnauthorizedException e) {
-							setButtonsEnabled(true);
-							showAlert("Wrong authorization schema", e.getMessage());
-							LOGGER.log(Level.ERROR, "Wrong authorization schema", e);
+							showAlert("Failed to connect to server", "Failed to connect to the database!" +
+									" This might be due to the server not currently working! Please try again in a few moments!");
+							LOGGER.log(Level.ERROR, "Server connection error", e);
 						} catch (NotFoundException e) {
 							setButtonsEnabled(true);
-							showAlert("User not found", e.getMessage());
-							LOGGER.log(Level.ERROR, "User not found", e);
+							showAlert(e.getTitle(), e.getMessage());
 						}
 					} catch (IOException e) {
 						setButtonsEnabled(true);
@@ -182,17 +176,14 @@ public class LoginController {
 						LOGGER.log(Level.ERROR, "Server connection error", e);
 					} catch (ForbiddenException e) {
 						setButtonsEnabled(true);
-						showAlert("Failed to login", e.getMessage());
-						LOGGER.log(Level.ERROR, "Failed to login", e);
+						showAlert(e.getTitle(), e.getMessage());
 					} catch (NotFoundException e) {
 						setButtonsEnabled(true);
-						showAlert("User not found", e.getMessage());
-						LOGGER.log(Level.ERROR, "User not found", e);
+						showAlert(e.getTitle(), e.getMessage());
 					}
 				} catch (IllegalArgumentException e) {
 					setButtonsEnabled(true);
 					showAlert("Failed to login", e.getMessage());
-					LOGGER.log(Level.ERROR, "Failed to login", e);
 				}
 				return null;
 			}
@@ -226,7 +217,6 @@ public class LoginController {
 	 * <p>
 	 * It is called <u>right after</u> the constructor finished execution and the @FXML annotated fields
 	 * are populated.
-	 *
 	 * <p>
 	 * This method then initializes any attributes needed in the GUI.
 	 */
@@ -237,11 +227,9 @@ public class LoginController {
 
 	/**
 	 * This method fires whenever the login button is pressed.
-	 *
 	 * <p>
 	 * It takes the username/password combination introduced and checks them through the
-	 * <a href="https://documenter.getpostman.com/view/3806934/RWgwRFa8" target="_top">API</a>.
-	 *
+	 * <a href="https://documenter.getpostman.com/view/7475341/S1TZyFyC?version=latest" target="_top">API</a>.
 	 * <p>
 	 * If the information is correct and the user exists in the database, then the program proceeds
 	 * to the dashboard.
@@ -296,7 +284,6 @@ public class LoginController {
 
 	/**
 	 * This method fires whenever the user clicks on the Github link.
-	 *
 	 * <p>
 	 * Redirects to the project's official <a href="https://github.com/CNITV/SQLiggyBank" target="_top">Github</a>.
 	 *
@@ -316,10 +303,9 @@ public class LoginController {
 
 	/**
 	 * This method fires whenever the user clicks on the API link.
-	 *
 	 * <p>
 	 * Redirects to the project's official
-	 * <a href="https://documenter.getpostman.com/view/3806934/RWgwRFa8" target="_top">API</a>.
+	 * <a href="https://documenter.getpostman.com/view/7475341/S1TZyFyC?version=latest" target="_top">API</a>.
 	 *
 	 * @param event the action event received from the application.
 	 */
@@ -332,6 +318,6 @@ public class LoginController {
         One of the stage properties is the host services that we need in order to reference a web page from a hyperlink.
          */
 		Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-		((HostServices) stage.getProperties().get("hostServices")).showDocument("https://documenter.getpostman.com/view/3806934/RWgwRFa8");
+		((HostServices) stage.getProperties().get("hostServices")).showDocument("https://documenter.getpostman.com/view/7475341/S1TZyFyC?version=latest`");
 	}
 }

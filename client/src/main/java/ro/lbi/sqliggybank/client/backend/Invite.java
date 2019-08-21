@@ -1,19 +1,17 @@
 package ro.lbi.sqliggybank.client.backend;
 
-import lombok.Getter;
-
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.UUID;
 
 /**
  * This class represents an invite. A new invite is automatically created by GSON when the database creates an invite link.
- *
  * <p>
  * WARNING: An Invite instance is not supposed to be created directly by the programmer.
  *
  * @author Alexandru GHERGHESCU (alexghergh)
  * @since 2019-05-13
  */
-@Getter
 public class Invite {
 
 	/**
@@ -22,19 +20,31 @@ public class Invite {
 	private UUID uuid;
 
 	/**
-	 * The name of the group.
+	 * The name of the group the invite belongs to.
 	 */
 	private String groupName;
 
 	/**
-	 * The description of the group.
+	 * The creation date of the invite.
 	 */
-	private long dateCreated;
+	private Date dateCreated;
 
 	@Override
 	public String toString() {
-		return "UUID: " + uuid + "\n" +
-				"Group name: " + groupName + "\n" +
-				"Date created: " + dateCreated + "\n";
+		SimpleDateFormat format = new SimpleDateFormat("E dd.MM.yyyy',' kk:mm:ss");
+
+		return uuid + " (" + format.format(dateCreated) + ")\n";
+	}
+
+	public UUID getUuid() {
+		return this.uuid;
+	}
+
+	public String getGroupName() {
+		return this.groupName;
+	}
+
+	public Date getDateCreated() {
+		return this.dateCreated;
 	}
 }

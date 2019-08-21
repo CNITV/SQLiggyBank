@@ -7,7 +7,6 @@ import java.util.Optional;
 
 /**
  * This class is a default implementation of different alerts needed in the program.
- *
  * <p>
  * It uses JavaFX alert implementation to create all the different alerts and customize them as needed.
  *

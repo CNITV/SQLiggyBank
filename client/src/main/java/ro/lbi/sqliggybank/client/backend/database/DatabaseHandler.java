@@ -1,12 +1,9 @@
 package ro.lbi.sqliggybank.client.backend.database;
 
 import okhttp3.*;
-import ro.lbi.sqliggybank.client.backend.Account;
 import ro.lbi.sqliggybank.client.backend.exceptions.BadRequestException;
 import ro.lbi.sqliggybank.client.backend.exceptions.ForbiddenException;
 import ro.lbi.sqliggybank.client.backend.exceptions.NotFoundException;
-import ro.lbi.sqliggybank.client.backend.exceptions.UnauthorizedException;
-import ro.lbi.sqliggybank.client.backend.User;
 
 import java.io.IOException;
 
@@ -17,32 +14,45 @@ import java.io.IOException;
  * The connection between the client and the server is made through this class.
  *
  * @author Alexandru GHERGHESCU (alexghergh)
+ * @see <a href="https://documenter.getpostman.com/view/7475341/S1TZyFyC?version=latest" target="_top">Postman online documentation for the API</a>.
  * @since 2018-12-15
  */
 public class DatabaseHandler {
 
-	private String serverUrl = "https://sqliggybank.stormhub.io";
+	/**
+	 * The URL of the server where the API rests.
+	 */
+	private String serverUrl = "http://localhost:8089";
 
 	/**
-	 * This method is used to log in a user.
-	 *
-	 * <p>
-	 * It calls the server on this endpoint:
-	 * POST /api/users/login
-	 *
-	 * @param account the account data introduced by the user on the client side.
-	 * @return the user credentials gotten from the server.
-	 * @throws IOException        throws this exception if something went wrong with the http call.
-	 * @throws ForbiddenException throws this exception if the user's login username/password combination was wrong.
-	 * @throws NotFoundException  throws this exception if the username wasn't found in the database.
+	 * The HTTP client to handle server connections.
 	 */
-	public String loginUser(Account account) throws IOException, ForbiddenException, NotFoundException {
-		OkHttpClient httpClient = new OkHttpClient();
+	private OkHttpClient httpClient;
 
+	public DatabaseHandler() {
+		httpClient = new OkHttpClient();
+	}
+
+	/*------------------------- Beginning of Users -------------------------*/
+
+	/**
+	 * Login a user.
+	 * <p>
+	 * Endpoint: POST /api/users/login
+	 *
+	 * @param username the username of the user
+	 * @param password the password of the user
+	 * @return a JSON schema containing the credentials of the user
+	 * @throws IOException        if there was a connection error
+	 * @throws NotFoundException  if the username couldn't be found in the database
+	 * @throws ForbiddenException if the password didn't match the password in the database
+	 */
+	public String loginUser(String username, String password)
+			throws IOException, NotFoundException, ForbiddenException {
 		MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 		RequestBody body = RequestBody.create(JSON, "{\n" +
-				"\t\"username\":\"" + account.getUsername() + "\",\n" +
-				"\t\"password\":\"" + account.getPassword() + "\"\n" +
+				"\t\"username\":\"" + username + "\",\n" +
+				"\t\"password\":\"" + password + "\"\n" +
 				"}");
 
 		Request request = new Request.Builder()
@@ -53,54 +63,9 @@ public class DatabaseHandler {
 		Response response = httpClient.newCall(request).execute();
 
 		if (response.code() == 404) {
-			throw new NotFoundException("Incorrect username or password!");
-		}
-		if (response.code() == 403) {
-			throw new ForbiddenException("Invalid username and password combination!");
-		}
-
-		String result;
-		if (response.body() != null) {
-			result = response.body().string();
-		} else {
-			throw new NullPointerException("Response body came out null! Try again!");
-		}
-		response.close();
-
-		return result;
-	}
-
-	/**
-	 * This method is used to get all the user information from the server.
-	 *
-	 * <p>
-	 * It calls the server on this endpoint:
-	 * GET /api/users/{username}
-	 *
-	 * @param username the username to look for in the database.
-	 * @param JWT      the JWT needed for the authorization schema (if the JWT doesn't match the username, only public fields are given).
-	 * @return a JSON containing the user information.
-	 * @throws IOException           throws this exception if something went wrong with the http call.
-	 * @throws UnauthorizedException throws this exception if the user has an invalid authorization header.
-	 * @throws NotFoundException     throws this exception if the user resource wasn't found in the database.
-	 */
-	public String getUser(String username, String JWT) throws IOException, UnauthorizedException, NotFoundException {
-		OkHttpClient httpClient = new OkHttpClient();
-
-		Request request = new Request.Builder()
-				.url(serverUrl + "/api/users/" + username)
-				.get()
-				.addHeader("Authorization", "Bearer " + JWT)
-				.build();
-
-		Response response = httpClient.newCall(request).execute();
-
-		if (response.code() == 404) {
-			throw new NotFoundException("That username doesn't exist!");
-		}
-
-		if (response.code() == 401) {
-			throw new UnauthorizedException("Invalid authorization header or token!");
+			throw new NotFoundException("Not found", "No such username!");
+		} else if (response.code() == 403) {
+			throw new ForbiddenException("Failed to login", "Invalid username and password combination!");
 		}
 
 		String result;
@@ -115,70 +80,21 @@ public class DatabaseHandler {
 	}
 
 	/**
-	 * This method is used to delete a user from the server.
-	 *
+	 * Creates a user.
 	 * <p>
-	 * It calls the server on this endpoint:
-	 * DEL /api/users/{username}
+	 * Endpoint: POST /api/users/new
 	 *
-	 * @param user the user to be deleted.
-	 * @return returns an OK response if everything went right.
-	 * @throws IOException           throws this exception if something went wrong with the http call.
-	 * @throws UnauthorizedException throws this exception if the user has an invalid authorization header.
+	 * @param username   the username of the new user
+	 * @param password   the password of the new user
+	 * @param first_name the first name of the new user. Can be null.
+	 * @param last_name  the last name of the new user. Can be null.
+	 * @param email      the email of the new user. Can be null.
+	 * @return a JSON schema containing the credentials of the user
+	 * @throws IOException        if there was a connection error
+	 * @throws ForbiddenException if the username or the email of the new user already appear in the database
 	 */
-	@SuppressWarnings("Duplicates")
-	public String deleteUser(User user) throws IOException, UnauthorizedException {
-		OkHttpClient httpClient = new OkHttpClient();
-
-		Request request = new Request.Builder()
-				.url(serverUrl + "/api/users/" + user.getUsername())
-				.delete()
-				.addHeader("Authorization", "Bearer " + user.getJWT())
-				.build();
-
-		Response response = httpClient.newCall(request).execute();
-
-		//TODO modify this to actual code
-		/*if (response.code() == 500) {
-
-		}*/
-
-		if (response.code() == 401) {
-			throw new UnauthorizedException("Invalid authorization header!");
-		}
-
-		String result;
-		if (response.body() != null) {
-			result = response.body().string();
-		} else {
-			throw new NullPointerException("Response body came out null! Try again!");
-		}
-		response.close();
-
-		return result;
-	}
-
-	/**
-	 * This method is used to register a user to the server.
-	 *
-	 * <p>
-	 * It calls the server on this endpoint:
-	 * POST api/users/new
-	 *
-	 * @param username   the username of the user.
-	 * @param password   the password of the user.
-	 * @param first_name the first name of the user.
-	 * @param last_name  the last name of the user.
-	 * @param email      the email of the user.
-	 * @return returns a JWT if everything went right.
-	 * @throws IOException        throws this exception if something went wrong with the http call.
-	 * @throws ForbiddenException throws this exception if the username already exists in the database.
-	 */
-	@SuppressWarnings("Duplicates")
-	public String registerUser(String username, String password, String first_name, String last_name, String email)
+	public String newUser(String username, String password, String first_name, String last_name, String email)
 			throws IOException, ForbiddenException {
-		OkHttpClient httpClient = new OkHttpClient();
-
 		MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 		RequestBody body = RequestBody.create(JSON, "{\n" +
 				"\t\"username\":\"" + username + "\",\n" +
@@ -196,10 +112,7 @@ public class DatabaseHandler {
 		Response response = httpClient.newCall(request).execute();
 
 		if (response.code() == 403) {
-			/*
-			Username/email already exists in the database.
-			 */
-			throw new ForbiddenException("Username or email already exists in the database!");
+			throw new ForbiddenException("Error", "Username or email already exists! Please choose another username/email!");
 		}
 
 		String result;
@@ -214,63 +127,84 @@ public class DatabaseHandler {
 	}
 
 	/**
-	 * This method is used to edit information about a user.
-	 *
+	 * Gets a user profile.
 	 * <p>
-	 * It calls the method on this endpoint:
-	 * PATCH /api/users/{username}
+	 * Endpoint: GET /api/users/{username}
 	 *
-	 * @param oldUsername the old username (needed for the API request).
-	 * @param username    the changed username of the user.
-	 * @param password    the changed password of the user.
-	 * @param first_name  the changed first name of the user.
-	 * @param last_name   the changed last name of the user.
-	 * @param email       the changed email of the user.
-	 * @param JWT         the JWT needed for the authorization schema (a logged in user can only change his account).
-	 * @return returns a JSON containing the new JWT token on success.
-	 * @throws IOException           throws this exception if something went wrong with the http call.
-	 * @throws IllegalStateException throws this exception if the username doesn't exist in the database.
-	 * @throws ForbiddenException    throws this exception if the requested username or password is empty.
-	 * @throws UnauthorizedException throws this exception if the authorization schema is wrong.
-	 * @throws BadRequestException   throws this exception if the request wasn't understood by the server.
+	 * @param username the username of the user to be searched for
+	 * @param JWT      the authentication token of the logged in user
+	 * @return a JSON schema containing the user profile
+	 * @throws IOException       if there was a connection error
+	 * @throws NotFoundException if there is no such username in the database
 	 */
-	@SuppressWarnings("Duplicates")
-	public String editUser(String oldUsername, String username, String password, String first_name, String last_name, String email, String JWT)
-			throws IOException, IllegalStateException, ForbiddenException, UnauthorizedException, BadRequestException {
-		OkHttpClient httpClient = new OkHttpClient();
+	public String userProfile(String username, String JWT)
+			throws IOException, NotFoundException {
+		Request request = new Request.Builder()
+				.url(serverUrl + "/api/users/" + username)
+				.get()
+				.addHeader("Authorization", "Bearer " + JWT)
+				.build();
 
+		Response response = httpClient.newCall(request).execute();
+
+		if (response.code() == 404) {
+			throw new NotFoundException("Not found", "No such username!");
+		}
+
+		String result;
+		if (response.body() != null) {
+			result = response.body().string();
+		} else {
+			throw new NullPointerException("Response body came out null! Try again!");
+		}
+		response.close();
+
+		return result;
+	}
+
+	/**
+	 * Edits information about a user.
+	 * <p>
+	 * Endpoint: PATCH /api/users/{username}
+	 *
+	 * @param username       the username of the user
+	 * @param JWT            the authentication token of the user
+	 * @param new_username   the new username of the user
+	 * @param new_password   the new password of the user
+	 * @param new_first_name the new first name of the user. Can contain a string with the value of "null". CANNOT be null.
+	 * @param new_last_name  the new last name of the user. Can contain a string with the value of "null". CANNOT be null.
+	 * @param new_email      the new email of the user. Can contain a string with the value of "null". CANNOT be null.
+	 * @return a JSON schema containing the new credentials of the user
+	 * @throws IOException         if there was a connection error
+	 * @throws ForbiddenException  if the username is already taken
+	 * @throws BadRequestException if the username or password are empty
+	 */
+	public String editUser(String username, String JWT, String new_username, String new_password,
+	                       String new_first_name, String new_last_name, String new_email)
+			throws IOException, ForbiddenException, BadRequestException {
 		MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 		RequestBody body = RequestBody.create(JSON, "{\n" +
-				"\t\"username\":\"" + username + "\",\n" +
-				"\t\"password\":\"" + password + "\",\n" +
-				"\t\"first_name\":" + (first_name.equals("") ? "null" : "\"" + first_name + "\"") + ",\n" +
-				"\t\"last_name\":" + (last_name.equals("") ? "null" : "\"" + last_name + "\"") + ",\n" +
-				"\t\"email\":" + (email.equals("") ? "null" : "\"" + email + "\"") + "\n" +
+				"\t\"username\":\"" + new_username + "\",\n" +
+				"\t\"password\":\"" + new_password + "\",\n" +
+				"\t\"first_name\":" + (new_first_name.equals("") ? "null" : "\"" + new_first_name + "\"") + ",\n" +
+				"\t\"last_name\":" + (new_last_name.equals("") ? "null" : "\"" + new_last_name + "\"") + ",\n" +
+				"\t\"email\":" + (new_email.equals("") ? "null" : "\"" + new_email + "\"") + "\n" +
 				"}");
 
 		Request request = new Request.Builder()
-				.url(serverUrl + "/api/users/" + oldUsername)
+				.url(serverUrl + "/api/users/" + username)
 				.patch(body)
 				.addHeader("Authorization", "Bearer " + JWT)
 				.build();
 
 		Response response = httpClient.newCall(request).execute();
 
-		//TODO modify this to actual code
-		if (response.code() == 500) {
-			throw new IllegalStateException("Username already exists in the database!");
-		}
-
 		if (response.code() == 403) {
-			throw new ForbiddenException("You can't have an empty username or password!");
-		}
-
-		if (response.code() == 401) {
-			throw new UnauthorizedException("Wrong authorization schema!");
+			throw new ForbiddenException("Username taken", "User already exists! Please choose another username!");
 		}
 
 		if (response.code() == 400) {
-			throw new BadRequestException("Bad request!");
+			throw new BadRequestException("Error", "You cannot have an empty username or password!");
 		}
 
 		String result;
@@ -285,31 +219,23 @@ public class DatabaseHandler {
 	}
 
 	/**
-	 * This method is used to get information about a group.
-	 *
+	 * Deletes a user.
 	 * <p>
-	 * The group information is, however, only available to users who are currently in the group.
+	 * Endpoint DELETE /api/users/{username}
 	 *
-	 * @param groupName the group name whose information the user wants.
-	 * @param JWT       the JWT needed for authorization to view the group.
-	 * @return a JSON containing group information.
-	 * @throws IOException        throws this exception if there was a connection error.
-	 * @throws ForbiddenException throws this exception if the user is not authorized to view the group (isn't part of it).
+	 * @param username the username of the user
+	 * @param JWT      the authentication token of the user
+	 * @throws IOException if there was a connection error
 	 */
-	public String getGroup(String groupName, String JWT) throws IOException, ForbiddenException {
-		OkHttpClient httpClient = new OkHttpClient();
-
+	public void deleteUser(String username, String JWT)
+			throws IOException {
 		Request request = new Request.Builder()
-				.url(serverUrl + "/api/groups/" + groupName)
-				.get()
+				.url(serverUrl + "/api/users/" + username)
+				.delete()
 				.addHeader("Authorization", "Bearer " + JWT)
 				.build();
 
 		Response response = httpClient.newCall(request).execute();
-
-		if (response.code() == 403) {
-			throw new ForbiddenException("You are not authorized to view this group!");
-		}
 
 		String result;
 		if (response.body() != null) {
@@ -318,132 +244,29 @@ public class DatabaseHandler {
 			throw new NullPointerException("Response body came out null! Try again!");
 		}
 		response.close();
-
-		return result;
 	}
 
-	/**
-	 * This method is used to generate a group invite link for a group. Only the owner of the group can generate a link.
-	 *
-	 * @param groupName generate a group invite for this group.
-	 * @param JWT       the JWT needed for the authorization to generate a link.
-	 * @return a JSON containing a new invite link.
-	 * @throws IOException        throws this exception if there was a connection error.
-	 * @throws ForbiddenException throws this exception if the user isn't authorized to perform this action.
-	 */
-	public String generateGroupInvite(String groupName, String JWT) throws IOException, ForbiddenException {
-		OkHttpClient httpClient = new OkHttpClient();
+	/*------------------------- Ending of Users -------------------------*/
 
-		Request request = new Request.Builder()
-				.url(serverUrl + "/api/groups/" + groupName + "/invites/new")
-				.get()
-				.addHeader("Authorization", "Bearer " + JWT)
-				.build();
-
-		Response response = httpClient.newCall(request).execute();
-
-		if (response.code() == 403) {
-			throw new ForbiddenException("You are not the owner of the group.");
-		}
-
-		String result;
-		if (response.body() != null) {
-			result = response.body().string();
-		} else {
-			throw new NullPointerException("Response body came out null! Try again!");
-		}
-		response.close();
-
-		return result;
-	}
+	/*------------------------- Beginning of Groups -------------------------*/
 
 	/**
-	 * This method is used to get the invite links of a group. They can only be seen by the owner of the group.
+	 * Creates a new group.
+	 * <p>
+	 * Endpoint: POST /api/groups/new
 	 *
-	 * @param groupName the group name whose links' information the user wants.
-	 * @param JWT       the JWT needed for authorization to view the group links.
-	 * @return a JSON containing all the invite links.
-	 * @throws IOException        throws this exception if there was a connection error.
-	 * @throws ForbiddenException throws this exception if the user is not authorized to view the group invites (isn't part of it).
+	 * @param name        the name of the group
+	 * @param description the description of the group
+	 * @param JWT         the authentication token of the user
+	 * @throws IOException        if there was a connection error
+	 * @throws ForbiddenException if the group name already exists
 	 */
-	public String getGroupInviteList(String groupName, String JWT) throws IOException, ForbiddenException {
-		OkHttpClient httpClient = new OkHttpClient();
-
-		Request request = new Request.Builder()
-				.url(serverUrl + "/api/groups/" + groupName + "/invites")
-				.get()
-				.addHeader("Authorization", "Bearer " + JWT)
-				.build();
-
-		Response response = httpClient.newCall(request).execute();
-
-		if (response.code() == 403) {
-			throw new ForbiddenException("You are not authorized to view the group links!");
-		}
-
-		String result;
-		if (response.body() != null) {
-			result = response.body().string();
-		} else {
-			throw new NullPointerException("Response body came out null! Try again!");
-		}
-		response.close();
-
-		return result;
-	}
-
-	/**
-	 * This method adds a user to a specified group through an invite link.
-	 *
-	 * @param groupName the group where the user wants to join.
-	 * @param inviteID  the invite ID of the group provided by the owner of the group.
-	 * @param JWT       the JWT of the user who wants to join the group.
-	 * @return OK on success.
-	 * @throws IOException        throws this exception if there was a connection error.
-	 * @throws ForbiddenException throws this exception if the user is already part of the group.
-	 */
-	public String joinGroup(String groupName, String inviteID, String JWT) throws IOException, ForbiddenException {
-		OkHttpClient httpClient = new OkHttpClient();
-
-		Request request = new Request.Builder()
-				.url(serverUrl + "/api/groups/" + groupName + "/invite/" + inviteID)
-				.get()
-				.addHeader("Authorization", "Bearer " + JWT)
-				.build();
-
-		Response response = httpClient.newCall(request).execute();
-
-		if (response.code() == 403) {
-			throw new ForbiddenException("You are already part of the group or the invitation is wrong!");
-		}
-
-		String result;
-		if (response.body() != null) {
-			result = response.body().string();
-		} else {
-			throw new NullPointerException("Response body came out null! Try again!");
-		}
-		response.close();
-
-		return result;
-	}
-
-	/**
-	 * This method is used to create a new group.
-	 *
-	 * @param groupName   the new group name.
-	 * @param description the new group description.
-	 * @param JWT         the JWT of the user who wants to create a group.
-	 * @return OK on success.
-	 * @throws IOException throws this exception if there was a connection error.
-	 */
-	public String createGroup(String groupName, String description, String JWT) throws IOException {
-		OkHttpClient httpClient = new OkHttpClient();
-
+	public void newGroup(String name, String description, String JWT)
+			throws IOException, ForbiddenException {
 		MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-		RequestBody body = RequestBody.create(JSON, "{\n" +
-				"\t\"name\":\"" + groupName + "\",\n" +
-				"\t\"description\":\"" + (description.equals("") ? "null" : description) + "\"\n" +
+		RequestBody body = RequestBody.create(JSON, "{" +
+				"\t\"name\":\"" + name + "\",\n" +
+				"\t\"description\":" + (description.equals("") ? "null" : "\"" + description + "\"") + "\n" +
 				"}");
 
 		Request request = new Request.Builder()
@@ -454,6 +277,39 @@ public class DatabaseHandler {
 
 		Response response = httpClient.newCall(request).execute();
 
+		if (response.code() == 403) {
+			throw new ForbiddenException("Name taken", "A group already exists with that name, please choose another one!");
+		}
+
+		String result;
+		if (response.body() != null) {
+			result = response.body().string();
+		} else {
+			throw new NullPointerException("Response body came out null! Try again!");
+		}
+		response.close();
+	}
+
+	/**
+	 * Gets info about a group. User must be in the group to be able to see information about it.
+	 * <p>
+	 * Endpoint: GET /api/groups/{groupName}
+	 *
+	 * @param name the name of the group
+	 * @param JWT  the authentication token of the user
+	 * @return a JSON schema containing info about the group
+	 * @throws IOException if there was a connection error
+	 */
+	public String groupInfo(String name, String JWT)
+			throws IOException {
+		Request request = new Request.Builder()
+				.url(serverUrl + "/api/groups/" + name)
+				.get()
+				.addHeader("Authorization", "Bearer " + JWT)
+				.build();
+
+		Response response = httpClient.newCall(request).execute();
+
 		String result;
 		if (response.body() != null) {
 			result = response.body().string();
@@ -462,20 +318,21 @@ public class DatabaseHandler {
 		}
 		response.close();
 
-		return "" + response.code();
+		return result;
 	}
 
 	/**
-	 * This method gets all the groups for a user.
+	 * Gets the groups of a user.
+	 * <p>
+	 * Endpoint: GET /api/lists/groups/{username}
 	 *
-	 * @param username the username logged in.
-	 * @param JWT      the authorization of the logged in user.
-	 * @return a JSON containing all the groups.
-	 * @throws IOException throws this exception if there was a connection error.
+	 * @param username the username of the user
+	 * @param JWT      the authentication token of the user
+	 * @return a JSON schema containing all the groups of the user
+	 * @throws IOException if there was a connection error
 	 */
-	public String getGroupsOfUser(String username, String JWT) throws IOException {
-		OkHttpClient httpClient = new OkHttpClient();
-
+	public String getGroupsOfUser(String username, String JWT)
+			throws IOException {
 		Request request = new Request.Builder()
 				.url(serverUrl + "/api/lists/groups/" + username)
 				.get()
@@ -496,18 +353,19 @@ public class DatabaseHandler {
 	}
 
 	/**
-	 * This method gets all the members of a group.
+	 * Gets all the members of a group.
+	 * <p>
+	 * Endpoint: GET /api/lists/members/{groupName}
 	 *
-	 * @param groupName the group name.
-	 * @param JWT       the JWT of the user.
-	 * @return a JSON containing all the members.
-	 * @throws IOException throws this exception if there was a connection error.
+	 * @param name the name of the group
+	 * @param JWT  the authentication of the user (the user must be logged in and be part of the group)
+	 * @return a JSON schema containing all the members of the group
+	 * @throws IOException if there was a connection error
 	 */
-	public String getMembersOfGroup(String groupName, String JWT) throws IOException {
-		OkHttpClient httpClient = new OkHttpClient();
-
+	public String getMembersOfGroup(String name, String JWT)
+			throws IOException {
 		Request request = new Request.Builder()
-				.url(serverUrl + "/api/lists/members/" + groupName)
+				.url(serverUrl + "/api/lists/members/" + name)
 				.get()
 				.addHeader("Authorization", "Bearer " + JWT)
 				.build();
@@ -526,36 +384,28 @@ public class DatabaseHandler {
 	}
 
 	/**
-	 * This method creates a bank.
+	 * Generates a group invite (only the owner of the group has such privileges).
+	 * <p>
+	 * Endpoint: GET /api/groups/{groupName}/invites/new
 	 *
-	 * @param groupName   the group name.
-	 * @param JWT         the JWT of the owner of the group.
-	 * @param bankName    the bank name.
-	 * @param description the bank description.
-	 * @return OK on success.
-	 * @throws IOException        throws this exception if there was a connection error.
-	 * @throws ForbiddenException throws this exception if the user isn't owner of the group.
+	 * @param name the name of the group
+	 * @param JWT  the authentication token of the owner
+	 * @return a JSON schema containing the ID of the new invite
+	 * @throws IOException        if there was a connection error
+	 * @throws ForbiddenException if the user is not the owner of the group
 	 */
-	public String createBank(String groupName, String JWT, String bankName, String description)
+	public String generateGroupInvite(String name, String JWT)
 			throws IOException, ForbiddenException {
-		OkHttpClient httpClient = new OkHttpClient();
-
-		MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-		RequestBody body = RequestBody.create(JSON, "{\n" +
-				"\t\"name\":\"" + bankName + "\",\n" +
-				"\t\"description\":\"" + (description.equals("") ? "null" : description) + "\"\n" +
-				"}");
-
 		Request request = new Request.Builder()
-				.url(serverUrl + "/api/banks/" + groupName + "/new")
-				.post(body)
+				.url(serverUrl + "/api/groups/" + name + "/invites/new")
+				.get()
 				.addHeader("Authorization", "Bearer " + JWT)
 				.build();
 
 		Response response = httpClient.newCall(request).execute();
 
 		if (response.code() == 403) {
-			throw new ForbiddenException("You are not the owner of this group!");
+			throw new ForbiddenException("Unauthorized", "You are not the owner of this group!");
 		}
 
 		String result;
@@ -566,24 +416,139 @@ public class DatabaseHandler {
 		}
 		response.close();
 
-		return "" + response.code();
+		return result;
 	}
 
 	/**
-	 * This method deletes a bank.
+	 * Gets the invites for a group (only the owner of the group has such privileges).
+	 * <p>
+	 * Endpoint: GET /api/groups/{groupName}/invites
 	 *
-	 * @param groupName the group name.
-	 * @param bankName  the bank name.
-	 * @param JWT       the JWT for the owner of the group.
-	 * @return OK on success.
-	 * @throws IOException        throws this exception if there was a connection error.
-	 * @throws ForbiddenException throws this exception if the user isn't authorized to delete the bank.
+	 * @param name the name of the group
+	 * @param JWT  the authentication token for the owner
+	 * @return a JSON schema containing all the invites for a group
+	 * @throws IOException        if there was a connection error
+	 * @throws ForbiddenException if the user is not the owner of the group
 	 */
-	public String deleteBank(String groupName, String bankName, String JWT) throws IOException, ForbiddenException {
-		OkHttpClient httpClient = new OkHttpClient();
+	public String getInvitesOfGroup(String name, String JWT)
+			throws IOException, ForbiddenException {
+		Request request = new Request.Builder()
+				.url(serverUrl + "/api/groups/" + name + "/invites")
+				.get()
+				.addHeader("Authorization", "Bearer " + JWT)
+				.build();
+
+		Response response = httpClient.newCall(request).execute();
+
+		if (response.code() == 403) {
+			throw new ForbiddenException("Unauthorized", "You are not the owner of this group!");
+		}
+
+		String result;
+		if (response.body() != null) {
+			result = response.body().string();
+		} else {
+			throw new NullPointerException("Response body came out null! Try again!");
+		}
+		response.close();
+
+		return result;
+	}
+
+	/**
+	 * Joins a group.
+	 * <p>
+	 * Endpoint: GET /api/groups/{groupName}/invite/{inviteID}
+	 *
+	 * @param name     the name of the group
+	 * @param JWT      the authentication token of the user that wants to join the group
+	 * @param inviteID the invite ID provided by the owner of the group used by the user to join the group
+	 * @throws IOException        if there was a connection error
+	 * @throws ForbiddenException if the user is already part of the group
+	 */
+	public void joinGroup(String name, String JWT, String inviteID)
+			throws IOException, ForbiddenException {
+		Request request = new Request.Builder()
+				.url(serverUrl + "/api/groups/" + name + "/invite/" + inviteID)
+				.get()
+				.addHeader("Authorization", "Bearer " + JWT)
+				.build();
+
+		Response response = httpClient.newCall(request).execute();
+
+		if (response.code() == 403) {
+			throw new ForbiddenException("Error", "You are already part of this group!");
+		}
+
+		String result;
+		if (response.body() != null) {
+			result = response.body().string();
+		} else {
+			throw new NullPointerException("Response body came out null! Try again!");
+		}
+		response.close();
+	}
+
+	/**
+	 * Edits information about a group (only the owner of the group has such privileges).
+	 * <p>
+	 * Endpoint: PATCH /api/groups/{groupName}
+	 *
+	 * @param name            the name of the group
+	 * @param JWT             the authentication token of the user
+	 * @param new_name        a new name for the group
+	 * @param new_description a new description for the group
+	 * @throws IOException         if there was a connection error
+	 * @throws ForbiddenException  if the user is not the owner of the group
+	 * @throws BadRequestException if the group name already exists
+	 */
+	public void editGroup(String name, String JWT, String new_name, String new_description)
+			throws IOException, ForbiddenException, BadRequestException {
+		MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+		RequestBody body = RequestBody.create(JSON, "{\n" +
+				"\t\"name\":\"" + new_name + "\",\n" +
+				"\t\"description\":" + (new_description.equals("") ? "null" : "\"" + new_description + "\"") + "\n" +
+				"}");
 
 		Request request = new Request.Builder()
-				.url(serverUrl + "/api/banks/" + groupName + "/" + bankName)
+				.url(serverUrl + "/api/groups/" + name)
+				.patch(body)
+				.addHeader("Authorization", "Bearer " + JWT)
+				.build();
+
+		Response response = httpClient.newCall(request).execute();
+
+		if (response.code() == 403) {
+			throw new ForbiddenException("Unauthorized", "You are not the owner of the group!");
+		}
+
+		if (response.code() == 400) {
+			throw new BadRequestException("Name taken", "A group with this name already exists!");
+		}
+
+		String result;
+		if (response.body() != null) {
+			result = response.body().string();
+		} else {
+			throw new NullPointerException("Response body came out null! Try again!");
+		}
+		response.close();
+	}
+
+	/**
+	 * Deletes a group (only the owner of the group has such privileges).
+	 * <p>
+	 * Endpoint: DELETE /api/users/{groupName}
+	 *
+	 * @param name the name of the group
+	 * @param JWT  the authentication token of the user
+	 * @throws IOException        if there was a connection error
+	 * @throws ForbiddenException if the user is not authorized to delete the group (is not the owner of the group)
+	 */
+	public void deleteGroup(String name, String JWT)
+			throws IOException, ForbiddenException {
+		Request request = new Request.Builder()
+				.url(serverUrl + "/api/groups/" + name)
 				.delete()
 				.addHeader("Authorization", "Bearer " + JWT)
 				.build();
@@ -591,7 +556,7 @@ public class DatabaseHandler {
 		Response response = httpClient.newCall(request).execute();
 
 		if (response.code() == 403) {
-			throw new ForbiddenException("You are not the owner of the group!");
+			throw new ForbiddenException("Unauthorized", "You are not the owner of the group, so you cannot delete it!");
 		}
 
 		String result;
@@ -601,24 +566,68 @@ public class DatabaseHandler {
 			throw new NullPointerException("Response body came out null! Try again!");
 		}
 		response.close();
+	}
 
-		return "" + response.code();
+	/*------------------------- Ending of groups -------------------------*/
+
+	/*------------------------- Beginning of banks -------------------------*/
+
+	/**
+	 * Creates a new bank (only the owner of the group has such privileges).
+	 * <p>
+	 * Endpoint: POST /api/banks/{groupName}/new
+	 *
+	 * @param groupName   the name of the group
+	 * @param JWT         the authentication token of the user
+	 * @param name        the name of the bank
+	 * @param description the description of the bank
+	 * @throws IOException        if there was a connection error
+	 * @throws ForbiddenException if the user is not the owner of the group
+	 */
+	public void newBank(String groupName, String JWT, String name, String description)
+			throws IOException, ForbiddenException {
+		MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+		RequestBody requestBody = RequestBody.create(JSON, "{" +
+				"\t\"name\":\"" + name + "\",\n" +
+				"\t\"description\":" + (description.equals("") ? "null" : "\"" + description + "\"") + "\n" +
+				"}");
+
+		Request request = new Request.Builder()
+				.url(serverUrl + "/api/banks/" + groupName + "/new")
+				.post(requestBody)
+				.addHeader("Authorization", "Bearer " + JWT)
+				.build();
+
+		Response response = httpClient.newCall(request).execute();
+
+		if (response.code() == 403) {
+			throw new ForbiddenException("Unauthorized", "You are not the owner of this group!");
+		}
+
+		String result;
+		if (response.body() != null) {
+			result = response.body().string();
+		} else {
+			throw new NullPointerException("Response body came out null! Try again!");
+		}
+		response.close();
 	}
 
 	/**
-	 * This method gets a bank information.
+	 * Gets bank information.
+	 * <p>
+	 * Endpoint: GET /api/banks/{groupName}/{bankName}
 	 *
-	 * @param groupName the group name.
-	 * @param bankName  the bank name.
-	 * @param JWT       the JWT of the user asking for the bank information.
-	 * @return a JSON containing information about the bank.
-	 * @throws IOException throws this exception if there was a connection error.
+	 * @param groupName the name of the group
+	 * @param JWT       the authentication token of the user
+	 * @param name      the name of the bank
+	 * @return a JSON schema containing information about the bank
+	 * @throws IOException if there was a connection error.
 	 */
-	public String getBank(String groupName, String bankName, String JWT) throws IOException {
-		OkHttpClient httpClient = new OkHttpClient();
-
+	public String bankInfo(String groupName, String JWT, String name)
+			throws IOException {
 		Request request = new Request.Builder()
-				.url(serverUrl + "/api/banks/" + groupName + "/" + bankName)
+				.url(serverUrl + "/api/banks/" + groupName + "/" + name)
 				.get()
 				.addHeader("Authorization", "Bearer " + JWT)
 				.build();
@@ -637,16 +646,17 @@ public class DatabaseHandler {
 	}
 
 	/**
-	 * This method returns all the banks of a group.
+	 * Gets all banks of a group.
+	 * <p>
+	 * Endpoint: GET /api/banks/{groupName}/list
 	 *
-	 * @param groupName the group name.
-	 * @param JWT       the JWT of the user asking for the information.
-	 * @return a JSON containing all the banks of a group.
-	 * @throws IOException throws this exception if there was a connection error.
+	 * @param groupName the name of the group
+	 * @param JWT       the authentication token of the user
+	 * @return a JSON schema containing all the banks of a group
+	 * @throws IOException if there was a connection error
 	 */
-	public String getBanksOfGroup(String groupName, String JWT) throws IOException {
-		OkHttpClient httpClient = new OkHttpClient();
-
+	public String getBanksOfGroup(String groupName, String JWT)
+			throws IOException {
 		Request request = new Request.Builder()
 				.url(serverUrl + "/api/banks/" + groupName + "/list")
 				.get()
@@ -667,27 +677,114 @@ public class DatabaseHandler {
 	}
 
 	/**
-	 * This method creates a goal
+	 * Edits bank information (only the owner of the group has such privileges).
+	 * <p>
+	 * Endpoint: PATCH /api/banks/{groupName}/{bankName}
 	 *
-	 * @param groupName     the name of the group.
-	 * @param bankName      the name of the bank.
-	 * @param JWT           the JWT of the owner of the group.
-	 * @param goalName      the name of the goal.
-	 * @param description   the description of the goal.
-	 * @param target_amount the target amount of money.
-	 * @return OK on success.
-	 * @throws IOException        throws this exception if there was a connection error.
-	 * @throws ForbiddenException throws this exception if the user is not the owner of the group.
+	 * @param groupName       the name of the group
+	 * @param JWT             the authentication token of the user
+	 * @param name            the name of the bank
+	 * @param new_name        a new name for the bank
+	 * @param new_description a new description for the bank
+	 * @throws IOException         if there was a connection error
+	 * @throws ForbiddenException  if the user is not the owner of the group
+	 * @throws BadRequestException if that bank name already exists
 	 */
-	public String createGoal(String groupName, String bankName, String JWT, String goalName, String description, int target_amount)
-			throws IOException, ForbiddenException {
-		OkHttpClient httpClient = new OkHttpClient();
-
+	public void editBank(String groupName, String JWT, String name, String new_name, String new_description)
+			throws IOException, ForbiddenException, BadRequestException {
 		MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 		RequestBody body = RequestBody.create(JSON, "{\n" +
-				"\t\"name\":\"" + goalName + "\",\n" +
-				"\t\"description\":\"" + (description.equals("") ? "null" : description) + "\",\n" +
-				"\t\"target_amount\":\"" + target_amount + "\"\n" +
+				"\t\"name\":\"" + new_name + "\",\n" +
+				"\t\"description\":" + (new_description.equals("") ? "null" : "\"" + new_description + "\"") + "\n" +
+				"}");
+
+		Request request = new Request.Builder()
+				.url(serverUrl + "/api/banks/" + groupName + "/" + name)
+				.patch(body)
+				.addHeader("Authorization", "Bearer " + JWT)
+				.build();
+		Response response = httpClient.newCall(request).execute();
+
+		if (response.code() == 403) {
+			throw new ForbiddenException("Unauthorized", "You are not the owner of the group!");
+		}
+
+		if (response.code() == 400) {
+			throw new BadRequestException("Name taken", "A bank with that name already exists!");
+		}
+
+		String result;
+		if (response.body() != null) {
+			result = response.body().string();
+		} else {
+			throw new NullPointerException("Response body came out null! Try again!");
+		}
+		response.close();
+	}
+
+	/**
+	 * Deletes a bank (only the owner of the group has such privileges).
+	 * <p>
+	 * Endpoint: DELETE /api/banks/{groupName}/{bankName}
+	 *
+	 * @param groupName the name of the group
+	 * @param JWT       the authentication token of the user
+	 * @param name      the name of the bank
+	 * @throws IOException        if there was a connection error
+	 * @throws ForbiddenException if the user is not the owner of the group
+	 */
+	public void deleteBank(String groupName, String JWT, String name)
+			throws IOException, ForbiddenException {
+		Request request = new Request.Builder()
+				.url(serverUrl + "/api/banks/" + groupName + "/" + name)
+				.delete()
+				.addHeader("Authorization", "Bearer " + JWT)
+				.build();
+
+		Response response = httpClient.newCall(request).execute();
+
+		if (response.code() == 403) {
+			throw new ForbiddenException("Unauthorized", "You are not the owner of the group!");
+		}
+
+		String result;
+		if (response.body() != null) {
+			result = response.body().string();
+		} else {
+			throw new NullPointerException("Response body came out null! Try again!");
+		}
+		response.close();
+	}
+
+	/*------------------------- Ending of banks -------------------------*/
+
+	/*------------------------- Beginning of goals -------------------------*/
+
+	/**
+	 * Adds a goal (only the owner of the group has such privileges).
+	 * <p>
+	 * Endpoint: POST /api/goals/{groupName}/{bankName}/new
+	 *
+	 * @param groupName     the name of the group
+	 * @param bankName      the name of the bank
+	 * @param JWT           the authentication token of the user
+	 * @param name          the name of the goal
+	 * @param description   the description of the goal
+	 * @param target_amount the target amount of money for the goal
+	 * @param deadline      the deadline for the goal
+	 * @throws IOException         if there was a connection error
+	 * @throws ForbiddenException  if the user is not the owner of the group
+	 * @throws BadRequestException if the goal name already exists
+	 */
+	public void addGoal(String groupName, String bankName, String JWT, String name, String description,
+	                    int target_amount, String deadline)
+			throws IOException, ForbiddenException, BadRequestException {
+		MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+		RequestBody body = RequestBody.create(JSON, "{\n" +
+				"\t\"name\":\"" + name + "\",\n" +
+				"\t\"description\":" + (description.equals("") ? "null" : "\"" + description + "\"") + ",\n" +
+				"\t\"target_amount\":" + target_amount + ",\n" +
+				"\t\"deadline\":\"" + deadline + "\"\n" +
 				"}");
 
 		Request request = new Request.Builder()
@@ -699,7 +796,11 @@ public class DatabaseHandler {
 		Response response = httpClient.newCall(request).execute();
 
 		if (response.code() == 403) {
-			throw new ForbiddenException("You are not the owner of this group!");
+			throw new ForbiddenException("Unauthorized", "You are not the owner of the group!");
+		}
+
+		if (response.code() == 400) {
+			throw new BadRequestException("Name taken", "Goal name already exists, please choose another name!");
 		}
 
 		String result;
@@ -709,26 +810,139 @@ public class DatabaseHandler {
 			throw new NullPointerException("Response body came out null! Try again!");
 		}
 		response.close();
-
-		return "" + response.code();
 	}
 
 	/**
-	 * This method deletes a goal from a bank.
+	 * Gets goal information.
+	 * <p>
+	 * Endpoint: GET /api/goals/{groupName}/{bankName}/{goalName}
 	 *
-	 * @param groupName the group name.
-	 * @param bankName  the bank name.
-	 * @param goalName  the goal name.
-	 * @param JWT       the JWT of the owner of the group.
-	 * @return OK on success.
-	 * @throws IOException        throws this exception if there was a connection error.
-	 * @throws ForbiddenException throws this exception if the user is not the owner of the group.
+	 * @param groupName the name of the group
+	 * @param bankName  the name of the bank
+	 * @param JWT       the authentication token of the user
+	 * @param name      the name of the goal
+	 * @return a JSON schema containing information about the goal
+	 * @throws IOException if there was a connection error
 	 */
-	public String deleteGoal(String groupName, String bankName, String goalName, String JWT) throws IOException, ForbiddenException {
-		OkHttpClient httpClient = new OkHttpClient();
+	public String goalInfo(String groupName, String bankName, String JWT, String name)
+			throws IOException {
+		Request request = new Request.Builder()
+				.url(serverUrl + "/api/goals/" + groupName + "/" + bankName + "/" + name)
+				.get()
+				.addHeader("Authorization", "Bearer " + JWT)
+				.build();
+
+		Response response = httpClient.newCall(request).execute();
+
+		String result;
+		if (response.body() != null) {
+			result = response.body().string();
+		} else {
+			throw new NullPointerException("Response body came out null! Try again!");
+		}
+		response.close();
+
+		return result;
+	}
+
+	/**
+	 * Gets all goals of a bank.
+	 *
+	 * @param groupName the name of the group
+	 * @param bankName  the name of the bank
+	 * @param JWT       the authentication token of the user
+	 * @return a JSON schema containing all the goals of a bank
+	 * @throws IOException if there was a connection error
+	 */
+	public String getGoalsOfBank(String groupName, String bankName, String JWT)
+			throws IOException {
+		Request request = new Request.Builder()
+				.url(serverUrl + "/api/goals/" + groupName + "/" + bankName + "/list")
+				.get()
+				.addHeader("Authorization", "Bearer " + JWT)
+				.build();
+
+		Response response = httpClient.newCall(request).execute();
+
+		String result;
+		if (response.body() != null) {
+			result = response.body().string();
+		} else {
+			throw new NullPointerException("Response body came out null! Try again!");
+		}
+		response.close();
+
+		return result;
+	}
+
+	/**
+	 * Edits goal information (only the owner of the group has such privileges).
+	 * <p>
+	 * Endpoint: PATCH /api/goals/{groupName}/{bankName}/{goalName}
+	 *
+	 * @param groupName         the name of the group
+	 * @param bankName          the name of the bank
+	 * @param JWT               the authentication token of the user
+	 * @param name              the name of the goal
+	 * @param new_name          a new name for the goal
+	 * @param new_description   a new description for the goal
+	 * @param new_target_amount a new target amount for the goal
+	 * @param new_deadline      a new deadline for the goal
+	 * @throws IOException         if there was a connection error
+	 * @throws ForbiddenException  if the user is not the owner of the group
+	 * @throws BadRequestException if that goal name already exists
+	 */
+	public void editGoal(String groupName, String bankName, String JWT, String name, String new_name,
+	                     String new_description, int new_target_amount, String new_deadline)
+			throws IOException, ForbiddenException, BadRequestException {
+		MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+		RequestBody body = RequestBody.create(JSON, "{\n" +
+				"\t\"name\":\"" + new_name + "\",\n" +
+				"\t\"description\":" + (new_description.equals("") ? "null" : "\"" + new_description + "\"") + "\",\n" +
+				"\t\"target_amount\":\"" + new_target_amount + "\",\n" +
+				"\t\"deadline\":\"" + new_deadline + "\"" +
+				"}");
 
 		Request request = new Request.Builder()
-				.url(serverUrl + "/api/goals/" + groupName + "/" + bankName + "/" + goalName)
+				.url(serverUrl + "/api/goals/" + groupName + "/" + bankName + "/" + name)
+				.patch(body)
+				.addHeader("Authorization", "Bearer " + JWT)
+				.build();
+		Response response = httpClient.newCall(request).execute();
+
+		if (response.code() == 403) {
+			throw new ForbiddenException("Unauthorized", "You are not the owner of the group!");
+		}
+
+		if (response.code() == 400) {
+			throw new BadRequestException("Name taken", "A goal with that name already exists in this bank!");
+		}
+
+		String result;
+		if (response.body() != null) {
+			result = response.body().string();
+		} else {
+			throw new NullPointerException("Response body came out null! Try again!");
+		}
+		response.close();
+	}
+
+	/**
+	 * Deletes a goal (only the owner of the group has such privileges).
+	 * <p>
+	 * Endpoint: /api/goals/{groupName}/{bankName}/{goalName}
+	 *
+	 * @param groupName the name of the group
+	 * @param bankName  the name of the bank
+	 * @param JWT       the authentication token of the user
+	 * @param name      the name of the goal
+	 * @throws IOException        if there was a connection error
+	 * @throws ForbiddenException if the user is not the owner of the group
+	 */
+	public void deleteGoal(String groupName, String bankName, String JWT, String name)
+			throws IOException, ForbiddenException {
+		Request request = new Request.Builder()
+				.url(serverUrl + "/api/goals/" + groupName + "/" + bankName + "/" + name)
 				.delete()
 				.addHeader("Authorization", "Bearer " + JWT)
 				.build();
@@ -736,7 +950,7 @@ public class DatabaseHandler {
 		Response response = httpClient.newCall(request).execute();
 
 		if (response.code() == 403) {
-			throw new ForbiddenException("You are not the owner of the group!");
+			throw new ForbiddenException("Unauthorized", "You are not the owner of the group!");
 		}
 
 		String result;
@@ -746,57 +960,14 @@ public class DatabaseHandler {
 			throw new NullPointerException("Response body came out null! Try again!");
 		}
 		response.close();
-
-		return "" + response.code();
 	}
 
-	/**
-	 * This method creates a new transaction to a group.
-	 *
-	 * @param groupName   the group name.
-	 * @param bankName    the bank name.
-	 * @param JWT         the JWT of the owner of the group.
-	 * @param amount      the amount transferred.
-	 * @param payee       the payee.
-	 * @param description the description of the transaction.
-	 * @param tags        the tags of the transaction.
-	 * @return OK on success.
-	 * @throws IOException        throws this exception if there was a connection error.
-	 * @throws ForbiddenException throws this exception if the user isn't owner of the group.
-	 */
-	public String addTransaction(String groupName, String bankName, String JWT, int amount, String payee,
-	                             String description, String tags) throws IOException, ForbiddenException {
-		OkHttpClient httpClient = new OkHttpClient();
+	/*------------------------- Ending of goals -------------------------*/
 
-		MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-		RequestBody body = RequestBody.create(JSON, "{\n" +
-				"\t\"amount\":\"" + amount + "\",\n" +
-				"\t\"payee\":\"" + payee + "\",\n" +
-				"\t\"description\":\"" + (description.equals("") ? "null" : description) + "\",\n" +
-				"\t\"tags\":\"" + (tags.equals("") ? "null" : tags) + "\"\n" +
-				"}");
+	/*------------------------- Beginning of transactions -------------------------*/
 
-		Request request = new Request.Builder()
-				.url(serverUrl + "/api/transactions/" + groupName + "/" + bankName + "/new")
-				.post(body)
-				.addHeader("Authorization", "Bearer " + JWT)
-				.build();
+	//TODO transactions
 
-		Response response = httpClient.newCall(request).execute();
-
-		if (response.code() == 403) {
-			throw new ForbiddenException("You are not the owner of the group!");
-		}
-
-		String result;
-		if (response.body() != null) {
-			result = response.body().string();
-		} else {
-			throw new NullPointerException("Response body came out null! Try again!");
-		}
-		response.close();
-
-		return "" + response.code();
-	}
+	/*------------------------- Ending of transactions -------------------------*/
 
 }

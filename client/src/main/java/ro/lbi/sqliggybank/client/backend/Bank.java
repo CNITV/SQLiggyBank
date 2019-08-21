@@ -1,19 +1,15 @@
 package ro.lbi.sqliggybank.client.backend;
 
-import lombok.Getter;
-
 import java.util.UUID;
 
 /**
- * This class represents a group. A new group is automatically created by GSON when the group gets retrieved from the database.
- *
+ * This class represents a bank. A new bank is automatically created by GSON when the group gets retrieved from the database.
  * <p>
- * WARNING: A Group instance is not supposed to be created directly by the programmer.
+ * WARNING: A Bank instance is not supposed to be created directly by the programmer.
  *
  * @author Alexandru GHERGHESCU (alexghergh)
  * @since 2019-05-14
  */
-@Getter
 public class Bank {
 
 	/**
@@ -36,12 +32,26 @@ public class Bank {
 	 */
 	private Group group;
 
-	@Override
-	public String toString() {
-		return "UUID: " + uuid + "\n" +
-				"Name: " + name + "\n" +
-				"Description: " + description + "\n" +
-				"Group: " + group + "\n";
+	public String getDescription() {
+		return description != null ? description : "";
 	}
 
+	@Override
+	public String toString() {
+		return "Name: " + name + '\n' +
+				"Description: " + (description == null ? " - " : description) + '\n' +
+				"Group: " + group.getName() + '\n';
+	}
+
+	public UUID getUuid() {
+		return this.uuid;
+	}
+
+	public String getName() {
+		return this.name;
+	}
+
+	public Group getGroup() {
+		return this.group;
+	}
 }

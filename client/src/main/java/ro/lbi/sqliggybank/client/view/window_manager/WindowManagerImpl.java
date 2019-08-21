@@ -13,9 +13,7 @@ import ro.lbi.sqliggybank.client.view.register.RegisterView;
 
 import java.io.IOException;
 
-import static ro.lbi.sqliggybank.client.view.App.app_name;
-import static ro.lbi.sqliggybank.client.view.App.win_height;
-import static ro.lbi.sqliggybank.client.view.App.win_width;
+import static ro.lbi.sqliggybank.client.view.App.*;
 
 /**
  * This is the implementation of the {@link ro.lbi.sqliggybank.client.view.window_manager.WindowManager WindowManager}
